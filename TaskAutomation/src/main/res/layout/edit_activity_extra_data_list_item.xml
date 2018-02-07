@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    tools:ignore="HardcodedText" >
+
+    <TextView
+        android:id="@+id/edit_activity_extra_data_list_item_key"
+        android:layout_width="100sp"
+        android:layout_height="wrap_content"
+        android:text="KEY"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/edit_activity_extra_data_list_item_type"
+        android:layout_width="70sp"
+        android:layout_height="wrap_content"
+        android:text="Boolean"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/edit_activity_extra_data_list_item_array"
+        android:layout_width="35sp"
+        android:layout_height="wrap_content"
+        android:text="Yes"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/edit_activity_extra_data_list_item_value"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="ABCDEFG"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</LinearLayout>

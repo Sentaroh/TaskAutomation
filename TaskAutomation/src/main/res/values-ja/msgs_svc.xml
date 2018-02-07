@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="msgs_svc_active_task">タスク=</string>
+	<string name="msgs_svc_no_active_task">アクティブなタスクがありません</string>
+	<string name="msgs_svc_termination">スケジューラーサービスが終了しました</string>
+	<string name="msgs_svc_started">スケジューラーサービスを開始しました</string>
+	<string name="msgs_svc_action_blocked" formatted="false">
+	    (Group=%s)%sがアクティブタスク（%s)により抑止されました</string>
+	<string name="msgs_svc_task_already_started" formatted="false">
+	    (Group=%s)タスクは既に開始されているため無視しました。 Event=%s, Task=%s</string>
+	    
+	<string name="msgs_svc_notification_info_next_schedule" formatted="false">実行予定=%s</string>
+	<string name="msgs_svc_notification_info_build_time" formatted="false">ビルド=%s</string>
+	<string name="msgs_svc_notification_info_task_list" formatted="false">タスク リスト</string>
+	<string name="msgs_svc_notification_info_no_task_list" formatted="false">タスク無し</string>
+	
+	<string name="msgs_svc_notification_info_battery_title" formatted="false">バッテリー</string>
+	<string name="msgs_svc_notification_info_battery_level" formatted="false">%s%%</string>
+
+	<string name="msgs_svc_notification_info_wake_lock_status_hold">画面消灯時にWake Lockを取得する</string>
+	<string name="msgs_svc_notification_info_wake_lock_status_not_hold">画面消灯時にWake Lockを取得しない</string>
+
+</resources>

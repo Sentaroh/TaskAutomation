@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_main_title">Settings</string>
+    
+    <string name="settings_main_enable_scheduler_title">Scheduler</string>
+    <string name="settings_main_enable_scheduler_summary_ena">Schedule a task.</string>
+	<string name="settings_main_enable_scheduler">settings_main_enable_scheduler</string>
+
+	<string name="settings_main_scheduler_max_task_count_title">Maximum concurrent task count</string>
+	<string name="settings_main_scheduler_max_task_count_summary">Current level=0</string>
+	<string name="settings_main_scheduler_max_task_count">settings_main_scheduler_max_task_count</string>
+	<string-array name="settings_main_scheduler_max_task_count_list_entries">
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+    </string-array>
+
+	<string name="settings_main_scheduler_thread_pool_count_title">Thread pool count</string>
+	<string name="settings_main_scheduler_thread_pool_count_summary">Current level=5</string>
+	<string name="settings_main_scheduler_thread_pool_count">settings_main_scheduler_thread_pool_count</string>
+	<string-array name="settings_main_scheduler_thread_pool_count_list_entries">
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+
+    <string name="settings_main_log_title">Log option</string>
+    <string name="settings_main_terminate_title">Termination option</string>
+
+    <string name="settings_main_scheduler_monitor_title">Monitor Scheduler</string>
+    <string name="settings_main_scheduler_monitor_summary_ena">When Scheduler have stopped to automatically restart Scheduler.</string>
+	<string name="settings_main_scheduler_monitor">settings_main_scheduler_monitor</string>
+    	
+    <string name="settings_main_device_admin_title">Screen lock</string>
+    <string name="settings_main_device_admin_summary_ena">Enable Screen Lock</string>
+	<string name="settings_main_device_admin">settings_main_device_admin</string>
+	
+	<string name="settings_main_scheduler_sleep_wake_lock_option_title">Holding WakeLock during screen off</string>
+	<string name="settings_main_scheduler_sleep_wake_lock_option_summary"></string>
+	<string name="settings_main_scheduler_sleep_wake_lock_option">settings_main_scheduler_sleep_wake_lock_option</string>
+	<string-array name="settings_main_scheduler_sleep_wake_lock_option_list_entries">
+        <item>Determine by the system</item>
+	    <item>Always hold Wake Lock</item>
+        <item>Setting individually</item>
+    </string-array>
+	<string-array name="settings_main_scheduler_sleep_wake_lock_option_list_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+		
+	<string name="settings_main_scheduler_sleep_wake_lock_light_sensor_title">WakeLock for light sensor</string>
+	<string name="settings_main_scheduler_sleep_wake_lock_light_sensor_summary_ena">Holding the Wakelock while using the light sensor</string>
+	<string name="settings_main_scheduler_sleep_wake_lock_light_sensor">settings_main_scheduler_sleep_wake_lock_light_sensor</string>
+	
+	<string name="settings_main_scheduler_sleep_wake_lock_proximity_sensor_title">WakeLock for proximity sensor</string>
+	<string name="settings_main_scheduler_sleep_wake_lock_proximity_sensor_summary_ena">Holding the Wakelock while using the proximity sensor</string>
+	<string name="settings_main_scheduler_sleep_wake_lock_proximity_sensor">settings_main_scheduler_sleep_wake_lock_proximity_sensor</string>
+	
+    <string name="settings_main_use_root_privilege_title">root privilege</string>
+    <string name="settings_main_use_root_privilege_summary_ena">Use root privilege</string>
+    <string name="settings_main_use_root_privilege_summary_not_granted">root privilege not granted</string>
+	<string name="settings_main_use_root_privilege">settings_main_use_root_privilege</string>
+							
+	<string name="settings_main_log_option_title">Log file</string>
+    <string name="settings_main_log_option_summary_ena">Write log file.</string>
+	<string name="settings_main_log_option">settings_main_log_option</string>
+    
+    <string name="settings_main_log_level_title">Debug message level</string>
+	<string name="settings_main_log_level_summary">Current debug message level=0</string>
+	<string name="settings_main_log_level_dialog_title">Select debug message level</string>
+	<string name="settings_main_log_level">settings_main_log_level</string>
+	<string-array name="settings_main_log_level_list_entries">
+        <item>0:No Debug message</item>
+        <item>1:Debug message</item>
+        <item>2:Detail debug message</item>
+        <item>3:Detail debug message with lock</item>
+    </string-array>
+    <string-array name="settings_main_log_level_list_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string name="settings_main_log_file_max_count_title">Max log file count</string>
+	<string name="settings_main_log_file_max_count_summary">Max log file count=</string>
+	<string name="settings_main_log_file_max_count_dialog_title">Select file count</string>
+	<string name="settings_main_log_file_max_count">settings_main_log_file_max_count</string>
+	<string-array name="settings_main_log_file_max_count_list_entries">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+    </string-array>
+    <string-array name="settings_main_log_file_max_count_list_values">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+    </string-array>
+    
+    <string name="settings_main_log_dir">settings_main_log_dir</string>
+	<string name="settings_main_log_dir_title">Log file directory</string>        
+    <string name="settings_main_log_dir_summary">Current=</string>        
+
+    <string name="settings_main_default_current_setting">Current=</string>
+    
+    <string name="settings_main_misc_title">Miscellaneous</string>
+    
+    <string name="settings_main_exit_clean_title">Exit cleanly</string>
+    <string name="settings_main_exit_clean_summary_ena">Kill application process after application cleanup.</string>
+	<string name="settings_main_exit_clean">settings_main_exit_clean</string>
+
+	<string name="settings_main_sample_title">Sample profile</string>
+	<string name="settings_main_sample_recreate_title">Re-create sample profile</string>
+    <string name="settings_main_sample_recreate_summary_ena">Re-create sample profiles　after settings close.</string>
+	<string name="settings_main_sample_recreate">settings_main_sample_recreate</string>
+
+	<string name="settings_main_light_sensor_title">Light sensor</string>
+
+    <string name="settings_main_light_sensor_use_thread_title">Light sensor receiver</string>
+    <string name="settings_main_light_sensor_use_thread_summary_ena">use thread</string>
+	<string name="settings_main_light_sensor_use_thread">settings_main_light_sensor_use_thread</string>
+	
+	<string name="settings_main_light_sensor_monitor_interval_time_title">Monitor interval time(Milisecond)</string>
+	<string name="settings_main_light_sensor_monitor_interval_time_summary">Current interval time(Milisecond)=</string>
+	<string name="settings_main_light_sensor_monitor_interval_time_dialog_title">Select interval time(Milisecond)</string>
+	<string name="settings_main_light_sensor_monitor_interval_time">settings_main_light_sensor_monitor_interval_time</string>
+	<string-array name="settings_main_light_sensor_monitor_interval_time_list_entries">
+	    <item>50</item>
+        <item>100</item>
+        <item>200</item>
+        <item>300</item>
+        <item>400</item>
+        <item>500</item>
+        <item>600</item>
+        <item>700</item>
+        <item>800</item>
+        <item>900</item>
+        <item>1000</item>
+        <item>1200</item>
+        <item>1500</item>
+        <item>1700</item>
+        <item>2000</item>
+        <item>3000</item>
+        <item>5000</item>
+    </string-array>
+
+    <string name="settings_main_light_sensor_monitor_active_time_title">Monitor active time(Millisecond)</string>
+	<string name="settings_main_light_sensor_monitor_active_time_summary">Current active time(Millisecond)=</string>
+	<string name="settings_main_light_sensor_monitor_active_time_dialog_title">Select active time(Millisecond)</string>
+	<string name="settings_main_light_sensor_monitor_active_time">settings_main_light_sensor_monitor_active_time</string>
+	<string-array name="settings_main_light_sensor_monitor_active_time_list_entries">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+    </string-array>
+    
+    <string name="settings_main_light_sensor_detect_thresh_hold_title">Thresh hold value</string>
+	<string name="settings_main_light_sensor_detect_thresh_hold_summary">Current thresh hold value=</string>
+	<string name="settings_main_light_sensor_detect_thresh_hold_dialog_title">Select thresh hold value</string>
+	<string name="settings_main_light_sensor_detect_thresh_hold">settings_main_light_sensor_detect_thresh_hold</string>
+	<string-array name="settings_main_light_sensor_detect_thresh_hold_list_entries">
+	    <item>1</item>
+	    <item>2</item>
+	    <item>3</item>
+	    <item>4</item>
+	    <item>5</item>
+	    <item>6</item>
+	    <item>7</item>
+	    <item>8</item>
+	    <item>9</item>
+	    <item>10</item>
+	    <item>15</item>
+	    <item>20</item>
+        <item>25</item>
+        <item>30</item>
+        <item>35</item>
+        <item>40</item>
+        <item>45</item>
+        <item>50</item>
+        <item>100</item>
+        <item>150</item>
+        <item>200</item>
+    </string-array>
+
+    <string name="settings_main_light_sensor_ignore_time_title">Light sensor ignored time(Second)</string>
+	<string name="settings_main_light_sensor_ignore_time_summary">Time(Seconds) to ignore after detecting the presence or absence of lightness=</string>
+	<string name="settings_main_light_sensor_ignore_time_dialog_title">Select ignored time(Second)</string>
+	<string name="settings_main_light_sensor_ignore_time">settings_main_light_sensor_ignore_time</string>
+    <string-array name="settings_main_light_sensor_ignore_time_list_entries">
+	    <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/tabhost"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:id="@+id/main_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
+
+		<TextView
+	        android:id="@+id/main_msg"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textColor="#ff0000"
+	        android:text=""
+	        android:visibility="gone"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+        	        
+	    <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="0dp"
+            android:layout_height="0dp" >
+		</FrameLayout>
+		
+        <com.sentaroh.android.Utilities.Widget.CustomViewPager
+            android:id="@+id/main_view_pager"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_weight="1"/>
+	    		
+        <Button
+            android:id="@+id/main_task_cancel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/msgs_main_view_cancel_active_task" 
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+	</LinearLayout>
+</TabHost>

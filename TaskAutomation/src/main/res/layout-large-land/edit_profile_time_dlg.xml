@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:ignore="InefficientWeight,HardcodedText" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/edit_profile_time_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Edit profile"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/edit_profile_time_title_sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
+    
+
+    <include
+        layout="@layout/divider_line1_turquoise" />
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="2dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="5dp"
+        android:fadeScrollbars="false" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+	        <LinearLayout
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal" >
+
+			    <EditText
+			        android:id="@+id/edit_profile_time_profile_et_name"
+			        android:layout_width="0dp"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="1"
+			        android:hint="@string/msgs_edit_profile_hdr_profile_name"
+			        android:inputType="text"
+			        android:singleLine="true"
+			        android:text=""
+			        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+			    <CheckBox
+			        android:id="@+id/edit_profile_time_enabled"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="0.07"
+			        android:text="@string/msgs_edit_profile_hdr_enabled"
+			        android:textAppearance="?android:attr/textAppearanceMedium" />
+            	            	            
+            </LinearLayout>
+
+            <Spinner
+                android:id="@+id/edit_profile_time_date_time_type"
+                style="@android:style/Widget.Spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/spinner_color_background"
+                android:minHeight="30dp"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <include layout="@layout/edit_profile_time_dlg_day_of_week" />
+			<include layout="@layout/edit_profile_time_dlg_yy_mm_dd" />
+			<include layout="@layout/edit_profile_time_dlg_hh_mm" />
+            
+        </LinearLayout>
+    </ScrollView>
+
+    <include layout="@layout/edit_profile_time_dlg_ok_cancel"/>
+
+</LinearLayout>

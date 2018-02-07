@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/edit_profile_action_ll_shell"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText,TextFields" >
+
+    <TextView
+        android:id="@+id/edit_profile_action_dlg_shell_layout_normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:visibility="gone"
+    />
+
+   <CheckBox
+       android:id="@+id/edit_profile_action_dlg_shell_cmd_with_su"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="@string/msgs_edit_profile_hdr_shell_cmd_with_su"
+       android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+ 	<EditText
+ 	    android:id="@+id/edit_profile_action_dlg_shell_cmd_text"
+ 	    android:layout_width="match_parent"
+ 	    android:layout_height="0dp"
+ 	    android:layout_weight="1"
+ 	    android:ems="10"
+ 	    android:gravity="top"
+ 	    android:hint="Shell command text"
+ 	    android:inputType="text"
+ 	    android:textAppearance="?android:attr/textAppearanceSmall"
+ 	    android:typeface="monospace" >
+
+ 	</EditText>
+
+</LinearLayout>

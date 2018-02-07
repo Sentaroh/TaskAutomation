@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_bsh_method_editor_dlg_method_spinner_title">Select Method</string>
+    <string name="msgs_bsh_method_editor_dlg_empty_ringtone_list">** Ringtone does not exists</string>
+    <string name="msgs_bsh_method_editor_dlg_empty_task_trigger_task_list">** Task triggrer task does not exists</string>
+    <string name="msgs_bsh_method_editor_dlg_empty_interval_timer_list">** Interval timer does not exists</string>
+    <string name="msgs_bsh_method_editor_dlg_specify_value_seconds">Specify value by seconds</string>
+    <string name="msgs_bsh_method_editor_dlg_specify_value_int">Specify value by integer</string>
+    <string name="msgs_bsh_method_editor_dlg_assign_title" formatted="false">Assign value for\n %s \n %s</string>
+    <string name="msgs_bsh_method_editor_dlg_select_file" formatted="false">Select file for\n %s \n %s</string>
+    <string name="msgs_bsh_method_editor_dlg_outofrange_int" formatted="false">Specified value was out of valid range, value must be %s between %s</string>
+    <string name="msgs_bsh_method_editor_dlg_outofrange_string">Specified value was invalid, value must be %s</string>
+    <string name="msgs_bsh_method_editor_dlg_playback_sound_start">Playback</string>
+    <string name="msgs_bsh_method_editor_dlg_playback_sound_stop">Stop</string>
+</resources>

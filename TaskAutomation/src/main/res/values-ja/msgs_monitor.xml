@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="msgs_monitor_termination">Schedulerモニターが終了しました</string>
+	<string name="msgs_monitor_started">Schedulerモニターを開始しました</string>
+	<string name="msgs_monitor_ignored">Schedulerモニターが再起動を無視しました</string>
+	<string name="msgs_monitor_issued">予期せぬScheduler停止のため、Schedulerを再起動します</string>
+	<string name="msgs_monitor_max_unpredictable_restart">予期せぬScheduler停止が最大回数を超えたためSchedulerを停止します。</string>
+</resources>

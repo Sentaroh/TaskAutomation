@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/edit_profile_action_ll_exec_ringtone"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+	    <Spinner
+	        android:id="@+id/edit_profile_action_exec_ringtone_type"
+	        style="@android:style/Widget.Spinner"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:layout_marginBottom="5dp"
+	        android:layout_marginLeft="5dp"
+	        android:background="@drawable/spinner_color_background"
+	        android:minHeight="30dp"
+	        android:paddingLeft="5dp" />
+	
+	    <Spinner
+	        android:id="@+id/edit_profile_action_exec_ringtone_name"
+	        style="@android:style/Widget.Spinner"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:layout_marginBottom="5dp"
+	        android:layout_marginLeft="5dp"
+	        android:layout_marginRight="5dp"
+	        android:background="@drawable/spinner_color_background"
+	        android:minHeight="30dp"
+	        android:paddingLeft="5dp" />
+        
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp" >
+
+        <CheckBox
+            android:id="@+id/edit_profile_action_profile_ringtone_use_volume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/msgs_edit_profile_hdr_sound_volume" />
+
+        <Button
+            android:id="@+id/edit_profile_action_profile_ringtone_play_back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:text="Playback" />
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/edit_profile_action_profile_ringtone_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

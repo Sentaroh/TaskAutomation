@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="msgs_main_terminate_appl">TaskAutomationアクティビティーを終了しますか?</string>
+	<string name="msgs_main_termination">TaskAutomationアクティビティーが終了しました</string>
+	<string name="msgs_main_started">TaskAutomationアクティビティーを開始しました。バージョン=%s</string>
+	<string name="msgs_main_restarted">TaskAutomationアクティビティーが再起動されました</string>
+	<string name="msgs_main_task_scheduler_not_running">Schedulerが無効になっているためタスクは実行されません</string>
+	<string name="msgs_main_task_scheduler_no_valid_profile">有効なプロファイルが存在しないためタスクは実行されません</string>	
+	<string name="msgs_main_tab_name_profile_group">グループ</string>
+	<string name="msgs_main_tab_name_control">管理</string>
+	<string name="msgs_main_tab_name_profile">プロファイル</string>
+
+	<string name="msgs_main_monitor_ignored">Schedulerモニターの再起動を無視しました</string>
+	<string name="msgs_main_monitor_issued">予期せぬSchedulerモニターが停止しました、Schedulerモニターを再起動します</string>
+			
+	<string name="msgs_main_view_cancel_active_task">全タスクの中止</string>
+		
+	<string name="msgs_main_cancel_confirm_msg">以下のタスクをキャンセルしますか？</string>
+	
+	<string name="msgs_main_screen_lock_confirm_title">スクリーンロックの使用</string>
+	<string name="msgs_main_screen_lock_confirm_msg">
+	    スクリーンロックを使用する場合は「デバイス管理者」を有効にしてください。
+	    アプリケーションをアンインストールするときは、いずれかの方法で「デバイス管理者」を無効にしてください。\n
+	  1.TaskAutomationの「設定」->「スクリーンのロック」の選択を解除。\n
+	  2.Androidの設定->セキュリティ->端末管理者で「TaskAutomation」をタップし、「無効にする」をクリックする。\n
+	</string>
+	
+	<string name="msgs_main_ccmenu_delete">削除</string>
+	<string name="msgs_main_ccmenu_edit_profile">編集</string>	
+	<string name="msgs_main_ccmenu_move_top">先頭</string>
+	<string name="msgs_main_ccmenu_move_bottom">最後</string>
+	<string name="msgs_main_ccmenu_move_up">上へ</string>
+	<string name="msgs_main_ccmenu_move_down">下へ</string>
+	
+	<string name="msgs_main_abort_scheduling_option">スケジューラーオプションが無効になっているため処理を中断しました。</string>
+	<string name="msgs_main_context_label_select_all">全項目を選択</string>
+	<string name="msgs_main_context_label_unselect_all">選択解除</string>
+	<string name="msgs_main_context_label_group_activate">グループの有効</string>
+	<string name="msgs_main_context_label_group_inactivate">グループの無効</string>
+	<string name="msgs_main_context_label_group_add">グループの追加</string>
+	<string name="msgs_main_context_label_group_delete">グループの削除</string>
+	<string name="msgs_main_context_label_group_rename">グループの改名</string>
+	<string name="msgs_main_context_label_group_copy">グループのコピー</string>
+
+	<string name="msgs_main_context_label_profile_activate">プロファイルの有効</string>
+	<string name="msgs_main_context_label_profile_inactivate">プロファイルの無効</string>
+	<string name="msgs_main_context_label_profile_add_task">タスクプロファイルの追加</string>
+	<string name="msgs_main_context_label_profile_add_action">アクションプロファイルの追加</string>
+	<string name="msgs_main_context_label_profile_add_timer">タイムプロファイルの追加</string>
+	<string name="msgs_main_context_label_profile_delete">プロファイルの削除</string>
+	<string name="msgs_main_context_label_profile_rename">プロファイルの改名</string>
+	<string name="msgs_main_context_label_profile_copy">プロファイルのコピー</string>
+				
+	<string name="msgs_menu_show_history">タスク情報</string>
+	<string name="msgs_menu_export_profile">プロファイル保存</string>
+	<string name="msgs_menu_import_profile">プロファイル取込</string>
+	<string name="msgs_menu_browse_logfile">ログ表示</string>
+	<string name="msgs_menu_toggle_scheduler_enable">Scheduler有効</string>
+	<string name="msgs_menu_toggle_scheduler_disable">Scheduler無効</string>
+	<string name="msgs_menu_about_task_scheduler">TaskAutomationについて</string>
+	<string name="msgs_menu_quick_task">クイックタスク設定</string>
+    <string name="msgs_menu_settings">設定</string>
+    <string name="msgs_menu_send_logfile">開発者にログファイルを送る</string>
+    <string name="msgs_menu_uninstall">TaskAutomationのアンインストール</string>
+    <string name="msgs_menu_uninstall_subtitle">アンインストールの確認</string>
+    <string name="msgs_menu_uninstall_message">スクリーンロックを無効にし、アンインストールを続行しますか？次に表示される画面でアプリケーションのアンインストールを中止した場合はアプリケーション設定でスクリーンロックを有効にしてください。</string>
+    <string name="msgs_menu_restart_scheduler">スケジューラーの再起動</string>
+    
+    <string name="msgs_confirm_activate_group">以下のグループを有効にしますか？</string>
+    <string name="msgs_confirm_inactivate_group">以下のグループを無効にしますか？</string>
+
+    <string name="msgs_confirm_activate_profile">以下のプロファイルを有効にしますか？</string>
+    <string name="msgs_confirm_inactivate_profile">以下のプロファイルを無効にしますか？</string>
+    
+    <string name="msgs_delete_profile_msg">以下のプロファイルを削除しますか？</string>
+    <string name="msgs_delete_profile_result">以下のプロファイルを削除しました。</string>
+    
+    <string name="msgs_copy_profile_title">プロファイルのコピー</string>
+    <string name="msgs_copy_profile_msg" formatted="false">プロファイル %s をグループ %s にコピーしますか</string>
+    <string name="msgs_copy_profile_result" formatted="false"
+        >プロファイル %s をグループ %s にコピーしました</string>
+    
+    <string name="msgs_rename_profile_title">プロファイル名変更</string>
+    <string name="msgs_rename_profile_msg" formatted="false"
+        >プロファイル名 %s を %s に変更しますか?</string>
+    <string name="msgs_rename_profile_result" formatted="false"
+        >プロファイル名 %s を %s に変更しました</string>
+    
+    <string name="msgs_save_to_profile_error">プロファイル保存時にエラーが発生しました。 ファイル名=%s</string>
+    <string name="msgs_create_profile_error">プロファイルリスト作成時にエラーが発生しました。ファイル名=%s</string>
+    <string name="msgs_no_profile_entry">プロファイルが空です</string>
+    
+    <string name="msgs_repeat_type_one_shot">日時指定</string>
+    <string name="msgs_repeat_type_every_year">毎年</string>
+    <string name="msgs_repeat_type_every_month">毎月</string>
+    <string name="msgs_repeat_type_every_day">毎日</string>
+    <string name="msgs_repeat_type_every_hour">毎時</string>
+    <string name="msgs_repeat_type_day_of_the_week">毎週</string>
+    <string name="msgs_repeat_type_interval">間隔</string>
+    
+	<string name="msgs_import_profile_select_file">取込むファイルの選択</string>
+	<string name="msgs_import_profile_import_fail">プロファイル取込みに失敗しました。</string>
+	<string name="msgs_import_profile_import_success">プロファイル取込みが正常終了しました。</string>
+	<string name="msgs_import_profile_title">取込むプロファイル項目の選択</string>
+	<string name="msgs_import_profile_confirm_title">上書き確認</string>
+	<string name="msgs_import_profile_confirm1_msg">下記項目が取込むように指定されました。</string>
+	<string name="msgs_import_profile_confirm2_msg">しかし、下記項目は既に存在します。上書きしますか？</string>
+	<string name="msgs_import_profile_noitem_title">有効なプロファイル項目が存在しません</string>
+	<string name="msgs_import_profile_noitem_msg">有効なプロファイル項目が存在するファイルを指定してください。</string>
+		
+	<string name="msgs_export_profile_select_file">保存するファイルの選択</string>
+	<string name="msgs_export_profile_import_fail">プロファイル保存に失敗しました。</string>
+	<string name="msgs_export_profile_import_success">プロファイル保存が正常終了しました。</string>
+	<string name="msgs_export_profile_title">保存するプロファイル項目の選択</string>
+	<string name="msgs_export_profile_override">ファイルを上書きしますか？</string>
+	<string name="msgs_export_import_profile_listing">一覧</string>
+	<string name="msgs_export_import_profile_specify_filename">ファイル名を指定してください</string>
+    
+	<string name="msgs_edit_profile_time_hdr_sun">日</string>
+	<string name="msgs_edit_profile_time_hdr_mon">月</string>
+	<string name="msgs_edit_profile_time_hdr_tue">火</string>
+	<string name="msgs_edit_profile_time_hdr_wed">水</string>
+	<string name="msgs_edit_profile_time_hdr_thu">木</string>
+	<string name="msgs_edit_profile_time_hdr_fri">金</string>
+	<string name="msgs_edit_profile_time_hdr_sat">土</string>
+	<string name="msgs_edit_profile_time_hdr_year">年</string>
+	<string name="msgs_edit_profile_time_hdr_month">月</string>
+	<string name="msgs_edit_profile_time_hdr_day">日</string>
+	<string name="msgs_edit_profile_time_hdr_hour">時</string>
+	<string name="msgs_edit_profile_time_hdr_minute">分</string>
+	
+	<string name="msgs_edit_profile_hdr_enabled">有効</string>
+	<string name="msgs_edit_profile_hdr_disabled">無効</string>
+	<string name="msgs_edit_profile_hdr_started">開始</string>
+	<string name="msgs_edit_profile_hdr_stopped">待機</string>
+	<string name="msgs_edit_profile_hdr_action">アクション無し</string>
+	<string name="msgs_edit_profile_hdr_event">起動イベント</string>
+	<string name="msgs_edit_profile_hdr_profile_name">プロファイル名</string>
+	<string name="msgs_edit_profile_hdr_sound_volume">音量を指定する</string>
+	<string name="msgs_edit_profile_hdr_shell_cmd_with_su">root権限でコマンドを実行する</string>
+	
+	<string name="msgs_edit_profile_hdr_add_task">タスクプロファイルの追加</string>
+	<string name="msgs_edit_profile_hdr_edit_task">タスクプロファイルの編集</string>
+	<string name="msgs_edit_profile_hdr_add_time">タイムプロファイルの追加</string>
+	<string name="msgs_edit_profile_hdr_edit_time">タイムプロファイルの編集</string>
+	<string name="msgs_edit_profile_hdr_add_action">アクションプロファイルの追加</string>
+	<string name="msgs_edit_profile_hdr_edit_action">アクションプロファイルの編集</string>
+	<string name="msgs_edit_profile_hdr_group">グループ</string>
+
+	<string name="msgs_edit_profile_hdr_browse_task">タスクプロファイル表示</string>
+	<string name="msgs_edit_profile_hdr_browse_time">タイムプロファイル表示</string>
+	<string name="msgs_edit_profile_hdr_browse_action">アクションプロファイル表示</string>
+		
+	<string name="msgs_edit_profile_hdr_notification">エラーを通知する</string>
+	
+	<string name="msgs_edit_profile_profile_name_missing">プロファイル名がありません。</string>
+	<string name="msgs_edit_profile_profile_name_invalid">プロファイル名が重複しているか＊から始まっています。</string>
+	<string name="msgs_edit_profile_day_not_selected">曜日が指定されていません。</string>
+	<string name="msgs_edit_profile_required_other_than_qt_grp">コピーするにはQuickTaskグループ以外が必要です。グループを作成してからコピーを行ってください。</string>
+	<string name="msgs_edit_profile_copy_error">コピーエラー</string>
+	
+	<string name="msgs_edit_profile_time_interval_must_be_greater_than_0">時間間隔は00:00より大きい値を指定してください</string>
+	
+	<string name="msgs_edit_profile_event_not_specified">起動イベントが指定されていません。</string>
+	<string name="msgs_edit_profile_action_not_specified">アクションが指定されていません。</string>
+	
+	<string name="msgs_edit_profile_action_select_category">アクション種類</string>
+	<string name="msgs_edit_profile_action_select_sub_category">小分類</string>
+	<string name="msgs_edit_profile_action_select_user">ユーザー定義</string>
+	<string name="msgs_edit_profile_action_select_primitive">基本アクション</string>
+	<string name="msgs_edit_profile_action_select_abort">タスク停止条件</string>
+	<string name="msgs_edit_profile_action_select_skip">アクションスキップ条件</string>
+	<string name="msgs_edit_profile_action_select_cancel">タスクキャンセル</string>
+	<string name="msgs_edit_profile_action_select_block">イベント抑止</string>
+	<string name="msgs_edit_profile_action_start_play_back">再生</string>
+	<string name="msgs_edit_profile_action_stop_play_back">中止</string>
+	<string name="msgs_edit_profile_action_test_exec">実行</string>
+	<string name="msgs_edit_profile_action_edit_script">スクリプト編集</string>
+
+	<string name="msgs_edit_profile_task_test_edit_parms">システム値の編集</string>
+	<string name="msgs_edit_profile_task_enable_env_parms">システム値を使用</string>
+	
+	<string name="msgs_edit_profile_task_use_root_privilege">root権限</string>
+		
+	<string name="msgs_edit_environment_parms_title">システム値の編集</string>
+	<string name="msgs_edit_environment_parms_reload">現在値の読込</string>
+	<string name="msgs_edit_environment_parms_sensor">センサー</string>
+	<string name="msgs_edit_environment_parms_sensor_light">明度</string>
+	<string name="msgs_edit_environment_parms_sensor_magnetic">磁気</string>
+	<string name="msgs_edit_environment_parms_sensor_proximity">近接</string>
+	<string name="msgs_edit_environment_parms_sensor_proximity_detected">検知</string>
+	<string name="msgs_edit_environment_parms_sensor_proximity_undetected">無検知</string>
+	<string name="msgs_edit_environment_parms_battery">バッテリー</string>
+	<string name="msgs_edit_environment_parms_battery_level">レベル</string>
+	<string name="msgs_edit_environment_parms_battery_power">電源</string>
+	<string name="msgs_edit_environment_parms_battery_power_ac">AC/USB</string>
+	<string name="msgs_edit_environment_parms_battery_power_battery">バッテリー</string>
+	<string name="msgs_edit_environment_parms_wifi">無線LAN</string>
+	<string name="msgs_edit_environment_parms_wifi_status">状態</string>
+	<string name="msgs_edit_environment_parms_wifi_status_on">オン</string>
+	<string name="msgs_edit_environment_parms_wifi_status_off">オフ</string>
+	<string name="msgs_edit_environment_parms_wifi_status_connected">接続</string>
+	<string name="msgs_edit_environment_parms_wifi_ssid">SSID</string>
+	<string name="msgs_edit_environment_parms_bluetooth">Bluetooth</string>
+	<string name="msgs_edit_environment_parms_bluetooth_status">状態</string>
+	<string name="msgs_edit_environment_parms_bluetooth_status_on">オン</string>
+	<string name="msgs_edit_environment_parms_bluetooth_status_off">オフ</string>
+	<string name="msgs_edit_environment_parms_bluetooth_status_connected">接続</string>
+	<string name="msgs_edit_environment_parms_bluetooth_device_name">装置名</string>
+	<string name="msgs_edit_environment_parms_airplane">エアプレーンモード</string>
+	<string name="msgs_edit_environment_parms_airplane_on">オン</string>
+	<string name="msgs_edit_environment_parms_ringer">Ringer Mode</string>
+	<string name="msgs_edit_environment_parms_ringer_normal">Normal</string>
+	<string name="msgs_edit_environment_parms_ringer_vibrate">Vibrate</string>
+	<string name="msgs_edit_environment_parms_ringer_silent">Silent</string>		
+	<string name="msgs_edit_environment_parms_telephony">電話</string>
+	<string name="msgs_edit_environment_parms_telephony_idle">待機</string>
+	<string name="msgs_edit_environment_parms_telephony_offhook">通話中</string>
+	<string name="msgs_edit_environment_parms_telephony_ringing">着信中</string>
+	<string name="msgs_edit_environment_parms_screen">スクリーン</string>
+	<string name="msgs_edit_environment_parms_screen_locked">ロック</string>
+
+	<string name="msgs_edit_profile_action_profle_error">アクションプロファイルエラー</string>		
+	<string name="msgs_edit_profile_action_activity_name_not_selected">アクティビティを選択してください</string>
+	
+	<string name="msgs_edit_profile_action_activity_data_uri_not_specified">Uriデータを入力してください</string>
+
+	<string name="msgs_edit_profile_action_activity_extra_data_edit">Extraデータ編集</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_no_data_exists">**No data exists</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_ccmenu_add">Extraデータ追加</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_ccmenu_edit">Extraデータ編集</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_ccmenu_delete">Extraデータ削除</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_key_name_missing">キー名が指定されていません</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_array_data_missing">Extra配列データが指定されていません</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_int_data_missing">整数値が指定されていません</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_title">Extraデータの編集</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_array">配列の使用</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_extra_data_type">Extraデータ型</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_add_array_btn">項目追加</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_del_array_btn">削除</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_edit_array_btn">編集</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_update_apply_btn">更新</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_update_cancel_btn">キャンセル</string>
+				
+	<string name="msgs_edit_profile_action_music_file_name_not_specified">音楽ファイル名を指定してください</string>
+
+	<string name="msgs_edit_profile_action_compare_type_eq">EQ</string>
+	<string name="msgs_edit_profile_action_compare_type_ne">NE</string>
+	<string name="msgs_edit_profile_action_compare_type_gt">GT</string>
+	<string name="msgs_edit_profile_action_compare_type_lt">LT</string>
+	<string name="msgs_edit_profile_action_compare_type_bw">Between</string>
+	<string name="msgs_edit_profile_action_compare_result_title">その結果</string>
+	<string name="msgs_edit_profile_action_compare_result_abort">停止</string>
+	<string name="msgs_edit_profile_action_compare_result_continue">継続</string>
+	<string name="msgs_edit_profile_action_compare_result_skip">スキップ</string>
+	<string name="msgs_edit_profile_action_compare_select_target">比較対象の選択</string>
+	<string name="msgs_edit_profile_action_compare_select_type">比較方法の選択</string>
+	<string name="msgs_edit_profile_action_compare_val1_not_specified">value1を入力してください</string>
+	<string name="msgs_edit_profile_action_compare_val2_not_specified">value2を入力してください</string>
+	<string name="msgs_edit_profile_action_compare_val2_must_great">value2はvalue1より大きい値にしてください</string>
+	<string name="msgs_edit_profile_action_compare_value_not_specified">比較値を入力してください</string>
+	
+	<string name="msgs_edit_profile_action_message_vibration">バイブレーターを使用する</string>
+	<string name="msgs_edit_profile_action_message_led">LEDを点滅させる</string>
+	<string name="msgs_edit_profile_action_message_led_green">緑</string>
+	<string name="msgs_edit_profile_action_message_led_red">赤</string>
+	<string name="msgs_edit_profile_action_message_led_blue">青</string>
+	<string name="msgs_edit_profile_action_message_text_not_specified">Message text was not specified</string>	
+
+	<string name="msgs_edit_profile_action_time_select_type">タイムの選択</string>
+	<string name="msgs_edit_profile_action_time_select_target">対象プロファイルの選択</string>
+	<string name="msgs_edit_profile_action_time_target_not_specified">ターゲットプロファイルが指定されていません</string>
+	<string name="msgs_edit_profile_action_task_select_type">タスクタイプの選択</string>
+	<string name="msgs_edit_profile_action_task_select_target">対象プロファイルの選択</string>
+	<string name="msgs_edit_profile_action_task_target_not_specified">ターゲットプロファイルが指定されていません</string>
+	
+	<string name="msgs_edit_profile_action_bsh_text_not_specified">スクリプトが空です</string>
+	<string name="msgs_edit_profile_action_shell_cmd_not_specified">シェルコマンドが空です</string>
+								
+	<string name="msgs_edit_profile_task_select_trigger_event">タスク起動イベントの選択</string>
+	<string name="msgs_edit_profile_action_select_action_type">アクションタイプ選択</string>
+	<string name="msgs_edit_profile_action_select_ringtone_type">リングトーンタイプの選択</string>
+	<string name="msgs_edit_profile_action_select_android_activity">アプリケーションの選択</string>
+	<string name="msgs_edit_profile_action_select_activity_data_type">データタイプの選択</string>
+	<string name="msgs_edit_profile_action_select_ringtone_name">リングトーンの選択</string>	
+
+	<string name="msgs_edit_profile_action_list_file">ファイル一覧</string>
+		
+	<string name="msgs_edit_profile_time_select_date_time_type">日時指定方法の選択</string>
+	<string name="msgs_edit_profile_time_select_year">年の選択</string>
+	<string name="msgs_edit_profile_time_select_month">月の選択</string>
+	<string name="msgs_edit_profile_time_select_day">日の選択</string>
+	<string name="msgs_edit_profile_time_select_hour">時の選択</string>
+	<string name="msgs_edit_profile_time_select_min">分の選択</string>
+		
+	
+	<string name="msgs_edit_profile_action_mp_file_not_found">ファイルが見つかりません</string>
+	<string name="msgs_edit_profile_action_mp_file_not_specified">ファイルが指定されていません</string>
+	<string name="msgs_edit_profile_action_mp_error_title">メディアプレーヤーエラー</string>
+	<string name="msgs_edit_profile_action_mp_error_msg" formatted="false">エラー=%s, 追加情報=%s</string>
+	
+	<string name="msgs_profile_group_create_new_profile_group">新規グループ作成</string>
+	<string name="msgs_profile_group_rename_profile_group">グループ名変更</string>
+	<string name="msgs_profile_group_copy_profile_group">グループ複写</string>
+	<string name="msgs_profile_group_select_profile_group">グループ選択</string>
+	<string name="msgs_profile_group_activate_profile_group">グループ有効</string>
+	<string name="msgs_profile_group_deactivate_profile_group">グループ無効</string>
+
+	<string name="msgs_profile_group_main_no_of_task">タスク=</string>
+	<string name="msgs_profile_group_main_no_of_action">アクション=</string>
+	<string name="msgs_profile_group_main_no_of_time">タイム=</string>
+	
+	<string name="msgs_profile_group_delete_confirm">下記のグループを削除してよろしいですか？</string>
+	
+	<string name="msgs_filter_select_filter">表示フィルターの選択</string>
+	<string name="msgs_filter_type_none">フィルター無し</string>
+	<string name="msgs_filter_type_task_profile">タスクプロファイル</string>
+	<string name="msgs_filter_type_action_profile">アクションプロファイル</string>
+	<string name="msgs_filter_type_time_profile">タイムプロファイル</string>
+	<string name="msgs_filter_type_time_event_task">タイムイベント起動</string>
+		
+</resources>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:ignore="UseCompoundDrawables,HardcodedText,InefficientWeight,ContentDescription" >
+    
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+	    <LinearLayout
+	        android:id="@+id/task_profile_list_view_item_prof_view"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content" >
+	
+	        <ImageView
+	            android:id="@+id/task_profile_list_view_item_icon1"
+	            android:layout_width="40dp"
+	            android:layout_height="40dp"
+	            android:layout_gravity="center_vertical"
+	            android:layout_marginLeft="5dp"
+	            android:src="@drawable/task" />
+	
+	
+	        <TextView
+	            android:id="@+id/task_profile_list_view_item_profilename"
+	            android:layout_width="0dp"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center"
+	            android:layout_marginLeft="5dp"
+	            android:layout_weight="1"
+	            android:ellipsize="end"
+	            android:lines="1"
+	            android:text="task name"
+	            android:textAppearance="?android:attr/textAppearanceLarge"
+	            tools:ignore="HardcodedText" />
+
+	        <TextView
+	            android:id="@+id/task_profile_list_view_item_profile_status"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginRight="5dp"
+	            android:lines="1"
+	            android:text="Disabled"
+	            android:textAppearance="?android:attr/textAppearanceMedium"
+	            tools:ignore="HardcodedText" />
+	
+	    </LinearLayout>
+	
+	    <LinearLayout
+	        android:id="@+id/task_profile_list_view_item_task_view1"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical" >
+	
+	        <LinearLayout
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content" 
+	            android:layout_marginLeft="20dp">
+	
+	            <ImageView
+	                android:layout_width="20dp"
+	                android:layout_height="20dp"
+	                android:layout_gravity="center_vertical"
+	                android:src="@drawable/action" />
+	
+	
+	            <TextView
+	                android:id="@+id/task_profile_list_view_item_task_action"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_marginLeft="5dp"
+	                android:layout_weight="1"
+	                android:ellipsize="end"
+	                android:lines="1"
+	                android:text="Action"
+	                android:textAppearance="?android:attr/textAppearanceMedium"
+	                tools:ignore="HardcodedText" />
+	
+	
+	            <TextView
+	                android:id="@+id/task_profile_list_view_item_task_status"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="center"
+	                android:lines="1"
+	                android:text="Started"
+	                android:layout_marginRight="5dp"
+	                android:textAppearance="?android:attr/textAppearanceMedium"
+	                tools:ignore="HardcodedText" />
+	
+	        </LinearLayout>
+	
+	        <LinearLayout
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content" 
+	            android:layout_marginLeft="20dp">
+	
+	            <ImageView
+	                android:layout_width="20dp"
+	                android:layout_height="20dp"
+	                android:layout_gravity="center_vertical"
+	                android:src="@drawable/timer" />
+	
+	
+	            <TextView
+	                android:id="@+id/task_profile_list_view_item_task_trigger"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_marginLeft="5dp"
+	                android:layout_weight="1"
+	                android:ellipsize="end"
+	                android:lines="1"
+	                android:text="Event"
+	                android:textAppearance="?android:attr/textAppearanceMedium"
+	                tools:ignore="HardcodedText" />
+	
+	        </LinearLayout>
+	    </LinearLayout>
+	
+	    <LinearLayout
+	        android:id="@+id/task_profile_list_view_item_time_view1"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content">
+	
+	
+	        <TextView
+	            android:id="@+id/task_profile_list_view_item_time_repeat"
+	            android:layout_width="100dp"
+	            android:layout_height="wrap_content"
+	            android:ellipsize="end"
+	            android:lines="1"
+	            android:text="Every"
+	            android:layout_marginLeft="20dp"
+	            android:textAppearance="?android:attr/textAppearanceMedium"
+	            tools:ignore="HardcodedText" />
+	
+	        <TextView
+	            android:id="@+id/task_profile_list_view_item_time_day_of_the_week"
+	            android:layout_width="90dp"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="5dp"
+	            android:ellipsize="end"
+	            android:lines="1"
+	            android:text="day of the week"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	        <TextView
+	            android:id="@+id/task_profile_list_view_item_time_date"
+	            android:layout_width="110dp"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="5dp"
+	            android:text="date"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	        <TextView
+	            android:id="@+id/task_profile_list_view_item_time_time"
+	            android:layout_width="80dp"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="5dp"
+	            android:text="time"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
+	    </LinearLayout>
+	
+	    <LinearLayout
+	        android:id="@+id/task_profile_list_view_item_action_view1"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical" >
+	
+	        <LinearLayout
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="20dp"
+	            android:orientation="horizontal" >
+	
+	            <TextView
+	                android:id="@+id/task_profile_list_view_item_action_task_type"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_marginRight="10dp"
+	                android:ellipsize="end"
+	                android:lines="1"
+	                android:text="Android"
+	                android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	            <TextView
+	                android:id="@+id/task_profile_list_view_item_action_sub_name1"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="1"
+	                android:ellipsize="end"
+	                android:lines="1"
+	                android:text="SMBSYnc"
+	                android:textAppearance="?android:attr/textAppearanceMedium" />
+	        </LinearLayout>
+	
+	        <TextView
+	            android:id="@+id/task_profile_list_view_item_action_sub_name2"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="20dp"
+	            android:ellipsize="end"
+	            android:lines="1"
+	            android:text="com.setaroh.android.SMBSync"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    </LinearLayout>
+        
+    </LinearLayout>    
+
+    <CheckBox
+        android:id="@+id/task_profile_list_view_item_cb1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+</LinearLayout>

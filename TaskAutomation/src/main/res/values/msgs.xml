@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="msgs_main_terminate_appl">Terminate TaskAutomation Activity?</string>
+	<string name="msgs_main_termination">TaskAutomation Activity was terminated</string>
+	<string name="msgs_main_started">TaskAutomation Activity has started, Version=%s</string>
+	<string name="msgs_main_restarted">TaskAutomation Activity has restarted</string>
+	<string name="msgs_main_task_scheduler_not_running">Task was not executed/scheduled because scheduler disabled</string>
+	<string name="msgs_main_task_scheduler_no_valid_profile">Task was not executed/scheduled because no valid profile</string>
+	<string name="msgs_main_tab_name_profile_group">Profile group</string>
+	<string name="msgs_main_tab_name_control">Control</string>
+	<string name="msgs_main_tab_name_profile">Profile</string>
+
+	<string name="msgs_main_monitor_ignored">Restart monitor was ignored</string>
+	<string name="msgs_main_monitor_issued">Scheduler monitor was unpredictable stopped, restart scheduler monitor</string>
+	
+	<string name="msgs_main_view_cancel_active_task">Cancel all active task</string>
+    
+	<string name="msgs_main_cancel_confirm_msg">Following task(s) are active, cancel active task?</string>
+	
+	<string name="msgs_main_screen_lock_confirm_title">Use the Lock Screen</string>
+	<string name="msgs_main_screen_lock_confirm_msg">
+		When you uninstall the application, please disable the "device administrator" 
+		in one of the following ways.\n
+		1.From TaskAutomation configuration, deselect the "Lock Screen".\n
+		2.From the settings screen of Android, Security -> Tap the "TaskAutomation" 
+		in the terminal manager, Click on "Disable".
+	</string>
+    
+	<string name="msgs_main_ccmenu_delete">Delete profile</string>
+	<string name="msgs_main_ccmenu_edit_profile">Edit profile</string>
+	<string name="msgs_main_ccmenu_move_top">Top</string>
+	<string name="msgs_main_ccmenu_move_bottom">Bottom</string>
+	<string name="msgs_main_ccmenu_move_up">Up</string>
+	<string name="msgs_main_ccmenu_move_down">Down</string>
+	
+	<string name="msgs_main_abort_scheduling_option">Scheduling option is disabled, the execution is aborted.</string>
+	<string name="msgs_main_context_label_select_all">Select all item</string>
+	<string name="msgs_main_context_label_unselect_all">Unselect all item</string>
+	<string name="msgs_main_context_label_group_activate">Activate group</string>
+	<string name="msgs_main_context_label_group_inactivate">Inactivate group</string>
+	<string name="msgs_main_context_label_group_add">Add group</string>
+	<string name="msgs_main_context_label_group_delete">Delete group</string>
+	<string name="msgs_main_context_label_group_rename">Rename group</string>
+	<string name="msgs_main_context_label_group_copy">Copy group</string>
+		
+	<string name="msgs_main_context_label_profile_activate">Enable profile</string>
+	<string name="msgs_main_context_label_profile_inactivate">Disable profile</string>
+	<string name="msgs_main_context_label_profile_add_task">Add task profile</string>
+	<string name="msgs_main_context_label_profile_add_action">Add action profile</string>
+	<string name="msgs_main_context_label_profile_add_timer">Add time profile</string>
+	<string name="msgs_main_context_label_profile_delete">Delete profile</string>
+	<string name="msgs_main_context_label_profile_rename">Rename profile</string>
+	<string name="msgs_main_context_label_profile_copy">Copy profile</string>
+			
+	<string name="msgs_menu_show_history">Task activity</string>
+	<string name="msgs_menu_export_profile">Export profile</string>
+	<string name="msgs_menu_import_profile">Import profile</string>
+	<string name="msgs_menu_browse_logfile">Browse log</string>
+	<string name="msgs_menu_toggle_scheduler_enable">Enable Scheduler</string>
+	<string name="msgs_menu_toggle_scheduler_disable">Disable Scheduler</string>
+	<string name="msgs_menu_about_task_scheduler">About TaskAutomation</string>
+	<string name="msgs_menu_quick_task">QuickTask settings</string>
+    <string name="msgs_menu_settings">Settings</string>
+    <string name="msgs_menu_send_logfile">Send logfile to developer</string>
+    <string name="msgs_menu_uninstall">Uninstall TaskAutomation</string>
+    <string name="msgs_menu_restart_scheduler">Restart a Scheduler.</string>
+    
+    <string name="msgs_menu_uninstall_subtitle">Confirm uninstall</string>
+    <string name="msgs_menu_uninstall_message">Do you want to continue with the uninstallation after disabling the lock screen? If you cancel the uninstallation of the application in the next screen, please enable the screen lock in the application settings.</string>
+    
+    <string name="msgs_confirm_activate_group">以下のグループを有効にしますか？</string>
+    <string name="msgs_confirm_inactivate_group">以下のグループを無効にしますか？</string>
+
+    <string name="msgs_confirm_activate_profile">以下のプロファイルを有効にしますか？</string>
+    <string name="msgs_confirm_inactivate_profile">以下のプロファイルを無効にしますか？</string>
+    
+    <string name="msgs_delete_profile_msg">Is to delete the following profiles?</string>
+    <string name="msgs_delete_profile_result">Following profiles were deleted</string>
+    
+    <string name="msgs_copy_profile_title">Copy profile</string>
+    <string name="msgs_copy_profile_msg" formatted="false"
+        >Do you want to copy the profile %s　to group %s</string>
+    <string name="msgs_copy_profile_result" formatted="false"
+        >%s was copied to group %s</string>
+    
+    <string name="msgs_rename_profile_title">Rename profile</string>
+    <string name="msgs_rename_profile_msg" formatted="false"
+        >Do you want to change the profile name from %s to %s ?</string>
+    <string name="msgs_rename_profile_result" formatted="false"
+        >Profile name was change from %s to %s</string>
+    
+    
+    <string name="msgs_save_to_profile_error">Profile save error occurred, fn=%s</string>
+    <string name="msgs_create_profile_error">Profile list creation error occurred, fn=%s</string>
+    <string name="msgs_no_profile_entry">No Profile enteries</string>
+    
+    <string name="msgs_repeat_type_one_shot">Specific date</string>
+    <string name="msgs_repeat_type_every_year">Every year</string>
+    <string name="msgs_repeat_type_every_month">Every month</string>
+    <string name="msgs_repeat_type_every_day">Every day</string>
+    <string name="msgs_repeat_type_every_hour">Every hour</string>
+    <string name="msgs_repeat_type_day_of_the_week">Every week</string>
+    <string name="msgs_repeat_type_interval">Interval</string>
+    
+	<string name="msgs_import_profile_select_file">Select file to be import</string>
+	<string name="msgs_import_profile_import_fail">Import profile was failed.</string>
+	<string name="msgs_import_profile_import_success">Import profile was successfully ended.</string>
+	<string name="msgs_import_profile_title">Select　Import profile item</string>
+	<string name="msgs_import_profile_confirm_title">Confirm override</string>
+	<string name="msgs_import_profile_confirm1_msg">It has been designated to import the following items.</string>
+	<string name="msgs_import_profile_confirm2_msg">However, the following item already exists. Do you want to overwrite it?</string>
+	<string name="msgs_import_profile_noitem_title">No valid profile items</string>
+	<string name="msgs_import_profile_noitem_msg">Please specify the file that there is a valid profile items</string>
+	
+	<string name="msgs_export_profile_select_file">Select file to be export</string>
+	<string name="msgs_export_profile_import_fail">Export profile was failed.</string>
+	<string name="msgs_export_profile_import_success">Export profile was successfully ended.</string>
+	<string name="msgs_export_profile_title">Select Export profile item</string>
+	<string name="msgs_export_profile_override">Override?</string>
+	<string name="msgs_export_import_profile_listing">Listing</string>
+	<string name="msgs_export_import_profile_specify_filename">Please specify file name</string>
+	
+	
+	<string name="msgs_edit_profile_time_hdr_sun">Sun</string>
+	<string name="msgs_edit_profile_time_hdr_mon">Mon</string>
+	<string name="msgs_edit_profile_time_hdr_tue">Tue</string>
+	<string name="msgs_edit_profile_time_hdr_wed">Wed</string>
+	<string name="msgs_edit_profile_time_hdr_thu">Thu</string>
+	<string name="msgs_edit_profile_time_hdr_fri">Fri</string>
+	<string name="msgs_edit_profile_time_hdr_sat">Sat</string>
+	<string name="msgs_edit_profile_time_hdr_year">Year</string>
+	<string name="msgs_edit_profile_time_hdr_month">Month</string>
+	<string name="msgs_edit_profile_time_hdr_day">Day</string>
+	<string name="msgs_edit_profile_time_hdr_hour">Hour</string>
+	<string name="msgs_edit_profile_time_hdr_minute">Minute</string>
+	
+	<string name="msgs_edit_profile_hdr_enabled">Enabled</string>
+	<string name="msgs_edit_profile_hdr_disabled">Disabled</string>
+	<string name="msgs_edit_profile_hdr_started">Started</string>
+	<string name="msgs_edit_profile_hdr_stopped">Wait</string>
+	<string name="msgs_edit_profile_hdr_action">No Action</string>
+	<string name="msgs_edit_profile_hdr_event">Trigger event</string>
+	<string name="msgs_edit_profile_hdr_profile_name">Profile name</string>
+	<string name="msgs_edit_profile_hdr_sound_volume">Use volume</string>
+	<string name="msgs_edit_profile_hdr_shell_cmd_with_su">Shell command execute with root privilege</string>
+	
+	<string name="msgs_edit_profile_hdr_add_task">Add task profile</string>
+	<string name="msgs_edit_profile_hdr_edit_task">Edit task profile</string>
+	<string name="msgs_edit_profile_hdr_add_time">Add time profile</string>
+	<string name="msgs_edit_profile_hdr_edit_time">Edit time profile</string>
+	<string name="msgs_edit_profile_hdr_add_action">Add action profile</string>
+	<string name="msgs_edit_profile_hdr_edit_action">Edit action profile</string>
+	<string name="msgs_edit_profile_hdr_group">Profile group</string>
+	
+	<string name="msgs_edit_profile_hdr_browse_task">Browse task profile</string>
+	<string name="msgs_edit_profile_hdr_browse_time">Browse time profile</string>
+	<string name="msgs_edit_profile_hdr_browse_action">Browse action profile</string>
+	
+	<string name="msgs_edit_profile_hdr_notification">Notify error</string>
+	
+	<string name="msgs_edit_profile_profile_name_missing">Profile name was missing.</string>
+	<string name="msgs_edit_profile_profile_name_invalid">Profile name was invalid(Dupplicated or starts with *(asterisk)),
+	    		 re-specify correct name.</string>
+	<string name="msgs_edit_profile_day_not_selected">Select day.</string>
+	<string name="msgs_edit_profile_required_other_than_qt_grp">It is necessary that a group of non-QuickTask are registered If you want to copy. Please perform the copy after you create a group.</string>
+	<string name="msgs_edit_profile_copy_error">Copy error</string>
+		
+	<string name="msgs_edit_profile_time_interval_must_be_greater_than_0">Time interval value is must be greater than 00:00</string>
+	
+	<string name="msgs_edit_profile_event_not_specified">Trigger event not specified.</string>
+	<string name="msgs_edit_profile_action_not_specified">Action not specified.</string>
+	
+	<string name="msgs_edit_profile_action_select_category">Action category</string>
+	<string name="msgs_edit_profile_action_select_sub_category">Sub category</string>
+	<string name="msgs_edit_profile_action_select_user">User defined</string>
+	<string name="msgs_edit_profile_action_select_primitive">Primitive action</string>
+	<string name="msgs_edit_profile_action_select_abort">Stop condition</string>
+	<string name="msgs_edit_profile_action_select_skip">Skip condition</string>
+	<string name="msgs_edit_profile_action_select_cancel">Task cancel</string>
+	<string name="msgs_edit_profile_action_select_block">Block event</string>
+	<string name="msgs_edit_profile_action_start_play_back">Start playback</string>
+	<string name="msgs_edit_profile_action_stop_play_back">Stop playback</string>
+	<string name="msgs_edit_profile_action_test_exec">Execute</string>
+	<string name="msgs_edit_profile_action_edit_script">Edit script</string>
+	
+	<string name="msgs_edit_profile_task_test_edit_parms">Edit system value</string>
+	<string name="msgs_edit_profile_task_enable_env_parms">Use system value</string>
+	
+	<string name="msgs_edit_profile_task_use_root_privilege">with root</string>
+		
+	<string name="msgs_edit_environment_parms_title">Edit system value</string>
+	<string name="msgs_edit_environment_parms_reload">Read current system value</string>
+	<string name="msgs_edit_environment_parms_sensor">Sensor</string>
+	<string name="msgs_edit_environment_parms_sensor_light">Light</string>
+	<string name="msgs_edit_environment_parms_sensor_magnetic">Magnetic Field</string>
+	<string name="msgs_edit_environment_parms_sensor_proximity">Proximity</string>
+	<string name="msgs_edit_environment_parms_sensor_proximity_detected">Detected</string>
+	<string name="msgs_edit_environment_parms_sensor_proximity_undetected">Undetected</string>
+	<string name="msgs_edit_environment_parms_battery">Battery</string>
+	<string name="msgs_edit_environment_parms_battery_level">Level</string>
+	<string name="msgs_edit_environment_parms_battery_power">Power</string>
+	<string name="msgs_edit_environment_parms_battery_power_ac">AC/USB</string>
+	<string name="msgs_edit_environment_parms_battery_power_battery">Battery</string>
+	<string name="msgs_edit_environment_parms_wifi">Wireless LAN</string>
+	<string name="msgs_edit_environment_parms_wifi_status">Status</string>
+	<string name="msgs_edit_environment_parms_wifi_status_on">On</string>
+	<string name="msgs_edit_environment_parms_wifi_status_off">Off</string>
+	<string name="msgs_edit_environment_parms_wifi_status_connected">Connected</string>
+	<string name="msgs_edit_environment_parms_wifi_ssid">SSID</string>
+	<string name="msgs_edit_environment_parms_bluetooth">Bluetooth</string>
+	<string name="msgs_edit_environment_parms_bluetooth_status">Status</string>
+	<string name="msgs_edit_environment_parms_bluetooth_status_on">On</string>
+	<string name="msgs_edit_environment_parms_bluetooth_status_off">Off</string>
+	<string name="msgs_edit_environment_parms_bluetooth_status_connected">Connected</string>
+	<string name="msgs_edit_environment_parms_bluetooth_device_name">Device name</string>
+	<string name="msgs_edit_environment_parms_airplane">Airplane mode</string>
+	<string name="msgs_edit_environment_parms_airplane_on">On</string>
+	<string name="msgs_edit_environment_parms_ringer">Ringer Mode</string>
+	<string name="msgs_edit_environment_parms_ringer_normal">Normal</string>
+	<string name="msgs_edit_environment_parms_ringer_vibrate">Vibrate</string>
+	<string name="msgs_edit_environment_parms_ringer_silent">Silent</string>		
+	<string name="msgs_edit_environment_parms_telephony">Telephony</string>
+	<string name="msgs_edit_environment_parms_telephony_idle">Idle</string>
+	<string name="msgs_edit_environment_parms_telephony_offhook">Off hook</string>
+	<string name="msgs_edit_environment_parms_telephony_ringing">Ringing</string>
+	<string name="msgs_edit_environment_parms_screen">Screen</string>
+	<string name="msgs_edit_environment_parms_screen_locked">Locked</string>
+		
+	<string name="msgs_edit_profile_action_profle_error">Action profile error</string>
+	<string name="msgs_edit_profile_action_activity_name_not_selected">Please select activity name</string>
+	
+	<string name="msgs_edit_profile_action_activity_data_uri_not_specified">Please specify Uri data</string>
+
+	<string name="msgs_edit_profile_action_activity_extra_data_edit">Edit extra data</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_no_data_exists">**No data exists</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_ccmenu_add">Add Extra data</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_ccmenu_edit">Edit Extra data</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_ccmenu_delete">Delete Extra data</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_key_name_missing">Specify extra data key name</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_array_data_missing">Specify extra array data</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_int_data_missing">Specify extra int value</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_title">Edit extra data</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_array">Array</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_extra_data_type">Extra data type</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_add_array_btn">Add item</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_del_array_btn">Delete</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_edit_array_btn">Edit</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_update_apply_btn">Apply</string>
+	<string name="msgs_edit_profile_action_activity_extra_data_dlg_update_cancel_btn">Cancel</string>
+		
+	<string name="msgs_edit_profile_action_music_file_name_not_specified">Please specify music file name</string>
+	
+	<string name="msgs_edit_profile_action_compare_type_eq">EQ</string>
+	<string name="msgs_edit_profile_action_compare_type_ne">NE</string>
+	<string name="msgs_edit_profile_action_compare_type_gt">GT</string>
+	<string name="msgs_edit_profile_action_compare_type_lt">LT</string>
+	<string name="msgs_edit_profile_action_compare_type_bw">Between</string>
+	<string name="msgs_edit_profile_action_compare_result_title">Result</string>
+	<string name="msgs_edit_profile_action_compare_result_abort">Stop</string>
+	<string name="msgs_edit_profile_action_compare_result_continue">Continue</string>
+	<string name="msgs_edit_profile_action_compare_result_skip">Skip action</string>
+	<string name="msgs_edit_profile_action_compare_select_target">Select compare target</string>
+	<string name="msgs_edit_profile_action_compare_select_type">Select compare type</string>
+	<string name="msgs_edit_profile_action_compare_val1_not_specified">Please specify the value 1.</string>
+	<string name="msgs_edit_profile_action_compare_val2_not_specified">Please specify the value 2.</string>
+	<string name="msgs_edit_profile_action_compare_val2_must_great">Value 2 must be greater than value1.</string>
+	<string name="msgs_edit_profile_action_compare_value_not_specified">Please specify the compare value.</string>
+
+	<string name="msgs_edit_profile_action_message_vibration">Use Vibration</string>
+	<string name="msgs_edit_profile_action_message_led">Blink LED</string>
+	<string name="msgs_edit_profile_action_message_led_green">Green</string>
+	<string name="msgs_edit_profile_action_message_led_red">Red</string>
+	<string name="msgs_edit_profile_action_message_led_blue">Blue</string>
+	<string name="msgs_edit_profile_action_message_text_not_specified">Message text was not specified</string>
+	
+	<string name="msgs_edit_profile_action_time_select_type">Select time type</string>
+	<string name="msgs_edit_profile_action_time_select_target">Select task</string>
+	<string name="msgs_edit_profile_action_time_target_not_specified">Target profile not specified</string>
+	<string name="msgs_edit_profile_action_task_select_type">Select task type</string>
+	<string name="msgs_edit_profile_action_task_select_target">Select task</string>
+	<string name="msgs_edit_profile_action_task_target_not_specified">Target profile not specified</string>
+	
+	<string name="msgs_edit_profile_action_bsh_text_not_specified">Script text not specified</string>
+	<string name="msgs_edit_profile_action_shell_cmd_not_specified">Shell command not specified</string>
+		
+	<string name="msgs_edit_profile_task_select_trigger_event">Select trigger event</string>
+	<string name="msgs_edit_profile_action_select_action_type">Select action type</string>
+	<string name="msgs_edit_profile_action_select_ringtone_type">Select ringtone type</string>
+	<string name="msgs_edit_profile_action_select_android_activity">Select Application</string>
+	<string name="msgs_edit_profile_action_select_activity_data_type">Select data type</string>
+	<string name="msgs_edit_profile_action_select_ringtone_name">Select ringtone</string>	
+	
+	<string name="msgs_edit_profile_action_list_file">File lists</string>
+	
+	<string name="msgs_edit_profile_time_select_date_time_type">Select on specifying date and time</string>
+	<string name="msgs_edit_profile_time_select_year">Select Year</string>
+	<string name="msgs_edit_profile_time_select_month">Select Month</string>
+	<string name="msgs_edit_profile_time_select_day">Select Day</string>
+	<string name="msgs_edit_profile_time_select_hour">Select Hour</string>
+	<string name="msgs_edit_profile_time_select_min">Select Minute</string>
+			
+	<string name="msgs_edit_profile_action_mp_file_not_found">Specified file can not be found</string>
+	<string name="msgs_edit_profile_action_mp_file_not_specified">File name was not specified</string>
+	<string name="msgs_edit_profile_action_mp_error" formatted="false">Media player error=%s, extra=%s</string>
+	<string name="msgs_edit_profile_action_mp_error_title">Media player error</string>
+	<string name="msgs_edit_profile_action_mp_error_msg" formatted="false">error=%s, extra=%s</string>
+	
+	<string name="msgs_profile_group_create_new_profile_group">Create new profile group</string>
+	<string name="msgs_profile_group_rename_profile_group">Rename profile group</string>
+	<string name="msgs_profile_group_copy_profile_group">Copy profile group</string>
+	<string name="msgs_profile_group_select_profile_group">Select profile group</string>
+	<string name="msgs_profile_group_activate_profile_group">Activate profile group</string>
+	<string name="msgs_profile_group_deactivate_profile_group">Deactivate profile group</string>
+	<string name="msgs_profile_group_main_no_of_task">Task=</string>
+	<string name="msgs_profile_group_main_no_of_action">Action=</string>
+	<string name="msgs_profile_group_main_no_of_time">Time=</string>
+	
+	<string name="msgs_profile_group_delete_confirm">Are you sure you want to remove the following group ?</string>
+	
+	<string name="msgs_filter_select_filter">Select View filter</string>
+	<string name="msgs_filter_type_none">No filter</string>
+	<string name="msgs_filter_type_task_profile">Task profile</string>
+	<string name="msgs_filter_type_action_profile">Action profile</string>
+	<string name="msgs_filter_type_time_profile">Time profile</string>
+	<string name="msgs_filter_type_time_event_task">Start-up by Time event</string>
+		
+</resources>

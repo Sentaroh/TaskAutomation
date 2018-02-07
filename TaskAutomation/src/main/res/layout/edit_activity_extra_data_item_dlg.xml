@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginLeft="5dp"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText,InefficientWeight,SelectableText" >
+
+    <TextView
+        android:id="@+id/edit_activity_extra_data_item_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/msgs_edit_profile_action_activity_extra_data_dlg_title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <include layout="@layout/divider_line1_turquoise" />
+
+    <TextView
+        android:id="@+id/edit_activity_extra_data_item_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#ff0000" />
+
+    <EditText
+        android:id="@+id/edit_activity_extra_data_item_key"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Key name"
+        android:inputType="text" >
+
+        <requestFocus />
+    </EditText>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <CheckBox
+            android:id="@+id/edit_activity_extra_data_item_array"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="@string/msgs_edit_profile_action_activity_extra_data_dlg_array"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            android:id="@+id/edit_activity_extra_data_item_add_array"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:text="@string/msgs_edit_profile_action_activity_extra_data_dlg_add_array_btn" 
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:text="@string/msgs_edit_profile_action_activity_extra_data_dlg_extra_data_type"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Spinner
+            android:id="@+id/edit_activity_extra_data_item_data_type"
+            style="@android:style/Widget.Spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/spinner_color_background"
+            android:minHeight="30dp"
+            android:paddingLeft="5dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
+
+    <include layout="@layout/divider_line2" />
+
+    <EditText
+        android:id="@+id/edit_activity_extra_data_item_data_int"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_marginLeft="5dp"
+        android:inputType="number"
+        android:hint="int value"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <EditText
+        android:id="@+id/edit_activity_extra_data_item_data_string"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_marginLeft="5dp"
+        android:inputType="text"
+        android:hint="String value" 
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+     <Spinner
+         android:id="@+id/edit_activity_extra_data_item_data_boolean"
+         style="@android:style/Widget.Spinner"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginBottom="5dp"
+         android:layout_marginLeft="5dp"
+         android:layout_marginRight="5dp"
+         android:background="@drawable/spinner_color_background"
+         android:minHeight="30dp"
+         android:paddingLeft="5dp"
+         android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+    <include layout="@layout/edit_activity_extra_data_item_dlg_apply_cancel"/>
+
+    <ListView
+        android:id="@+id/edit_activity_extra_data_item_array_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+    </ListView>
+
+    <TextView
+        android:id="@+id/edit_activity_extra_data_item_array_spacer"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+    </TextView>
+    
+	<include layout="@layout/edit_activity_extra_data_item_dlg_ok_cancel"/>
+</LinearLayout>

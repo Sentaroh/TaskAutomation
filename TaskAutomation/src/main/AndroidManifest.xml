@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sentaroh.android.TaskAutomation">
+    
+    <uses-sdk android:targetSdkVersion="11" android:minSdkVersion="10" />
+    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/> 
+	<uses-permission android:name="android.permission.BLUETOOTH"/>
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.USES_POLICY_FORCE_LOCK"/>
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
+    <uses-permission android:name="android.permission.NFC"/>
+
+    <application 
+        android:icon="@drawable/main_icon"
+        android:label="@string/app_name" android:theme="@style/Main" 
+        android:allowBackup="true"
+        android:name="GlobalParameters">
+        <receiver 
+    	    android:name=".SchedulerReceiver"
+    	    android:icon="@drawable/main_icon" 
+    	    android:label="TaskReceiver"
+    	    android:process=":Svc" 
+    	    android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="android.intent.action.ACTION_SHUTDOWN" />
+				<action android:name="android.intent.action.LOCALE_CHANGED" />
+				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_START_ACTIVITY_TASK_STATUS"/>
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_DISABLE_KEYGUARD" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_ENABLE_KEYGUARD" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_TIMER_EXPIRED" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_START_SCHEDULER" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_RESTART_SCHEDULER" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_RESET_SCHEDULER" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_BUILD_EXEC_TASK_LIST" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_RELOAD_DEVICE_ADMIN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.EXTERNAL_INTERFACE_REQUEST" />
+				
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_HOME_SCREEN_BATTERY_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_HOME_SCREEN_WIFI_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_HOME_SCREEN_BLUETOOTH_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_HOME_SCREEN_SILENT_BTN" />
+	
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_LOCKED_SCREEN_SIMPLE_BATTERY_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_LOCKED_SCREEN_SIMPLE_WIFI_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_LOCKED_SCREEN_SIMPLE_BLUETOOTH_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_LOCKED_SCREEN_SIMPLE_SILENT_BTN" />
+				
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_LOCKED_SCREEN_WITH_INFO_BATTERY_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_LOCKED_SCREEN_WITH_INFO_WIFI_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_LOCKED_SCREEN_WITH_INFO_BLUETOOTH_BTN" />
+				<action android:name="com.sentaroh.android.TaskAutomation.DEVICE_LOCKED_SCREEN_WITH_INFO_SILENT_BTN" />
+			</intent-filter>
+		</receiver>
+        <receiver 
+            android:name=".DevAdmReceiver"
+            android:process=":Svc"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data 
+                android:name="android.app.device_admin"
+                android:resource="@xml/policy_device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+       	</receiver>
+		<service 
+		    android:name=".SchedulerService" 
+		    android:process=":Svc" android:exported="false">
+			<intent-filter>
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_SERVICE_HEARTBEAT" />
+			</intent-filter>
+						
+		</service>
+		<service 
+		    android:name=".SchedulerMonitor" 
+		    android:process=":Mon" android:exported="false">
+        </service>
+		
+        <activity
+            android:name="com.sentaroh.android.TaskAutomation.Config.ActivityMain"
+            android:label="@string/app_name" 
+            android:launchMode="standard"
+            android:configChanges="orientation|keyboardHidden"
+            android:alwaysRetainTaskState="true" 
+            android:windowSoftInputMode="adjustPan" android:icon="@drawable/main_icon">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            
+        </activity>
+        <activity 
+	        android:name="com.sentaroh.android.TaskAutomation.Config.ActivitySettings"
+            android:label="Settings"
+            android:screenOrientation="unspecified"
+            android:launchMode="standard" >
+        </activity>
+        <activity 
+	        android:name=".ActivityTaskStatus"
+            android:label="TaskStatus"
+            android:process=":Sub"
+            android:screenOrientation="unspecified" 
+            android:launchMode="singleTop"
+            android:configChanges="orientation|keyboardHidden" 
+            android:taskAffinity=".ActivityTaskStatus" android:excludeFromRecents="true">
+        </activity>
+        <activity 
+	        android:name=".ActivityRestartScheduler"
+            android:label="RestartScheduler"
+            android:launchMode="singleTask"
+            android:process=":Sub"
+            android:screenOrientation="unspecified" 
+            android:configChanges="orientation|keyboardHidden" 
+            android:clearTaskOnLaunch="true"
+            android:theme="@android:style/Theme.Translucent" 
+            android:taskAffinity=".ActivityRestartScheduler" android:excludeFromRecents="true">
+        </activity>
+        <activity 
+	        android:name=".ActivityNfcReceiver"
+            android:label="NfcReceiver"
+            android:launchMode="singleTask"
+            android:process=":Nfc"
+            android:screenOrientation="unspecified" 
+            android:configChanges="orientation|keyboardHidden" 
+            android:clearTaskOnLaunch="true"
+            android:theme="@android:style/Theme.Translucent" 
+            android:excludeFromRecents="true">
+			<!-- 
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+			    <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+			    <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+			    <category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+			<meta-data
+			    android:name="android.nfc.action.TECH_DISCOVERED"
+			    android:resource="@xml/nfc_filter" />			
+			-->            
+        </activity>
+        <activity 
+	        android:name=".ActivityMessage"
+            android:label="MessageDialog"
+            android:screenOrientation="unspecified" 
+            android:clearTaskOnLaunch="false"
+            android:process=":Sub" 
+            android:configChanges="orientation|keyboardHidden" 
+            android:launchMode="standard"
+            android:taskAffinity=".ActivityMessageDialog" android:theme="@android:style/Theme.Translucent" android:excludeFromRecents="true">
+        </activity>
+        <activity 
+	        android:name=".ShortcutSleep"
+            android:label="@string/msgs_sleep_appname"
+            android:screenOrientation="unspecified"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent"
+            android:taskAffinity=".ShortcutSleep"
+            android:configChanges="orientation|keyboardHidden" android:excludeFromRecents="true">
+   			<intent-filter >
+				<action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
+        <activity 
+	        android:name=".ShortcutMakeSleep"
+            android:label="@string/msgs_sleep_appname"
+            android:exported="true"
+            android:icon="@drawable/sleepbtn" android:excludeFromRecents="true">
+   			<intent-filter>
+		        <action android:name="android.intent.action.CREATE_SHORTCUT" />
+		        <category android:name="android.intent.category.DEFAULT" />
+		    </intent-filter>
+        </activity>
+        
+        <receiver 
+    	    android:name=".WidgetProviderBattery"
+    	    android:icon="@drawable/device_battery_charge_100"
+    	    android:process=":Svc"
+    	    android:exported="true" 
+    	    android:label="@string/msgs_widget_battery">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data 
+			    android:name="android.appwidget.provider"
+			    android:resource="@xml/widget_battery" />
+		</receiver>
+		<receiver 
+    	    android:name=".WidgetProviderWIFI" 
+		    android:icon="@drawable/device_wifi_on"
+		    android:process=":Svc"
+		    android:exported="true" 
+    	    android:label="@string/msgs_widget_wifi">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data 
+			    android:name="android.appwidget.provider"
+			    android:resource="@xml/widget_wifi" />
+		</receiver>
+		<receiver 
+    	    android:name=".WidgetProviderBluetooth"
+    	    android:icon="@drawable/device_bluetooth_on"
+    	    android:process=":Svc"
+    	    android:exported="true" 
+    	    android:label="@string/msgs_widget_bluetooth">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data 
+			    android:name="android.appwidget.provider"
+			    android:resource="@xml/widget_bluetooth" />
+		</receiver>
+		<receiver 
+    	    android:name=".WidgetProviderSilent"
+    	    android:icon="@drawable/device_silent_on"
+    	    android:process=":Svc"
+    	    android:exported="true" 
+    	    android:label="@string/msgs_widget_silent">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data 
+			    android:name="android.appwidget.provider"
+			    android:resource="@xml/widget_silent" />
+		</receiver>
+		<receiver 
+    	    android:name=".WidgetProviderLockedScreenSimple"
+    	    android:icon="@drawable/device_battery_charge_100"
+    	    android:process=":Svc"
+    	    android:exported="true" 
+    	    android:label="@string/msgs_widget_locked_screen_simple">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data 
+			    android:name="android.appwidget.provider"
+			    android:resource="@xml/widget_locked_screen_simple" />
+		</receiver>
+		<receiver 
+    	    android:name=".WidgetProviderLockedScreenWithInfo"
+    	    android:icon="@drawable/device_battery_charge_100"
+    	    android:process=":Svc"
+    	    android:exported="true" 
+    	    android:label="@string/msgs_widget_locked_screen_with_info">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data 
+			    android:name="android.appwidget.provider"
+			    android:resource="@xml/widget_locked_screen_with_info" />
+		</receiver>
+		<receiver 
+    	    android:name="com.sentaroh.android.TaskAutomation.Log.LogReceiver"
+    	    android:icon="@drawable/main_icon" 
+    	    android:process=":Svc" 
+    	    android:exported="false">
+			<intent-filter>
+			    <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+			    <action android:name="android.intent.action.MEDIA_MOUNTED" />
+			    <action android:name="android.intent.action.MEDIA_EJECT" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_SEND" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_RESET" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_DELETE" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_ROTATE" />
+				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_FLUSH" />
+			</intent-filter>
+		</receiver>
+				
+    </application>
+    
+</manifest>

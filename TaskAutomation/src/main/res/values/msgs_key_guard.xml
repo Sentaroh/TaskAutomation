@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_key_guard_trust_device_label_add">Add trusted device</string>
+    <string name="msgs_key_guard_trust_device_label_delete">Delete selected item</string>
+	<string name="msgs_key_guard_trust_device_label_select_all">Select all item</string>
+	<string name="msgs_key_guard_trust_device_label_unselect_all">Unselect all item</string>
+    	
+    <string name="msgs_key_guard_trust_device_delete_confirm_msg">Are you sure you want to remove the following items?</string>
+    <string name="msgs_key_guard_trust_device_add_new_wifi_ap_msg">Access points that are currently connected has been registered in the already trusted access point.</string>
+    <string name="msgs_key_guard_trust_device_turn_on_wifi_msg">Wireless LAN could not get the information because it is off.</string>
+    <string name="msgs_key_guard_trust_device_no_trust_item_msg">Trusted access point or Bluetooth device is not registered.</string>
+    
+    <string name="msgs_key_guard_trust_device_add_new_dev_some_error">Some devices do not appear for the following reason</string>
+    
+    <string name="msgs_key_guard_trust_device_add_new_bt_title">Please select a trusted devices</string>
+    <string name="msgs_key_guard_trust_device_add_new_bt_no_dev_msg">All devices and is registered as a trusted devices that is set in the pair with Bluetooth.</string>
+    <string name="msgs_key_guard_trust_device_add_new_bt_adapter_on_msg">Bluetooth device information can not acquired because Bluetooth adapter is turned off.</string>
+    
+    <string name="msgs_key_guard_trust_device_restart_scheduler_required">To reflect the update you need to restart the scheduler. Are you sure you want to restart the scheduler right now?</string>
+    
+	<string name="msgs_key_gurad_info_keyguard_ctrl_disabled">Disable keyguard control</string>
+	<string name="msgs_key_gurad_info_keyguard_ctrl_enabled">Enable keyguard control</string>
+	
+	<string name="msgs_key_gurad_info_keyguard_disabled_after_unlock">Keyguard manual unlock required</string>
+	
+    
+</resources>

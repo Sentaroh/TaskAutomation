@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <issue id="ButtonStyle">
+        <ignore path="res/layout-large-v14/edit_profile_action_dlg_ok_cancel.xml" />
+        <ignore path="res/layout-large-v14/edit_profile_task_dlg_ok_cancel.xml" />
+        <ignore path="res/layout-large-v14/edit_profile_time_dlg_ok_cancel.xml" />
+        <ignore path="res/layout-large-v14/export_import_profile_dlg_ok_cancel.xml" />
+        <ignore path="res/layout-large-v14/rename_profile_dlg_ok_cancel.xml" />
+        <ignore path="res/layout-v14/activity_message_ok_cancel.xml" />
+        <ignore path="res/layout-v14/edit_activity_extra_data_item_dlg_apply_cancel.xml" />
+    </issue>
+    <issue id="ContentDescription">
+        <ignore path="res/layout/notification_layout.xml" />
+        <ignore path="res/layout/widget_main.xml" />
+    </issue>
+    <issue id="HardcodedText">
+        <ignore path="res/layout-large/activity_main.xml" />
+        <ignore path="res/layout/activity_main.xml" />
+        <ignore path="res/layout/main.xml" />
+        <ignore path="res/layout/main_list_item.xml" />
+        <ignore path="res/layout/msg_list_item_view.xml" />
+        <ignore path="res/layout/notification_layout.xml" />
+    </issue>
+    <issue id="InflateParams">
+        <ignore path="src/com/sentaroh/android/TaskAutomation/Config/ActivityMain.java" />
+    </issue>
+    <issue id="InlinedApi">
+        <ignore path="src/com/sentaroh/android/TaskAutomation/TaskManager.java" />
+    </issue>
+    <issue id="NewApi">
+        <ignore path="src/com/sentaroh/android/TaskScheduler/ActivityMain.java" />
+        <ignore path="src/com/sentaroh/android/TaskScheduler/ActivitySoundPlaybackDialog.java" />
+    </issue>
+    <issue id="SdCardPath">
+        <ignore path="src/com/sentaroh/android/TaskScheduler/CommonUtil.java" />
+        <ignore path="src/com/sentaroh/android/TaskScheduler/TaskSchedulerMain.java" />
+        <ignore path="src/com/sentaroh/android/TaskScheduler/TaskSchedulerUtil.java" />
+    </issue>
+    <issue id="UselessParent">
+        <ignore path="res/layout-large/activity_main.xml" />
+        <ignore path="res/layout/activity_main.xml" />
+    </issue>
+    <issue id="WorldReadableFiles">
+        <ignore path="src/com/sentaroh/android/TaskScheduler/DeviceProviderBattery.java" />
+        <ignore path="src/com/sentaroh/android/TaskScheduler/DeviceProviderBluetooth.java" />
+        <ignore path="src/com/sentaroh/android/TaskScheduler/DeviceProviderWIFI.java" />
+        <ignore path="src/com/sentaroh/android/TaskScheduler/DeviceServiceMonitor.java" />
+    </issue>
+</lint>

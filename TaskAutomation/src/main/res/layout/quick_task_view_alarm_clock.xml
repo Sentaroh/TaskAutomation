@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/msgs_quick_hdr_alarm_clock"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	<include android:id="@+id/quick_task_view_alarm_clock_01"
+	    layout="@layout/quick_task_view_alarm_clock_detail" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="20dp"/>
+	<include android:id="@+id/quick_task_view_alarm_clock_02" 
+	    layout="@layout/quick_task_view_alarm_clock_detail" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="20dp"/>
+	<include android:id="@+id/quick_task_view_alarm_clock_03" 
+	    layout="@layout/quick_task_view_alarm_clock_detail" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="20dp"/>
+				
+
+</LinearLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_status_dialog_title">TaskAutomation info</string>
+    <string name="msgs_status_dialog_active_task">Active tasks</string>
+    <string name="msgs_status_dialog_task_history">Task history</string>
+    <string name="msgs_status_dialog_cancel_button">Cancel task</string>
+    <string name="msgs_status_dialog_refresh">Refresh</string>
+    <string name="msgs_status_dialog_close">Close</string>
+    <string name="msgs_status_dialog_log">Browse log</string>
+    <string name="msgs_status_dialog_enable_scheduler">Scheduler is enabled</string>
+    
+	<string name="msgs_status_dialog_enable_scheduler_confirm_msg_enable">Are you sure you want to enable the scheduler?</string>
+	<string name="msgs_status_dialog_enable_scheduler_confirm_msg_disable">Are you sure you want to disable the scheduler?</string>
+    
+    <string name="msgs_status_view_stat_success">Success</string>
+    <string name="msgs_status_view_stat_error">Error</string>
+    <string name="msgs_status_view_stat_cancelled">Cancelled</string>
+    <string name="msgs_status_view_stat_started">Started</string>
+    
+    <string name="msgs_status_ccmenu_refresh">Refresh</string>
+    <string name="msgs_status_ccmenu_move_top">Top</string>
+	<string name="msgs_status_ccmenu_move_bottom">Bottom</string>
+	<string name="msgs_status_ccmenu_clear">Clear</string>
+    
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+    <header android:title="@string/settings_main_enable_scheduler_title"
+        android:fragment="com.sentaroh.android.TaskAutomation.Config.ActivitySettings$SettingsSceduler"/>
+	<header android:title="@string/settings_main_log_title"
+	    android:fragment="com.sentaroh.android.TaskAutomation.Config.ActivitySettings$SettingsLog"/>
+	<header android:title="@string/settings_main_light_sensor_title"
+	    android:fragment="com.sentaroh.android.TaskAutomation.Config.ActivitySettings$SettingsLight"/>
+<!-- 	
+	<header android:title="@string/settings_main_magnetic_field_sensor_title"
+	    android:fragment="com.sentaroh.android.TaskAutomation.Config.ActivitySettings$SettingsMagnetic"/>
+ -->    
+	<header android:title="@string/settings_main_misc_title"
+	    android:fragment="com.sentaroh.android.TaskAutomation.Config.ActivitySettings$SettingsMisc"/>
+</preference-headers>

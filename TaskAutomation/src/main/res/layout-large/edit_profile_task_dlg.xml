@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:ignore="UselessParent,HardcodedText" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+	    <TextView
+	        android:id="@+id/edit_profile_task_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:text="Edit profile"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        tools:ignore="HardcodedText" />
+
+	    <TextView
+	        android:id="@+id/edit_profile_task_title_sub"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:text=""
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        tools:ignore="HardcodedText" />
+	    
+    </LinearLayout>
+    
+
+    <include layout="@layout/divider_line1_turquoise" />
+
+    <EditText
+        android:id="@+id/edit_profile_task_profile_et_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/msgs_edit_profile_hdr_profile_name"
+        android:inputType="text"
+        android:singleLine="true"
+        android:text="" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <CheckBox
+                android:id="@+id/edit_profile_task_enabled"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/msgs_edit_profile_hdr_enabled" />
+
+            <CheckBox
+                android:id="@+id/edit_profile_task_error_notification"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/msgs_edit_profile_hdr_notification" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp" >
+
+            <TextView
+                android:layout_width="165dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:text="@string/msgs_edit_profile_hdr_event"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <Spinner
+                    android:id="@+id/edit_profile_task_exec_trigger_category"
+                    style="@android:style/Widget.Spinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/spinner_color_background"
+                    android:minHeight="30dp"
+                    android:paddingLeft="5dp" />
+
+                <Spinner
+                    android:id="@+id/edit_profile_task_exec_trigger_event"
+                    style="@android:style/Widget.Spinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/spinner_color_background"
+                    android:minHeight="30dp"
+                    android:paddingLeft="5dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" >
+
+                <TextView
+                    android:id="@+id/edit_profile_task_action_category"
+                    android:layout_width="165dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:text="@string/msgs_edit_profile_action_select_category"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <Spinner
+                        android:id="@+id/edit_profile_task_select_action"
+                        style="@android:style/Widget.Spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/spinner_color_background"
+                        android:minHeight="30dp"
+                        android:paddingLeft="5dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical" >
+
+                        <Spinner
+                            android:id="@+id/edit_profile_task_user_actionlist"
+                            style="@android:style/Widget.Spinner"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:background="@drawable/spinner_color_background"
+                            android:minHeight="30dp"
+                            android:paddingLeft="5dp" />
+
+                        <Spinner
+                            android:id="@+id/edit_profile_task_builtin_primitive_actionlist"
+                            style="@android:style/Widget.Spinner"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:background="@drawable/spinner_color_background"
+                            android:minHeight="30dp"
+                            android:paddingLeft="5dp" />
+
+                        <Spinner
+                            android:id="@+id/edit_profile_task_builtin_abort_actionlist"
+                            style="@android:style/Widget.Spinner"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:background="@drawable/spinner_color_background"
+                            android:minHeight="30dp"
+                            android:paddingLeft="5dp" />
+
+                        <Spinner
+                            android:id="@+id/edit_profile_task_builtin_skip_actionlist"
+                            style="@android:style/Widget.Spinner"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:background="@drawable/spinner_color_background"
+                            android:minHeight="30dp"
+                            android:paddingLeft="5dp" />
+                        
+                        <Spinner
+                            android:id="@+id/edit_profile_task_builtin_cancel_actionlist"
+                            style="@android:style/Widget.Spinner"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:background="@drawable/spinner_color_background"
+                            android:minHeight="30dp"
+                            android:paddingLeft="5dp" />
+
+                        <Spinner
+                            android:id="@+id/edit_profile_task_builtin_block_actionlist"
+                            style="@android:style/Widget.Spinner"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:background="@drawable/spinner_color_background"
+                            android:minHeight="30dp"
+                            android:paddingLeft="5dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/android:list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:fadeScrollbars="false"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <include layout="@layout/divider_line1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/edit_profile_task_test_exec"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/msgs_edit_profile_action_test_exec" />
+
+        <Button
+            android:id="@+id/edit_profile_task_test_edit_parms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="@string/msgs_edit_profile_task_test_edit_parms" />
+        
+        <CheckBox
+            android:id="@+id/edit_profile_task_enable_env_parms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:text="@string/msgs_edit_profile_task_enable_env_parms" />
+
+    </LinearLayout>
+
+    <include layout="@layout/edit_profile_task_dlg_ok_cancel"/>
+
+</LinearLayout>

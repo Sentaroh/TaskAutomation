@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TaskAutomation</string>
+    <string name="notification_error">TaskAutomation Error</string>
+    <string name="notification_plyback_close">TaskAutomation Notification playback close</string>
+
+</resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+   	    <CheckBoxPreference
+			android:key="settings_main_enable_scheduler"
+			android:title="@string/settings_main_enable_scheduler_title"
+			android:summary="@string/settings_main_enable_scheduler_summary_ena" />
+   	    <ListPreference
+			android:key="settings_main_scheduler_max_task_count"
+			android:title="@string/settings_main_scheduler_max_task_count_title"
+			android:summary="@string/settings_main_scheduler_max_task_count_summary"
+			android:dialogTitle="@string/settings_main_scheduler_max_task_count_title"
+			android:entries="@array/settings_main_scheduler_max_task_count_list_entries"
+			android:entryValues="@array/settings_main_scheduler_max_task_count_list_entries"/>
+   	    <ListPreference
+			android:key="settings_main_scheduler_thread_pool_count"
+			android:title="@string/settings_main_scheduler_thread_pool_count_title"
+			android:summary="@string/settings_main_scheduler_thread_pool_count_summary"
+			android:dialogTitle="@string/settings_main_scheduler_thread_pool_count_title"
+			android:entries="@array/settings_main_scheduler_thread_pool_count_list_entries"
+			android:entryValues="@array/settings_main_scheduler_thread_pool_count_list_entries"/>
+   	    
+   	    <CheckBoxPreference
+			android:key="settings_main_scheduler_monitor"
+			android:title="@string/settings_main_scheduler_monitor_title"
+			android:summary="@string/settings_main_scheduler_monitor_summary_ena" />
+   	    	    
+   	    <CheckBoxPreference
+			android:key="settings_main_device_admin"
+			android:title="@string/settings_main_device_admin_title"
+			android:summary="@string/settings_main_device_admin_summary_ena" />
+
+   	    <ListPreference
+			android:key="settings_main_scheduler_sleep_wake_lock_option"
+			android:title="@string/settings_main_scheduler_sleep_wake_lock_option_title"
+			android:summary="@string/settings_main_scheduler_sleep_wake_lock_option_summary"
+			android:dialogTitle="@string/settings_main_scheduler_sleep_wake_lock_option_title"
+			android:entries="@array/settings_main_scheduler_sleep_wake_lock_option_list_entries"
+			android:entryValues="@array/settings_main_scheduler_sleep_wake_lock_option_list_values"/>
+   	    	    
+   	    <CheckBoxPreference
+			android:key="settings_main_scheduler_sleep_wake_lock_light_sensor"
+			android:title="@string/settings_main_scheduler_sleep_wake_lock_light_sensor_title"
+			android:summary="@string/settings_main_scheduler_sleep_wake_lock_light_sensor_summary_ena" />
+
+   	    <CheckBoxPreference
+			android:key="settings_main_scheduler_sleep_wake_lock_proximity_sensor"
+			android:title="@string/settings_main_scheduler_sleep_wake_lock_proximity_sensor_title"
+			android:summary="@string/settings_main_scheduler_sleep_wake_lock_proximity_sensor_summary_ena"/>
+
+   	    <CheckBoxPreference
+			android:key="settings_main_use_root_privilege"
+			android:title="@string/settings_main_use_root_privilege_title"
+			android:summary="@string/settings_main_use_root_privilege_summary_ena" />
+   	    	    	    	    	    	    
+</PreferenceScreen>

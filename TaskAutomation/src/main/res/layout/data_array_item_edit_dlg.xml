@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" xmlns:tools="http://schemas.android.com/tools" tools:ignore="HardcodedText">
+
+    <TextView
+        android:id="@+id/data_array_item_edit_dlg_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <include layout="@layout/divider_line1_turquoise" />
+    
+    <TextView
+        android:id="@+id/data_array_item_edit_dlg_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#ff0000" />
+
+    <EditText
+        android:id="@+id/data_array_item_edit_dlg_value"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="value"
+        android:inputType="text"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <include layout="@layout/data_array_item_edit_dlg_ok_cancel"/>
+        
+</LinearLayout>

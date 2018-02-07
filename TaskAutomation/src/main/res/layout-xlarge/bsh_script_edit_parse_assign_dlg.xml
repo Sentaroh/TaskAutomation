@@ -1,0 +1,95 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText,UselessParent,InefficientWeight,NestedWeights" >
+
+    <TextView
+        android:id="@+id/bsh_script_edit_parse_assign_dlg_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <include layout="@layout/divider_line1_turquoise" />
+
+    <TextView
+        android:id="@+id/bsh_script_edit_parse_assign_dlg_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#ff0000" />
+
+    <ListView
+        android:id="@+id/bsh_script_edit_parse_assign_dlg_select_itemlist"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" 
+        android:layout_weight="1">
+    </ListView>
+	
+	<include layout="@layout/divider_line1" />    
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+	    <EditText
+	        android:id="@+id/bsh_script_edit_parse_assign_dlg_string_value"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:ems="10"
+	        android:hint="value"
+	        android:inputType="text" >
+	    </EditText>
+        
+        <Button
+            android:id="@+id/bsh_script_edit_parse_assign_dlg_playback_sound_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/msgs_bsh_method_editor_dlg_playback_sound_start" />
+
+        <Button
+            android:id="@+id/bsh_script_edit_parse_assign_dlg_playback_sound_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/msgs_bsh_method_editor_dlg_playback_sound_stop" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/bsh_script_edit_parse_assign_dlg_int_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="value"
+        android:inputType="number" >
+    </EditText>
+    
+    <RadioGroup
+        android:id="@+id/bsh_script_edit_parse_assign_dlg_rg_boolean"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/bsh_script_edit_parse_assign_dlg_rg_boolean_true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="true" />
+
+        <RadioButton
+            android:id="@+id/bsh_script_edit_parse_assign_dlg_rg_boolean_false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="false" />
+    </RadioGroup>
+
+    <include layout="@layout/bsh_script_edit_parse_assign_dlg_ok_cancel"/>
+
+</LinearLayout>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="msgs_thread_task_started" formatted="false"
+	    >タスクが開始されました。 グループ=%s, イベント=%s, タスク=%s</string>    
+	<string name="msgs_thread_task_end_success" formatted="false"
+	    >タスクが正常終了しました。  グループ=%s, イベント=%s, タスク=%s</string>
+	<string name="msgs_thread_task_end_cancelled" formatted="false">タスクがキャンセルされました。 グループ=%s, イベント=%s, タスク=%s</string>
+	<string name="msgs_thread_task_end_error" formatted="false">タスクが異常終了しました。 グループ=%s,  イベント=%s, タスク=%s</string>
+	<string name="msgs_thread_task_exec_android" formatted="false">実行中のアクション: アクション名=%s, Android=%s, パッケージ=%s</string>
+	<string name="msgs_thread_task_exec_builtin">実行中のアクション Builtin=%s</string>
+	<string name="msgs_thread_task_exec_builtin_abort">%s が成立したためタスクを停止しました。</string>
+	<string name="msgs_thread_task_intent_notfound">Androidパッケージが不明です。 パッケージ=%s</string>
+	<string name="msgs_thread_task_screen_lock_ignored" formatted="false">
+	    スクリーンロックが無効になっているため、*LOCK-SCREENを無視しました。イベント=%s, タスク=%s</string>
+	<string name="msgs_thread_task_unknoww_action">不明なアクションです。 アクション=%s</string>
+	
+	<string name="msgs_thread_task_exec_play_sound" formatted="false">実行中のアクション: アクション名=%s, Music, ファイル名=%s</string>
+	<string name="msgs_thread_task_play_sound_notfound">ファイルが存在しません。ファイル名=%s</string>
+	<string name="msgs_thread_task_play_ringtone_notfound">リングトーンが存在しません。リングトーン名=%s</string>
+	<string name="msgs_thread_task_play_sound_error">不明なエラーが発生しました。ファイル名=%s</string>
+	
+	<string name="msgs_thread_task_exec_play_ringtone" formatted="false">実行中のアクション:Action名=%s, Ringtone, タイプ=%s, 名前=%s</string>	
+	
+	<string name="msgs_thread_task_exec_compare" formatted="false">
+	    実行したアクション: アクション名=%s, Compare=%s, Current-Value=%s, Target=%s, Type=%s, Compare-Value=(%s), Result-Action=%s</string>
+	<string name="msgs_thread_task_exec_compare_abort">指定条件が成立したためタスクを停止しました。</string>
+	<string name="msgs_thread_task_exec_compare_skip">指定条件が成立したため次のアクションをスキップします。 スキップしたアクション=%s</string>
+	
+	<string name="msgs_thread_task_exec_light_not_available">明度センサーが使用できないためタスクを停止しました。</string>
+	<string name="msgs_thread_task_exec_proximity_not_available">近接センサーが使用できないためタスクを停止しました。</string>
+	<string name="msgs_thread_task_exec_magnetic_field_not_available">磁気センサーが使用できないためタスクを停止しました。</string>
+
+	<string name="msgs_thread_task_exec_message" formatted="false">実行中のアクション:Message=%s, Type=%s, Vibration=%s, LED=%s, LED Color=%s</string>
+	
+	<string name="msgs_thread_task_exec_time" formatted="false">実行中のアクション:Time=%s, Type=%s, Target=%s</string>
+	<string name="msgs_thread_task_exec_task" formatted="false">実行中のアクション:Task=%s, Type=%s, Target=%s</string>
+	
+	<string name="msgs_thread_task_exec_ignore_sound_ringer_not_normal">Ringerモードがサイレントまたはバイブレートのためタスクを無視しました。</string>
+
+	<string name="msgs_thread_task_exec_wait" formatted="false">実行中のアクション:Wait=%s, Target=%s, Timeout=%s, Units=%s</string>
+	
+	<string name="msgs_thread_task_sound_playback_notification_title">音の再生停止</string>
+	<string name="msgs_thread_task_sound_playback_notification_text">アイコンをタップすると全ての音の再生を停止します</string>
+</resources>

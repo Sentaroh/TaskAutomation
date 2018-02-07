@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_dialog_dlg_close">閉じる</string>
+    <string name="msgs_dialog_dlg_stop">ストップ</string>
+    
+    <string name="msgs_sound_dialog_dlg_subtitle">サウンド再生中</string>
+    <string name="msgs_sound_dialog_dlg_close">閉じる</string>
+    <string name="msgs_sound_dialog_dlg_stop">再生停止</string>
+    
+    <string name="msgs_restart_dialog_dlg_subtitle_restarting">Schedulerの再起動中</string>
+    <string name="msgs_restart_dialog_dlg_subtitle_waiting">タスクの終了待ち</string>
+    <string name="msgs_restart_dialog_dlg_stop">強制的に再起動</string>
+    <string name="msgs_restart_dialog_dlg_close">キャンセル</string>
+    
+</resources>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_main_title">設定</string>
+    
+	<string name="settings_main_enable_scheduler_title">スケジューラー</string>
+    <string name="settings_main_enable_scheduler_summary_ena">タスクを実行する</string>
+	
+	<string name="settings_main_scheduler_max_task_count_title">最大タスク数</string>
+	<string name="settings_main_scheduler_max_task_count_summary">現在値=20</string>
+	
+	<string name="settings_main_scheduler_thread_pool_count_title">スレッドプール数</string>
+	<string name="settings_main_scheduler_thread_pool_count_summary">現在値=5</string>
+		
+	<string name="settings_main_log_title">ログオプション</string>
+	<string name="settings_main_terminate_title">終了オプション</string>
+
+    <string name="settings_main_scheduler_monitor_title">スケジューラー監視</string>
+    <string name="settings_main_scheduler_monitor_summary_ena">スケジューラーが停止した場合は再起動する</string>
+				
+    <string name="settings_main_device_admin_title">スクリーンのロック</string>
+    <string name="settings_main_device_admin_summary_ena">スクリーンロックを使用する</string>
+
+	<string name="settings_main_scheduler_sleep_wake_lock_option_title">スクリーン消灯時のWakeLock</string>
+	<string name="settings_main_scheduler_sleep_wake_lock_option_summary"></string>
+	<string-array name="settings_main_scheduler_sleep_wake_lock_option_list_entries">
+        <item>システムで判断する</item>
+	    <item>常にWakeLockを保持する</item>
+        <item>個別に設定する</item>
+    </string-array>
+		
+	<string name="settings_main_scheduler_sleep_wake_lock_light_sensor_title">照明センサー使用時のWakeLock</string>
+	<string name="settings_main_scheduler_sleep_wake_lock_light_sensor_summary_ena">照明センサー使用時はWakeLockを保持する</string>
+	
+	<string name="settings_main_scheduler_sleep_wake_lock_proximity_sensor_title">近接センサー使用時のWakeLock</string>
+	<string name="settings_main_scheduler_sleep_wake_lock_proximity_sensor_summary_ena">近接センサー使用時はWakeLockを保持する</string>
+
+    <string name="settings_main_use_root_privilege_title">root権限の使用</string>
+    <string name="settings_main_use_root_privilege_summary_ena">root権限を使用する</string>
+    <string name="settings_main_use_root_privilege_summary_not_granted">root権限が許可されていません</string>
+
+	<string name="settings_main_log_option_title">ログ出力</string>
+    <string name="settings_main_log_option_summary_ena">ログを書き出す</string>
+    
+    <string name="settings_main_log_level_title">デバッグ情報</string>
+	<string name="settings_main_log_level_summary">現設定=0</string>
+	<string name="settings_main_log_level_dialog_title">レベルの選択</string>
+	<string-array name="settings_main_log_level_list_entries">
+        <item>0:デバッグなし</item>
+        <item>1:最小限の情報</item>
+        <item>2:詳細情報</item>
+        <item>3:詳細情報+ロック情報</item>
+    </string-array>
+    
+    <string name="settings_main_log_file_max_count_title">保持するログファイルの最大数</string>
+	<string name="settings_main_log_file_max_count_summary">保持するログファイルの最大数=</string>
+	<string name="settings_main_log_file_max_count_dialog_title">ログファイルの最大数</string>
+		
+    <string name="settings_main_log_dir">settings_main_log_dir</string>
+	<string name="settings_main_log_dir_title">ログファイルのディレクトリ</string>        
+    <string name="settings_main_log_dir_summary">現在</string>        
+        
+    <string name="settings_main_default_current_setting">現設定=</string>
+    
+    <string name="settings_main_misc_title">その他</string>
+    
+    <string name="settings_main_exit_clean_title">終了時の処理</string>
+    <string name="settings_main_exit_clean_summary_ena">アプリケーション終了時にプロセスをキルする</string>
+
+	<string name="settings_main_sample_title">サンプルプロファイル</string>
+	<string name="settings_main_sample_recreate_title">サンプルプロファイルの再作成</string>
+    <string name="settings_main_sample_recreate_summary_ena">設定終了時に再作成する</string>
+	
+	<string name="settings_main_light_sensor_title">照明センサー</string>
+	
+    <string name="settings_main_light_sensor_use_thread_title">照明センサー スレッド</string>
+    <string name="settings_main_light_sensor_use_thread_summary_ena">スレッドを使用する</string>
+	
+	<string name="settings_main_light_sensor_monitor_interval_time_title">モニター間隔時間(ミリ秒)</string>
+	<string name="settings_main_light_sensor_monitor_interval_time_summary">モニター間隔時間(ミリ秒)=</string>
+	<string name="settings_main_light_sensor_monitor_interval_time_dialog_title">モニター間隔時間の選択(ミリ秒)</string>
+
+    <string name="settings_main_light_sensor_monitor_active_time_title">モニター時間(ミリ秒)</string>
+	<string name="settings_main_light_sensor_monitor_active_time_summary">モニター時間(ミリ秒)=</string>
+	<string name="settings_main_light_sensor_monitor_active_time_dialog_title">モニター時間の選択(ミリ秒)</string>
+    
+    <string name="settings_main_light_sensor_detect_thresh_hold_title">明度閾値</string>
+	<string name="settings_main_light_sensor_detect_thresh_hold_summary">明度閾値=</string>
+	<string name="settings_main_light_sensor_detect_thresh_hold_dialog_title">明度閾値の選択</string>
+
+    <string name="settings_main_light_sensor_ignore_time_title">明度センサーの無視時間(秒)</string>
+	<string name="settings_main_light_sensor_ignore_time_summary">明度の有無を検知した後に無視する時間(秒)=</string>
+	<string name="settings_main_light_sensor_ignore_time_dialog_title">無視時間の選択(秒)</string>
+	
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_dialog_dlg_close">Close</string>
+    <string name="msgs_dialog_dlg_stop">Stop</string>
+    
+    <string name="msgs_sound_dialog_dlg_subtitle">Sound playing</string>
+    <string name="msgs_sound_dialog_dlg_close">Close</string>
+    <string name="msgs_sound_dialog_dlg_stop">Stop playback</string>
+    
+    <string name="msgs_restart_dialog_dlg_subtitle_restarting">Restarting the Scheduler</string>
+    <string name="msgs_restart_dialog_dlg_subtitle_waiting">Waiting for task termination</string>
+    <string name="msgs_restart_dialog_dlg_stop">Force restart</string>
+    <string name="msgs_restart_dialog_dlg_close">Cancel</string>
+        
+</resources>

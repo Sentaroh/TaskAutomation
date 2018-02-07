@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_status_dialog_title">TaskAutomation情報</string>
+    <string name="msgs_status_dialog_active_task">アクティブ</string>
+    <string name="msgs_status_dialog_task_history">履歴</string>
+	<string name="msgs_status_dialog_cancel_button">キャンセル</string>    
+    <string name="msgs_status_dialog_refresh">再読込</string>
+    <string name="msgs_status_dialog_close">閉じる</string>
+	<string name="msgs_status_dialog_log">ログ表示</string>
+	<string name="msgs_status_dialog_enable_scheduler">スケジューラー有効</string>
+	
+	<string name="msgs_status_dialog_enable_scheduler_confirm_msg_enable">スケジューラーを有効にしますか？</string>
+	<string name="msgs_status_dialog_enable_scheduler_confirm_msg_disable">スケジューラーを無効にしますか？</string>
+    
+    <string name="msgs_status_view_stat_success">成功</string>
+    <string name="msgs_status_view_stat_error">エラー</string>
+    <string name="msgs_status_view_stat_cancelled">キャンセル</string>
+    <string name="msgs_status_view_stat_started">開始</string>
+    
+    <string name="msgs_status_ccmenu_refresh">再読込</string>
+    <string name="msgs_status_ccmenu_move_top">先頭</string>
+	<string name="msgs_status_ccmenu_move_bottom">最後</string>
+	<string name="msgs_status_ccmenu_clear">消去</string>
+    
+</resources>

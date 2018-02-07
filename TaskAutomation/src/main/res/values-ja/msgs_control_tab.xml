@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_control_tab_export_profile">プロファイル書出</string>
+    <string name="msgs_control_tab_import_profile">プロファイル取込</string>
+    
+    <string name="msgs_control_tab_send_logfile">ログを開発者に送信</string>
+    <string name="msgs_control_tab_delete_logfile">ログを消去</string>
+    <string name="msgs_control_tab_rotate_logfile">ログを保存</string>
+    
+    <string name="msgs_control_tab_log_option_enabled">ログ記録を無効</string>
+    <string name="msgs_control_tab_log_option_disabled">ログ記録を有効</string>
+    
+    <string name="msgs_control_tab_quick_task_switch_enabled">QuickTaskを無効</string>
+    <string name="msgs_control_tab_quick_task_switch_disabled">QuickTaskを有効</string>
+    
+    <string name="msgs_control_tab_quick_task_settings">QuickTask設定</string>
+    
+    <string name="msgs_control_tab_confirm_log_rotate">ログをファイルに保存しますか?</string>
+    <string name="msgs_control_tab_confirm_log_delete">ログを消去しますか?</string>
+    <string name="msgs_control_tab_confirm_log_option_change_disable">ログを無効にしますか?</string>
+    <string name="msgs_control_tab_confirm_log_option_change_enable">ログを有効にしますか?</string>
+    <string name="msgs_control_tab_confirm_quick_task_switch_disable">QuickTaskを無効にしますか?</string>
+    <string name="msgs_control_tab_confirm_quick_task_switch_enaable">QuickTaskを有効にしますか?</string>
+    
+    <string name="msgs_control_tab_export_profile_desc">プロファイルを外部または内部メディアに書き出します。</string>
+    <string name="msgs_control_tab_import_profile_desc">外部または内部メディアに書き出されたプロファイルを取り込みます。</string>
+    <string name="msgs_control_tab_log_option_desc">ログ記録を有効または無効にします。</string>
+    <string name="msgs_control_tab_rotate_log_file_desc">ログをTaskAutomation_log_yyyy-mm-dd_hh-mm-ss-ttt.txtに保存します。(yyyy:西暦, mm:月, dd:日, hh:時間, mm:分, ss:秒, ttt:ミリ秒)</string>
+    <string name="msgs_control_tab_delete_logfile_desc">ログを消去します。</string>
+    
+    <string name="msgs_control_tab_send_log_file_desc">ログを開発者にE-Mailで送信します。</string>
+    
+    <string name="msgs_control_tab_confirm_send_log_title">ログを開発者に送信</string>
+    <string name="msgs_control_tab_confirm_send_log_send">送信</string>
+    <string name="msgs_control_tab_confirm_send_log_preview">プレビュー</string>
+    <string name="msgs_control_tab_confirm_send_log_msg">ログを開発者にE-Mailを使用して送信します。\n
+１．プレビューボタンを押しtemp_log.txtを表示し、内容を確認してください（テキストファイルを表示するためのアプリケーション選択の画面が表示されたら、アプリケーションを表示してください）\n
+２．送信する内容を確認したら、送信ボタンを押しE-Mail選択ダイアログでE-Mailを選択\n
+３，必要ならばE-Mail本文にメッセージを入力し、E-Mailを送信してください。（ログはzipに圧縮し、添付ファイルになっています）</string>
+
+    <string name="msgs_control_tab_quick_task_switch_desc">QuickTaskを有効または無効にします。</string>
+    <string name="msgs_control_tab_quick_task_settings_desc">QuickTask設定画面を表示します。</string>
+    
+    <string name="msgs_control_tab_manage_logfile">ログファイルの管理</string>
+	<string name="msgs_control_tab_manage_log_file_desc">ログファイルを管理します。（削除、表示、送信など）</string>    
+	
+	<string name="msgs_control_tab_manage_trust_list">信頼できる装置</string>
+	<string name="msgs_control_tab_manage_trust_list_desc">信頼できるWiFiアクセスポイントやBluetooth装置などの追加や削除</string>    
+		
+</resources>

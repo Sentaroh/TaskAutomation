@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_bsh_method_editor_dlg_method_spinner_title">メソッドの選択</string>
+    <string name="msgs_bsh_method_editor_dlg_empty_ringtone_list">** リングトーンがありません</string>
+    <string name="msgs_bsh_method_editor_dlg_empty_task_trigger_task_list">** タスクトリガータスクがありません</string>
+    <string name="msgs_bsh_method_editor_dlg_empty_interval_timer_list">** 間隔タイマーがありません</string>
+    <string name="msgs_bsh_method_editor_dlg_specify_value_seconds">秒を指定してください</string>
+    <string name="msgs_bsh_method_editor_dlg_specify_value_int">整数を指定してください</string>
+    <string name="msgs_bsh_method_editor_dlg_assign_title" formatted="false">値の割り当て\n %s \n %s</string>
+    <string name="msgs_bsh_method_editor_dlg_select_file" formatted="false">ファイルの選択\n %s \n %s</string>
+    <string name="msgs_bsh_method_editor_dlg_outofrange_int" formatted="false">指定された値は範囲外です, %s から %s の範囲で指定してください</string>
+    <string name="msgs_bsh_method_editor_dlg_outofrange_string">指定された値は範囲外です, 左記から選択してください %s</string>
+    <string name="msgs_bsh_method_editor_dlg_playback_sound_start">再生</string>
+    <string name="msgs_bsh_method_editor_dlg_playback_sound_stop">停止</string>
+    
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="msgs_control_tab_export_profile">Export profile</string>
+    <string name="msgs_control_tab_import_profile">Import profile</string>
+    
+    <string name="msgs_control_tab_send_logfile">Send log to developer</string>
+    <string name="msgs_control_tab_delete_logfile">Erase log</string>
+    <string name="msgs_control_tab_rotate_logfile">Save log to file</string>
+    
+    <string name="msgs_control_tab_log_option_enabled">To disable log</string>
+    <string name="msgs_control_tab_log_option_disabled">To enable log</string>
+    
+    <string name="msgs_control_tab_quick_task_switch_enabled">To disable QuickTask</string> 
+    <string name="msgs_control_tab_quick_task_switch_disabled">To enable QuickTask</string>
+    
+    <string name="msgs_control_tab_quick_task_settings">QuickTask settings</string>
+    
+    <string name="msgs_control_tab_confirm_log_rotate">Do you want to save the log to file?</string>
+    <string name="msgs_control_tab_confirm_log_delete">Do you want to erase the log?</string>
+    <string name="msgs_control_tab_confirm_log_option_change_disable">Do you want to disable the log?</string>
+    <string name="msgs_control_tab_confirm_log_option_change_enable">Do you want to enable the log?</string>
+    <string name="msgs_control_tab_confirm_quick_task_switch_disable">Do you want to disable the QuickTask?</string>
+    <string name="msgs_control_tab_confirm_quick_task_switch_enaable">Do you want to enable the QuickTask?</string>
+
+    <string name="msgs_control_tab_export_profile_desc">Export profile to the internal or external storage.</string>
+    <string name="msgs_control_tab_import_profile_desc">Import profile from the internal or external storage.</string>
+    <string name="msgs_control_tab_log_option_desc">To enable or disable the writing of the log.</string>
+    <string name="msgs_control_tab_rotate_log_file_desc">Save the log to \"TaskAutomation_log_yyyy-mm-dd_hh-mm-ss-ttt.txt\", and then clear the log file. (yyyy: year, mm: month, dd: day, hh: hour, mm: minute, ss: second, ttt: ms)</string>
+    <string name="msgs_control_tab_delete_logfile_desc">Clear the log.</string>
+
+	<string name="msgs_control_tab_send_log_file_desc">Send log file by E-Mail to the developer.</string>
+
+    <string name="msgs_control_tab_confirm_send_log_title">Send log file to the developer.</string>
+    <string name="msgs_control_tab_confirm_send_log_send">Send</string>
+    <string name="msgs_control_tab_confirm_send_log_preview">Preview</string>
+    <string name="msgs_control_tab_confirm_send_log_msg">Send log file by E-Mail to the developer.\n
+1.Press the Preview button to see the temp_log.txt, then please check the contents.(If the selection screen of the application is displayed, and then select the FAVORIT application to display the text file.)\n
+2.When you are finished reading file to send, then select the E-Mail in EMail selection dialog.\n
+3.Enter the message in the EMAIL body if necessary. (The log file is attached with compressed into zip and )</string>
+		    
+    <string name="msgs_control_tab_quick_task_switch_desc">To enable or disable the QuickTask.</string>
+    <string name="msgs_control_tab_quick_task_settings_desc">Invoke QuickTask settings.</string>
+    
+    <string name="msgs_control_tab_manage_logfile">Manage log file</string>
+	<string name="msgs_control_tab_manage_log_file_desc">Manage the log files.（Delete, Browse, Send etc）</string>
+	
+	<string name="msgs_control_tab_manage_trust_list">Manage trusted device</string>
+	<string name="msgs_control_tab_manage_trust_list_desc">Manage the trusted item list.（Delete and add item）</string>    
+		
+</resources>

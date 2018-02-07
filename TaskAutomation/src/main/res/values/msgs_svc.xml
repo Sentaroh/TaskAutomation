@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="msgs_svc_active_task">Task=</string>
+	<string name="msgs_svc_no_active_task">No active task</string>
+	<string name="msgs_svc_termination">Scheduler Service was terminated</string>
+	<string name="msgs_svc_started">Scheduler Service has started</string>
+	<string name="msgs_svc_action_blocked" formatted="false">
+	    (Group=%s)%s blocked by active task, task=%s</string>
+	<string name="msgs_svc_task_already_started" formatted="false">
+	    (Group=%s)Task was ignored.(Already started) Event=%s, Task=%s</string>
+	    
+	<string name="msgs_svc_notification_info_next_schedule" formatted="false">Scheduled task=%s</string>
+	<string name="msgs_svc_notification_info_build_time" formatted="false">Build=%s</string>
+	<string name="msgs_svc_notification_info_task_list" formatted="false">Scheduled task(s)</string>
+	<string name="msgs_svc_notification_info_no_task_list" formatted="false">No scheduled task</string>
+	
+	<string name="msgs_svc_notification_info_battery_title" formatted="false">Battery</string>
+	<string name="msgs_svc_notification_info_battery_level" formatted="false">%s%%</string>
+	
+	<string name="msgs_svc_notification_info_wake_lock_status_hold">Wake Lock acquired during screen off</string>
+	<string name="msgs_svc_notification_info_wake_lock_status_not_hold">Wake Lock not acquired during screen off</string>
+	
+</resources>

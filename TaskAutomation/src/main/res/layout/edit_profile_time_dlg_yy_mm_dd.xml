@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_profile_time_ll_exec_ymd"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    
+    <LinearLayout
+        android:id="@+id/edit_profile_time_ll_exec_year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/msgs_edit_profile_time_hdr_year"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <Spinner
+            android:id="@+id/edit_profile_time_exec_year"
+            style="@android:style/Widget.Spinner"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/spinner_color_background"
+            android:minHeight="40dp"
+            android:paddingLeft="5dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/edit_profile_time_ll_exec_month"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/msgs_edit_profile_time_hdr_month"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <Spinner
+            android:id="@+id/edit_profile_time_exec_month"
+            style="@android:style/Widget.Spinner"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/spinner_color_background"
+            android:minHeight="40dp"
+            android:paddingLeft="5dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/edit_profile_time_ll_exec_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/msgs_edit_profile_time_hdr_day"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <Spinner
+            android:id="@+id/edit_profile_time_exec_day"
+            style="@android:style/Widget.Spinner"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/spinner_color_background"
+            android:minHeight="40dp"
+            android:paddingLeft="5dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
+    
+</LinearLayout>

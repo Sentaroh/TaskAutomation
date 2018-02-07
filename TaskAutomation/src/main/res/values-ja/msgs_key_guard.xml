@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_key_guard_trust_device_label_add">信頼できる装置の追加</string>
+    <string name="msgs_key_guard_trust_device_label_delete">装置の削除</string>
+	<string name="msgs_key_guard_trust_device_label_select_all">全て選択</string>
+	<string name="msgs_key_guard_trust_device_label_unselect_all">全ての選択を解除</string>
+    	
+    <string name="msgs_key_guard_trust_device_delete_confirm_msg">下記項目を削除しますか？</string>
+    <string name="msgs_key_guard_trust_device_add_new_wifi_ap_msg">現在接続されているアクセスポイントは既に信頼できるアクセスポイントに登録されています。</string>
+    <string name="msgs_key_guard_trust_device_turn_on_wifi_msg">WiFiがオフのために情報を取得できませんでした。</string>
+    <string name="msgs_key_guard_trust_device_no_trust_item_msg">信頼できるアクセスポイントまたはBluetooth装置が登録されていません。</string>
+    
+    <string name="msgs_key_guard_trust_device_add_new_dev_some_error">下記の理由により一部の装置が表示されません</string>
+    
+    <string name="msgs_key_guard_trust_device_add_new_bt_title">信頼する装置を選択してください</string>
+    <string name="msgs_key_guard_trust_device_add_new_bt_no_dev_msg">Bluetoothでペア設定されている全ての装置が信頼できる装置として登録されています。</string>
+    <string name="msgs_key_guard_trust_device_add_new_bt_adapter_on_msg">Bluetoothアダプターがオフのために装置情報が取得できませんでした。</string>
+    
+    <string name="msgs_key_guard_trust_device_restart_scheduler_required">スケジューラーを再起動しないと更新が反映できません。今すぐにスケジューラーを再起動しますか？</string>
+    
+    <string name="msgs_key_gurad_info_keyguard_ctrl_disabled">キーガード制御は無効です</string>
+	<string name="msgs_key_gurad_info_keyguard_ctrl_enabled">キーガード制御は有効です</string>
+	<string name="msgs_key_gurad_info_keyguard_disabled_after_unlock">キーガードの手動アンロックが必要です</string>				
+    
+</resources>

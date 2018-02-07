@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText" >
+
+    <TextView
+        android:id="@+id/edit_environment_parms_dlg_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/msgs_edit_environment_parms_title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <include layout="@layout/divider_line1_turquoise" />
+
+    <TextView
+        android:id="@+id/edit_environment_parms_dlg_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#ff0000" />
+
+    <Button
+        android:id="@+id/edit_environment_parms_dlg_reload_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msgs_edit_environment_parms_reload" />
+    
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_weight="1"
+        android:fadeScrollbars="false" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/msgs_edit_environment_parms_sensor"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_sensor_light" />
+
+                <EditText
+                    android:id="@+id/edit_environment_parms_dlg_light_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Light sensor value"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_sensor_proximity" />
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_proximity_detected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_sensor_proximity_detected" />
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_proximity_undetected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_sensor_proximity_undetected" />
+                </RadioGroup>
+            </LinearLayout>
+			<include layout="@layout/divider_line2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/msgs_edit_environment_parms_battery"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_battery_level" />
+
+                <EditText
+                    android:id="@+id/edit_environment_parms_dlg_battery_level"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Battery level(0-100)"
+                    android:inputType="number" >
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_battery_power" />
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_battery_power_ac"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/msgs_edit_environment_parms_battery_power_ac" />
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_battery_power_battery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_battery_power_battery" />
+                </RadioGroup>
+            </LinearLayout>
+			<include layout="@layout/divider_line2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/msgs_edit_environment_parms_wifi"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_wifi_status" />
+
+                <RadioGroup
+                    android:id="@+id/edit_environment_parms_dlg_wifi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_wifi_off"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_wifi_status_off" />
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_wifi_on"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/msgs_edit_environment_parms_wifi_status_on" />
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_wifi_connected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_wifi_status_connected" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_wifi_ssid" />
+
+                <EditText
+                    android:id="@+id/edit_environment_parms_dlg_wifi_ssid"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Connected SSID name"
+                    android:inputType="text" />
+            </LinearLayout>
+			<include layout="@layout/divider_line2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/msgs_edit_environment_parms_bluetooth"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_bluetooth_status" />
+
+                <RadioGroup
+                    android:id="@+id/edit_environment_parms_dlg_bluetooth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_bluetooth_off"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_bluetooth_status_off" />
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_bluetooth_on"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/msgs_edit_environment_parms_bluetooth_status_on" />
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_bluetooth_connected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/msgs_edit_environment_parms_bluetooth_status_connected" />
+                    
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_bluetooth_device_name" />
+
+                <EditText
+                    android:id="@+id/edit_environment_parms_dlg_bluetooth_device_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Connected device name"
+                    android:inputType="text" />
+            </LinearLayout>
+			<include layout="@layout/divider_line2" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_airplane" />
+                
+			    <CheckBox
+			        android:id="@+id/edit_environment_parms_dlg_airplane_mode"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:text="@string/msgs_edit_environment_parms_airplane_on" />
+            </LinearLayout>
+            <include layout="@layout/divider_line2" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_ringer" />
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_ringer_mode_normal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/msgs_edit_environment_parms_ringer_normal" />
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_ringer_mode_vibrate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_ringer_vibrate" />
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_ringer_mode_silent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_ringer_silent" />
+
+                </RadioGroup>
+			</LinearLayout>
+			<include layout="@layout/divider_line2" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_telephony" />
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_telephony_call_idle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/msgs_edit_environment_parms_telephony_idle" />
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_telephony_call_off_hook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_telephony_offhook" />
+
+                    <RadioButton
+                        android:id="@+id/edit_environment_parms_dlg_telephony_call_ringing"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/msgs_edit_environment_parms_telephony_ringing" />
+
+                </RadioGroup>
+			</LinearLayout>
+            <include layout="@layout/divider_line2" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/msgs_edit_environment_parms_screen" />
+                
+			    <CheckBox
+			        android:id="@+id/edit_environment_parms_dlg_screen_locked"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:text="@string/msgs_edit_environment_parms_screen_locked" />
+            </LinearLayout>
+            
+        </LinearLayout>
+    </ScrollView>
+
+    <include layout="@layout/edit_environment_parms_dlg_ok_cancel"/>
+
+</LinearLayout>

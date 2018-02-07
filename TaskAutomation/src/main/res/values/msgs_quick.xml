@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_quick_hdr_title">Settings for QuickTask</string>
+    <string name="msgs_quick_vlue_not_specified">Not specified</string>
+    <string name="msgs_quick_hdr_use_bean_shell">QucikTask profile is created by BeanShell</string>
+    <string name="msgs_quick_hdr_ignore_airplane_mode">To control should be ignored airplane mode</string>
+    <string name="msgs_quick_hdr_wifi">Wireless LAN control</string>
+    <string name="msgs_quick_hdr_bt">Bluetooth control</string>
+    <string name="msgs_quick_hdr_screen">Screen control</string>
+    <string name="msgs_quick_hdr_alarm_clock">Alarm clock</string>
+    <string name="msgs_quick_hdr_time_activity">Activity timer</string>
+    <string name="msgs_quick_hdr_edit_btn">Edit QuickTask</string>
+    <string name="msgs_quick_hdr_cancel_btn">Cancel</string>
+    <string name="msgs_quick_hdr_apply_btn">Apply</string>
+    <string name="msgs_quick_hdr_detail_edit">Edit</string>
+    <string name="msgs_quick_hdr_detail_enable">Enable</string>
+    
+    <string name="msgs_quick_hdr_wifi_screen_lock">Turn off the Wi-Fi to lock the screen after one minute.</string>
+    <string name="msgs_quick_hdr_wifi_screen_lock_usual">Always turn off</string>
+    <string name="msgs_quick_hdr_wifi_screen_lock_battery">When using the battery pack</string>        
+    <string name="msgs_quick_hdr_wifi_wifi_on">Turn off Wi-Fi when not connected to the access point for more than one minute.</string>
+    <string name="msgs_quick_hdr_wifi_wifi_on_usual">Always turn off</string>
+    <string name="msgs_quick_hdr_wifi_wifi_on_battery">When using the battery pack</string>        
+    <string name="msgs_quick_hdr_wifi_screen_unlock">Wi-Fi on when you cancel the screen lock</string>
+    <string name="msgs_quick_hdr_wifi_screen_unlock_usual">Always turn on</string>
+    <string name="msgs_quick_hdr_wifi_screen_unlock_battery">When battery is charging</string>        
+
+    <string name="msgs_quick_hdr_ｂｔ_screen_lock">Turn off the Bluetooth to lock the screen after one minute.</string>
+    <string name="msgs_quick_hdr_ｂｔ_screen_lock_usual">Always turn off</string>
+    <string name="msgs_quick_hdr_ｂｔ_screen_lock_battery">When using the battery pack</string>        
+    <string name="msgs_quick_hdr_ｂｔ_ｂｔ_on">Turn off Bluetooth when not connected to the device for more than one minute.</string>
+    <string name="msgs_quick_hdr_ｂｔ_ｂｔ_on_usual">Always turn off</string>
+    <string name="msgs_quick_hdr_ｂｔ_ｂｔ_on_battery">When using the battery pack</string>        
+    <string name="msgs_quick_hdr_bt_screen_unlock">Bluetooth on when you cancel the screen lock</string>
+    <string name="msgs_quick_hdr_bt_screen_unlock_usual">Alway turn on</string>
+    <string name="msgs_quick_hdr_bt_screen_unlock_battery">When battery is charging</string>        
+    
+    <string name="msgs_quick_hdr_screen_proximity_undetect">
+        	Lighting on the screen when you are no longer detect the proximity when screen was locked</string>
+    <string name="msgs_quick_hdr_screen_proximity_detect">
+        	Lock the screen when it detects more than one minute proximity</string>
+    <string name="msgs_quick_hdr_screen_proximity_detect_ignore_landscape">
+        	Ignore proximity sensor when device orientation is landscape</string>
+    <string name="msgs_quick_hdr_screen_light_detect">
+        	Turn on the illumination of the screen brightness was detected when screen was locked</string>
+    <string name="msgs_quick_hdr_screen_light_undetect">
+        	Lock the screen has detected more than one minute the darkness</string>
+    <string name="msgs_quick_hdr_screen_trust_device">Do not display the key guard when connected to a trusted device</string>
+    	
+    <string name="msgs_quick_hdr_screen_magnetic_field_detect">スクリーンロック時に磁気が検知されなくなったらスクリーンの照明をオン</string>
+    <string name="msgs_quick_hdr_screen_magnetic_field_undetect">スクリーンがロックされていない時に磁気を検知したらスクリーンをロック</string>
+    
+    <string name="msgs_quick_profile_gen_dlg_msg">Do you want to apply a quick task profile?</string>
+</resources>

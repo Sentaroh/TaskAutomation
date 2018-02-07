@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="msgs_thread_task_started" formatted="false">Task started. Group=%s, Event=%s, Task=%s</string>    
+	<string name="msgs_thread_task_end_success" formatted="false">Task was successfully ended. Group=%s, Event=%s, Task=%s</string>
+	<string name="msgs_thread_task_end_cancelled" formatted="false">Task was cancelled. Group=%s, Event=%s, Task=%s</string>
+	<string name="msgs_thread_task_end_error" formatted="false">Task was ended with error. Group=%s, Event=%s, Task=%s</string>
+	<string name="msgs_thread_task_exec_android" formatted="false">Executing action. Action name=%s, Android=%s, Package=%s</string>
+	<string name="msgs_thread_task_exec_builtin">Executing action. Builtin=%s</string>
+	<string name="msgs_thread_task_exec_builtin_abort">Aborted the task for %s is satisfied.</string>
+	<string name="msgs_thread_task_intent_notfound">Specified package name was invalid. Package=%s</string>
+	<string name="msgs_thread_task_screen_lock_ignored" formatted="false">*LOCK-SCREEN was ignored(Disable screen lock), Event=%s, Task=%s</string>
+	<string name="msgs_thread_task_unknoww_action">Unknown action code, code=%s</string>
+	
+	<string name="msgs_thread_task_exec_play_sound" formatted="false">Executing action. Action name=%s, Music, Name=%s</string>
+	<string name="msgs_thread_task_play_sound_notfound">File not found. File name=%s</string>
+	<string name="msgs_thread_task_play_ringtone_notfound">Ringtone not found. Ringtone name=%s</string>
+	<string name="msgs_thread_task_play_sound_error">Unknown error was occurred. File name=%s</string>
+	
+	<string name="msgs_thread_task_exec_play_ringtone" formatted="false">Executing action. Action name=%s, Ringtone, Type=%s, Name=%s</string>
+	
+	<string name="msgs_thread_task_exec_compare" formatted="false">
+	    Executed action. Action name=%s, Compare=%s, Current-Value=%s, Target=%s, Type=%s, Compare-Value=(%s), Result-Action=%s</string>
+	<string name="msgs_thread_task_exec_compare_abort">To stopped the task because the specific condition is satisfied.</string>
+	<string name="msgs_thread_task_exec_compare_skip">To skip next action because the specific condition is satisfied. Skipped action=%s</string>
+	
+	<string name="msgs_thread_task_exec_light_not_available">Task has stopped because Light sensor not available.</string>
+	<string name="msgs_thread_task_exec_proximity_not_available">Task has stopped because proximity sensor not available.</string>
+	<string name="msgs_thread_task_exec_magnetic_field_not_available">Task has stopped because Magnetic field sensor not available.</string>
+
+	<string name="msgs_thread_task_exec_message" formatted="false">Executing action. Message=%s, Type=%s, Vibration=%s, LED=%s, LED Color=%s</string>
+	
+	<string name="msgs_thread_task_exec_time" formatted="false">Executing action. Time=%s, Type=%s, Target=%s</string>
+	<string name="msgs_thread_task_exec_task" formatted="false">Executing action. Task=%s, Type=%s, Target=%s</string>
+	
+	<string name="msgs_thread_task_exec_ignore_sound_ringer_not_normal">Ignore sound task because ringer mode silent or vibrate.</string>
+	
+	<string name="msgs_thread_task_exec_wait" formatted="false">Executing action. Wait=%s, Target=%s, Timeout=%s, Units=%s</string>
+	
+	<string name="msgs_thread_task_sound_playback_notification_title">Stop playback</string>
+	<string name="msgs_thread_task_sound_playback_notification_text">When you tap the icon to stop the playback of all of the sound</string>
+	
+
+</resources>

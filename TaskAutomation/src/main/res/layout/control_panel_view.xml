@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/control_tab_view_export"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="@string/msgs_control_tab_export_profile" 
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+
+	    <Button
+	        android:id="@+id/control_tab_view_import"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+	        android:text="@string/msgs_control_tab_import_profile"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+	    <Button
+	        android:id="@+id/control_tab_view_log_option"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+	        android:text="@string/msgs_control_tab_log_option_enabled"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+	    <Button
+	        android:id="@+id/control_tab_view_rotate_log_file"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+	        android:text="@string/msgs_control_tab_rotate_logfile"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+    </LinearLayout>
+    
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/control_tab_view_delete_log_file"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="@string/msgs_control_tab_delete_logfile"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <Button
+            android:id="@+id/control_tab_view_send_log_file"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="@string/msgs_control_tab_send_logfile"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    
+        <Button
+            android:id="@+id/control_tab_view_manage_log_file"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="@string/msgs_control_tab_manage_logfile"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <Button
+            android:id="@+id/control_tab_view_manage_trust_list"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="@string/msgs_control_tab_manage_trust_list"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    
+	    <Button
+	        android:id="@+id/control_tab_view_quick_task_switch"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+	        android:text="@string/msgs_control_tab_quick_task_switch_enabled"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+	    <Button
+	        android:id="@+id/control_tab_view_quick_task_settings"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+	        android:text="@string/msgs_control_tab_quick_task_settings"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    </LinearLayout>
+    
+</LinearLayout>

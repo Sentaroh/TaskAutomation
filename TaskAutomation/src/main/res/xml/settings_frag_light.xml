@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+   	    <CheckBoxPreference
+			android:key="settings_main_light_sensor_use_thread"
+			android:title="@string/settings_main_light_sensor_use_thread_title"
+			android:summary="@string/settings_main_light_sensor_use_thread_summary_ena" />
+    
+   	    <ListPreference
+			android:key="settings_main_light_sensor_monitor_interval_time"
+			android:title="@string/settings_main_light_sensor_monitor_interval_time_title"
+			android:summary="@string/settings_main_light_sensor_monitor_interval_time_summary"
+			android:dialogTitle="@string/settings_main_light_sensor_monitor_interval_time_title"
+			android:entries="@array/settings_main_light_sensor_monitor_interval_time_list_entries"
+			android:entryValues="@array/settings_main_light_sensor_monitor_interval_time_list_entries"
+			android:dependency="settings_main_light_sensor_use_thread"/>
+   	    <ListPreference
+			android:key="settings_main_light_sensor_monitor_active_time"
+			android:title="@string/settings_main_light_sensor_monitor_active_time_title"
+			android:summary="@string/settings_main_light_sensor_monitor_active_time_summary"
+			android:dialogTitle="@string/settings_main_light_sensor_monitor_active_time_title"
+			android:entries="@array/settings_main_light_sensor_monitor_active_time_list_entries"
+			android:entryValues="@array/settings_main_light_sensor_monitor_active_time_list_entries"
+			android:dependency="settings_main_light_sensor_use_thread"/>
+   	    		    		    
+   	    <ListPreference
+			android:key="settings_main_light_sensor_detect_thresh_hold"
+			android:title="@string/settings_main_light_sensor_detect_thresh_hold_title"
+			android:summary="@string/settings_main_light_sensor_detect_thresh_hold_summary"
+			android:dialogTitle="@string/settings_main_light_sensor_detect_thresh_hold_title"
+			android:entries="@array/settings_main_light_sensor_detect_thresh_hold_list_entries"
+			android:entryValues="@array/settings_main_light_sensor_detect_thresh_hold_list_entries"
+			/>
+   	    <ListPreference
+			android:key="settings_main_light_sensor_ignore_time"
+			android:title="@string/settings_main_light_sensor_ignore_time_title"
+			android:summary="@string/settings_main_light_sensor_ignore_time_summary"
+			android:dialogTitle="@string/settings_main_light_sensor_ignore_time_title"
+			android:entries="@array/settings_main_light_sensor_ignore_time_list_entries"
+			android:entryValues="@array/settings_main_light_sensor_ignore_time_list_entries"
+			/>
+</PreferenceScreen>
