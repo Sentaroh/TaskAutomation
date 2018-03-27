@@ -95,7 +95,6 @@ import com.sentaroh.android.TaskAutomation.Common.TaskResponse;
 import com.sentaroh.android.TaskAutomation.Config.ProfileUtilities;
 import com.sentaroh.android.TaskAutomation.Config.QuickTaskMaintenance;
 import com.sentaroh.android.TaskAutomation.Config.SampleProfile;
-import com.sentaroh.android.TaskAutomationInterface.TaServiceInterface;
 import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
@@ -312,11 +311,6 @@ public final class SchedulerService extends Service {
 			mWidgetSvc.startWidgetIntentThread(action);
 		} else if (action.startsWith(DEVICE_BTN_PREFIX)) {
 			mWidgetSvc.processDeviceButton(action);
-		} else if (action.startsWith(TaServiceInterface.BROADCAST_REQUEST)) {
-			ExternalApplicationInterface.processExternalIntent(
-					mTaskMgrParms, mEnvParms, mUtil, mSvcInstance, in, action, 
-					mTimerEventTaskList, mBuiltinEventTaskList, mTaskEventTaskList, 
-					mProfileArrayList);
 		} else if (action.startsWith(CANCEL_ALL_SOUND_PLAYBACK_STOP_REQUEST)) {
 			cancelSoundPlayBackTask();
 		} else {

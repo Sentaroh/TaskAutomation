@@ -25,8 +25,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 //import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
 
-import com.sentaroh.android.TaskAutomationInterface.TaServiceInterface;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -54,17 +52,11 @@ public class SchedulerReceiver extends BroadcastReceiver{
 		String action=arg1.getAction();
 		if (action!=null) {
 			Intent in = new Intent(context, SchedulerService.class);
-			if (action.equals(TaServiceInterface.BROADCAST_REQUEST)) {
-				in.setAction(action);
-				in.putExtras(arg1.getExtras());
-				context.startService(in);
-			} else {
-				if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-					CommonUtilities.clearSavedBluetoothConnectedDeviceList(context);
-				}
-				in.setAction(action);
-				context.startService(in);
-			}
+            if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+                CommonUtilities.clearSavedBluetoothConnectedDeviceList(context);
+            }
+            in.setAction(action);
+            context.startService(in);
 		}
 	};
 	

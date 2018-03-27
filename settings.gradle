@@ -1,4 +1,4 @@
-include ':TaskAutomationInterface'
+//include ':TaskAutomationInterface'
 
 //include ':Utilities'
 //project(':Utilities').projectDir = new File(settingsDir, '../Utilities/Utilities')
