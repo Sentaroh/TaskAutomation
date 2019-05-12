@@ -1803,7 +1803,7 @@ public class TaskExecutor implements Runnable {
 
     final static public void vibrateDefaultPattern(Context context, ActionResponse ar) {
 		Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-		vibrator.vibrate(new long[]{0,200,400,200,400,200},-1);
+		vibrator.vibrate(new long[]{0,200,100,200},-1);
 //		vibrator.vibrate(1000);
 		ar.action_resp=ActionResponse.ACTION_SUCCESS;
 		ar.resp_msg_text="";
