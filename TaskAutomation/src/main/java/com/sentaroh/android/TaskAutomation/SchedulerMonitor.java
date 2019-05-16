@@ -23,9 +23,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.TaskAutomation.Common.CommonConstants.*;
+import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
 
-import com.sentaroh.android.TaskAutomation.Common.EnvironmentParms;
+import com.sentaroh.android.TaskAutomation.EnvironmentParms;
 import com.sentaroh.android.Utilities.NotifyEvent;
 
 import android.annotation.SuppressLint;
@@ -51,20 +51,23 @@ public class SchedulerMonitor extends Service {
 	private long mUnpredictableStopTime=0;
 	
 	private EnvironmentParms mEnvParms=null;
+	private GlobalParameters mGp=null;
 	
 	@Override
     public void onCreate() {
 		mContext=getApplicationContext();
 		mEnvParms=new EnvironmentParms();
 		mEnvParms.loadSettingParms(mContext);
-		
-        mUtil=new CommonUtilities(mContext, "SchedMon", mEnvParms);
+
+		mGp=GlobalWorkArea.getGlobalParameters(mContext);
+
+        mUtil=new CommonUtilities(mContext, "SchedMon", mEnvParms, mGp);
 		mUtil.addDebugMsg(1,"I","onCreate entered");
 		mUtil.addDebugMsg(1,"I","initSettingParms "+
 				"localRootDir="+mEnvParms.localRootDir+
-				", debug_level="+mEnvParms.settingDebugLevel+
-				", settingExitClean="+mEnvParms.settingExitClean+
-				", settingEnableMonitor="+mEnvParms.settingEnableMonitor);
+				", debug_level="+mGp.settingDebugLevel+
+				", settingExitClean="+mGp.settingExitClean+
+				", settingEnableMonitor="+mGp.settingEnableMonitor);
 		mUtil.addLogMsg("I",getString(R.string.msgs_monitor_started)+" "+
 				android.os.Process.myPid());
 
@@ -82,8 +85,8 @@ public class SchedulerMonitor extends Service {
 //		cancelHeartBeat(mContext);
     	if (in!=null) 
     		if (in.getAction()!=null) action=in.getAction();
-		if (mEnvParms.settingDebugLevel>=3) mUtil.addDebugMsg(3,"I","onStartCommand entered, action="+action);
-    	if (!mEnvParms.settingEnableMonitor) {
+		if (mGp.settingDebugLevel>=3) mUtil.addDebugMsg(3,"I","onStartCommand entered, action="+action);
+    	if (!mGp.settingEnableMonitor) {
     		mUtil.addLogMsg("W",getString(R.string.msgs_main_abort_scheduling_option));
     		
     		terminateService();
@@ -116,7 +119,7 @@ public class SchedulerMonitor extends Service {
 
         mUtil=null;
 
-        if (mEnvParms.settingExitClean) {
+        if (mGp.settingExitClean) {
 			System.gc();
 			android.os.Process.killProcess(android.os.Process.myPid());
         }
@@ -175,7 +178,7 @@ public class SchedulerMonitor extends Service {
     				wl.acquire(100);
         			mUtil.addDebugMsg(1, "I", "Scheduler service was disconnected");
         			mSchedulerClient = null;
-        			if (mEnvParms.settingEnableMonitor) {
+        			if (mGp.settingEnableMonitor) {
         				mUnpredictableStopCount++;
         				if (mUnpredictableStopCount>5) {
         					getPrefsMgr().edit().putBoolean(getString(

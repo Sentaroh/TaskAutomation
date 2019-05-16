@@ -23,7 +23,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.TaskAutomation.Common.CommonConstants.*;
+import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +33,7 @@ import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -55,16 +56,6 @@ import android.telephony.TelephonyManager;
 import bsh.EvalError;
 import bsh.ParseException;
 
-import com.sentaroh.android.TaskAutomation.Common.ActionResponse;
-import com.sentaroh.android.TaskAutomation.Common.ActivityExtraDataItem;
-import com.sentaroh.android.TaskAutomation.Common.BshExecEnvListItem;
-import com.sentaroh.android.TaskAutomation.Common.EnvironmentParms;
-import com.sentaroh.android.TaskAutomation.Common.TaskActionItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskHistoryItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskListItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskManagerParms;
-import com.sentaroh.android.TaskAutomation.Common.TaskResponse;
-import com.sentaroh.android.TaskAutomation.Common.TrustDeviceItem;
 import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.LocalMountPoint;
 import com.sentaroh.android.Utilities.ShellCommandUtil;
@@ -78,9 +69,11 @@ public class TaskExecutor implements Runnable {
 	private TaskResponse mTaskResponse=null;
 	private TaskManagerParms mTaskMgrParms=null;
 	private WakeLock mWakelockTask=null;
+	private GlobalParameters mGp=null;
 	
 	public TaskExecutor(TaskResponse tr, TaskManagerParms tmp,
-			TaskListItem tai, EnvironmentParms sdv) {
+			TaskListItem tai, EnvironmentParms sdv, GlobalParameters gp) {
+	    mGp=gp;
 		mTaskListItem=tai;
 		mEnvParms=sdv;
 		mTaskResponse=tr;
@@ -109,8 +102,7 @@ public class TaskExecutor implements Runnable {
 			long b_time=System.currentTimeMillis();
 			
 			String log_ident=""+Thread.currentThread().getId();
-			mUtil=new CommonUtilities(mTaskMgrParms.context, "Executor",mEnvParms);
-			mUtil.setLogId(Thread.currentThread().getName());
+			mUtil=new CommonUtilities(mTaskMgrParms.context, Thread.currentThread().getName(), mEnvParms, mGp);
 			ArrayList<TaskActionItem> taskActionList = mTaskListItem.taskActionList;
 	        mTaskResponse.active_thread_id=log_ident;
 			mUtil.addLogMsg("I",
@@ -122,7 +114,7 @@ public class TaskExecutor implements Runnable {
 	    	TaskManager.callBackToActivity(mTaskMgrParms,mEnvParms,mUtil,
 	    			mTaskResponse.resp_time,NTFY_TO_ACTV_TASK_STARTED,
 	    			mTaskResponse.active_group_name,mTaskResponse.active_task_name,null,null,null,
-	    			TaskResponse.RESP_CODE_SUCCESS,null);
+	    			TaskResponse.RESP_CODE_SUCCESS,null, mGp);
 	    	
 	    	int alsz=taskActionList.size();
 	    	TaskActionItem tai;
@@ -139,13 +131,13 @@ public class TaskExecutor implements Runnable {
 							mTaskResponse.resp_time,NTFY_TO_ACTV_ACTION_STARTED,
 							mTaskResponse.active_group_name,
 							mTaskResponse.active_task_name,mTaskResponse.active_action_name,mTaskResponse.active_shell_cmd,
-							mTaskResponse.active_dialog_id,mTaskResponse.resp_code,mTaskResponse.resp_msg_text);
+							mTaskResponse.active_dialog_id,mTaskResponse.resp_code,mTaskResponse.resp_msg_text, mGp);
 				}
 				String next_action="";
 				if ((i+1)<taskActionList.size()) {
 					next_action=taskActionList.get(i+1).action_name;
 				}
-				executeAction(mTaskMgrParms, mEnvParms, mUtil, mTaskResponse, ar,tai,next_action);
+				executeAction(mTaskMgrParms, mEnvParms, mUtil, mTaskResponse, ar,tai,next_action, mGp);
 				if (ar.action_resp==ActionResponse.ACTION_ABORT) {
 					if (ar.resp_msg_text!=null && ar.resp_msg_text.length()>0) mUtil.addLogMsg("I",ar.resp_msg_text);
 					if (mTaskResponse.task_action_notification) {
@@ -154,7 +146,7 @@ public class TaskExecutor implements Runnable {
 								mTaskResponse.resp_time,NTFY_TO_ACTV_ACTION_ENDED,
 								mTaskResponse.active_group_name,
 								mTaskResponse.active_task_name,mTaskResponse.active_action_name,mTaskResponse.active_shell_cmd,
-								mTaskResponse.active_dialog_id,ar.action_resp,ar.resp_msg_text);
+								mTaskResponse.active_dialog_id,ar.action_resp,ar.resp_msg_text, mGp);
 					}
 					break;
 				} else if (ar.action_resp==ActionResponse.ACTION_CANCELLED || 
@@ -173,7 +165,7 @@ public class TaskExecutor implements Runnable {
 								mTaskResponse.resp_time,NTFY_TO_ACTV_ACTION_ENDED,
 								mTaskResponse.active_group_name,
 								mTaskResponse.active_task_name,mTaskResponse.active_action_name,mTaskResponse.active_shell_cmd,
-								mTaskResponse.active_dialog_id,ar.action_resp,ar.resp_msg_text);
+								mTaskResponse.active_dialog_id,ar.action_resp,ar.resp_msg_text, mGp);
 					}
 				} else if (ar.action_resp==ActionResponse.ACTION_SKIP) {
 					if (ar.resp_msg_text!=null && ar.resp_msg_text.length()>0) mUtil.addLogMsg("I",ar.resp_msg_text);
@@ -183,7 +175,7 @@ public class TaskExecutor implements Runnable {
 								mTaskResponse.resp_time,NTFY_TO_ACTV_ACTION_ENDED,
 								mTaskResponse.active_group_name,
 								mTaskResponse.active_task_name,mTaskResponse.active_action_name,mTaskResponse.active_shell_cmd,
-								mTaskResponse.active_dialog_id,ActionResponse.ACTION_SUCCESS,ar.resp_msg_text);
+								mTaskResponse.active_dialog_id,ActionResponse.ACTION_SUCCESS,ar.resp_msg_text, mGp);
 					}
 					i++;
 					if (i<taskActionList.size()) {
@@ -195,7 +187,7 @@ public class TaskExecutor implements Runnable {
 									mTaskResponse.active_group_name,
 									mTaskResponse.active_task_name,mTaskResponse.active_action_name,mTaskResponse.active_shell_cmd,
 									mTaskResponse.active_dialog_id,ActionResponse.ACTION_SUCCESS,
-									"Action was skipped");
+									"Action was skipped", mGp);
 						}
 					}
 				} else if (ar.action_resp==ActionResponse.ACTION_ERROR) {
@@ -206,7 +198,7 @@ public class TaskExecutor implements Runnable {
 								mTaskResponse.resp_time,NTFY_TO_ACTV_ACTION_ENDED,
 								mTaskResponse.active_group_name,
 								mTaskResponse.active_task_name,mTaskResponse.active_action_name,mTaskResponse.active_shell_cmd,
-								mTaskResponse.active_dialog_id,ar.action_resp,ar.resp_msg_text);
+								mTaskResponse.active_dialog_id,ar.action_resp,ar.resp_msg_text, mGp);
 					}
 					mTaskResponse.active_thread_ctrl.setThreadMessage(ar.resp_msg_text);
 					mTaskResponse.active_thread_ctrl.setThreadResultError();
@@ -220,9 +212,9 @@ public class TaskExecutor implements Runnable {
 			}
 			mTaskResponse.active_action_name="";
 			mTaskResponse.active_dialog_id="";
-			if (mTaskMgrParms.schedulerEnabled) processTaskEnd(mTaskMgrParms,mEnvParms,mUtil,mTaskResponse);
+			if (mTaskMgrParms.schedulerEnabled) processTaskEnd(mTaskMgrParms,mEnvParms,mUtil,mTaskResponse, mGp);
 
-			if (mEnvParms.settingDebugLevel>=1) {
+			if (mGp.settingDebugLevel>=1) {
 				long e_time=System.currentTimeMillis()-b_time;
 				mUtil.addDebugMsg(1,"I","Task execution elapsed time="+e_time);
 //				if (tr.active_task_name.equals("#QT-Screen-Proximity-undetected")) {
@@ -242,9 +234,9 @@ public class TaskExecutor implements Runnable {
 	};
 
 	final static private void processTaskEnd(TaskManagerParms tmp,
-    		EnvironmentParms ep, CommonUtilities util, TaskResponse tr) {
+    		EnvironmentParms ep, CommonUtilities util, TaskResponse tr, GlobalParameters gp) {
 		TaskListItem ati=TaskManager.removeActiveTaskListItem(tmp,ep,util,
-				tr.active_group_name,tr.active_task_name);
+				tr.active_group_name,tr.active_task_name, gp);
 //		Log.v("","end entered");
 		if (ati!=null) {
 			String th_result=tr.active_thread_ctrl.getThreadResult();
@@ -273,20 +265,20 @@ public class TaskExecutor implements Runnable {
 			TaskManager.updateTaskHistoryListItem(tmp,ep,util,
 					tr.resp_time,tr.active_group_name,
 					tr.active_event_name,tr.active_task_name,
-					TaskHistoryItem.TASK_HISTORY_TASK_STATUS_ENDED,tr.resp_code,"");
-			TaskManager.showNotification(tmp,ep,util);
+					TaskHistoryItem.TASK_HISTORY_TASK_STATUS_ENDED,tr.resp_code,"", gp);
+//			TaskManager.showNotification(tmp,ep,util, gp);
 			TaskManager.callBackToActivity(tmp,ep,util,
 					tr.resp_time,NTFY_TO_ACTV_TASK_ENDED,
 					tr.active_group_name,
 					tr.active_task_name,tr.active_action_name,tr.active_shell_cmd,
-					tr.active_dialog_id,tr.resp_code,tr.resp_msg_text);
-			TaskManager.rescheduleTask(tmp,ep,util);
+					tr.active_dialog_id,tr.resp_code,tr.resp_msg_text, gp);
+			TaskManager.rescheduleTask(tmp,ep,util, gp);
 			if (tmp.activeTaskList.size()==0 && tmp.taskQueueList.size()==0) {
 				tmp.locationUtil.deactivateLocationProvider();
 			}
 //			TaskManager.resourceCleanup(tmp,ep,util);
 		} else {
-			TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp,util);
+			TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp,util, gp);
 			tmp.schedulerEnabled=false;
     		String msg="Internal error: Active task list was corrupted. activeTaskList size="+tmp.activeTaskList.size()+
     				", group="+tr.active_group_name+", task="+tr.active_task_name;
@@ -308,24 +300,24 @@ public class TaskExecutor implements Runnable {
 	
 	final static private void executeAction(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-    		ActionResponse ar, TaskActionItem tai, String next_action) {
+    		ActionResponse ar, TaskActionItem tai, String next_action, GlobalParameters gp) {
 		String action_type=tai.action_type;
 
 		if (action_type.equals(PROFILE_ACTION_TYPE_ACTIVITY)) {
 			executeAndroidActivity(tmp,ep,util,tr,
-					ar,tai.action_activity_name,tai.action_activity_pkgname,tai);
+					ar,tai.action_activity_name,tai.action_activity_pkgname,tai, gp);
 		} else if (action_type.equals(PROFILE_ACTION_TYPE_MUSIC)) {
 			executePlayBackMusic(tmp,ep,util,tr,ar,tai.action_name,tai.action_dialog_id,
 					tai.action_sound_file_name,
 					tai.action_sound_vol_left,
-					tai.action_sound_vol_left);
+					tai.action_sound_vol_left, gp);
 		} else if (action_type.equals(PROFILE_ACTION_TYPE_RINGTONE)) {
 			executePlayBackRingtone(tmp,ep,util,tr,ar,tai.action_name,tai.action_dialog_id,
 					tai.action_ringtone_type,
 					tai.action_ringtone_name,
 					tai.action_ringtone_path,
 					tai.action_ringtone_vol_left,
-					tai.action_ringtone_vol_left);
+					tai.action_ringtone_vol_left, gp);
 		} else if (action_type.equals(PROFILE_ACTION_TYPE_COMPARE)) {
 			executeCompareAction(tmp,ep,util,tr,ar,tai.action_name,tai.action_dialog_id,
 					tai.action_compare_target,
@@ -345,25 +337,25 @@ public class TaskExecutor implements Runnable {
 					tai.action_time_type,tai.action_time_target);
 		} else if (action_type.equals(PROFILE_ACTION_TYPE_TASK)) {
 			executeTaskAction(tmp,ep,util,tr,ar,tai.action_name,tai.action_dialog_id,
-					tai.action_task_type, tai.action_task_target);
+					tai.action_task_type, tai.action_task_target, gp);
 		} else if (action_type.equals(PROFILE_ACTION_TYPE_WAIT)) {
 			executeWaitAction(tmp,ep,util,tr,ar,tai.action_name,tai.action_dialog_id,
 					tai.action_wait_target,tai.action_wait_timeout_value,tai.action_wait_timeout_units);
 		} else if (action_type.equals(PROFILE_ACTION_TYPE_BSH_SCRIPT)) {
-			executeBeanShellScriptAction(tmp,ep,util,tr,ar,tai);
+			executeBeanShellScriptAction(tmp,ep,util,tr,ar,tai, gp);
 		} else if (action_type.equals(PROFILE_ACTION_TYPE_SHELL_COMMAND)) {
-			if (tai.action_shell_cmd_with_su && !ep.settingUseRootPrivilege) {
+			if (tai.action_shell_cmd_with_su && !gp.settingUseRootPrivilege) {
 				ar.action_resp=ActionResponse.ACTION_ERROR;
 				ar.resp_msg_text="Shell command not executed, because shell command required su priviledge but TaskAutomation is not have su priviledge, command="+tai.action_shell_cmd;
 			} else {
-				if (ep.settingUseRootPrivilege && tai.action_shell_cmd_with_su) executeShellCommandWithSu(tmp,ep,util,tr,ar,tai);
+				if (gp.settingUseRootPrivilege && tai.action_shell_cmd_with_su) executeShellCommandWithSu(tmp,ep,util,tr,ar,tai);
 				else executeShellCommand(tmp,ep,util,tr,ar,tai);
 			}
 		} else if (action_type.equals(PROFILE_ACTION_TYPE_BUILTIN)) {
 			util.addLogMsg("I",
 				String.format(tmp.teMsgs.msgs_thread_task_exec_builtin, tai.action_builtin_action));
 			executeBuiltinAction(tmp,ep,util,tr,ar,tai.action_builtin_action,tai.action_dialog_id,
-					tr.active_event_name,tr.active_task_name, next_action);
+					tr.active_event_name,tr.active_task_name, next_action, gp);
 		} else {
 			ar.action_resp=ActionResponse.ACTION_ERROR;
 			String tmsg=String.format(tmp.teMsgs.msgs_thread_task_unknoww_action, action_type);
@@ -374,7 +366,7 @@ public class TaskExecutor implements Runnable {
 	
 	final static private void executeAndroidActivity(TaskManagerParms tmp,
 			EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-			ActionResponse ar,String task,String pkg, TaskActionItem eali) {
+			ActionResponse ar,String task,String pkg, TaskActionItem eali, GlobalParameters gp) {
 		util.addLogMsg("I",String.format(tmp.teMsgs.msgs_thread_task_exec_android, ar.current_action, task,pkg));
 		final PackageManager pm = tmp.context.getPackageManager();
 		Intent in=pm.getLaunchIntentForPackage(pkg);
@@ -384,7 +376,7 @@ public class TaskExecutor implements Runnable {
 			in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 			if (eali.action_activity_data_type.equals(PROFILE_ACTION_TYPE_ACTIVITY_DATA_TYPE_URI)){
 				in.setData(Uri.parse(eali.action_activity_data_uri));
-				if (ep.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Uri data added : Uri=",eali.action_activity_data_uri);
+				if (gp.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Uri data added : Uri=",eali.action_activity_data_uri);
 			} else if (eali.action_activity_data_type.equals(PROFILE_ACTION_TYPE_ACTIVITY_DATA_TYPE_EXTRA)){
 				ArrayList<ActivityExtraDataItem>aed_list=eali.action_activity_data_extra_list;
 				for (int i=0;i<aed_list.size();i++) {
@@ -396,15 +388,15 @@ public class TaskExecutor implements Runnable {
 						if (aedi.data_type.equals(PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_STRING)) {
 							d_val_string=aedi.data_value;
 							in.putExtra(aedi.key_value, d_val_string);
-							if (ep.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra String data added : key=",aedi.key_value,", value=",d_val_string);
+							if (gp.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra String data added : key=",aedi.key_value,", value=",d_val_string);
 						}else if (aedi.data_type.equals(PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_INT)) {
 							d_val_int=Integer.valueOf(aedi.data_value);
 							in.putExtra(aedi.key_value, d_val_int);						
-							if (ep.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra Int data added : key=",aedi.key_value,", value=",String.valueOf(d_val_int));
+							if (gp.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra Int data added : key=",aedi.key_value,", value=",String.valueOf(d_val_int));
 						}else if (aedi.data_type.equals(PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_BOOLEAN)) {
 							if (aedi.data_value.equals("true")) d_val_boolean=true;
 							in.putExtra(aedi.key_value, d_val_boolean);						
-							if (ep.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra Boolean data added : key=",aedi.key_value,", value=",String.valueOf(d_val_boolean));
+							if (gp.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra Boolean data added : key=",aedi.key_value,", value=",String.valueOf(d_val_boolean));
 						}
 					} else if (aedi.data_value_array.equals(PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_ARRAY_YES)) {
 						if (aedi.data_type.equals(PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_STRING)) {
@@ -412,7 +404,7 @@ public class TaskExecutor implements Runnable {
 							String[] d_val_extra=new String[d_val_array.length];
 							for (int ai=0;ai<d_val_array.length;ai++) {
 								d_val_extra[ai]=d_val_array[ai];
-								if (ep.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra array String data added : key=",aedi.key_value,", value=",d_val_extra[ai]);
+								if (gp.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra array String data added : key=",aedi.key_value,", value=",d_val_extra[ai]);
 							}
 							in.putExtra(aedi.key_value, d_val_extra);
 						}else if (aedi.data_type.equals(PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_INT)) {
@@ -420,7 +412,7 @@ public class TaskExecutor implements Runnable {
 							int[] d_val_extra=new int[d_val_array.length];
 							for (int ai=0;ai<d_val_array.length;ai++) {
 								d_val_extra[ai]=Integer.valueOf(d_val_array[ai]);
-								if (ep.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra array Int data added : key=",aedi.key_value,", value=",String.valueOf(d_val_extra[ai]));
+								if (gp.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra array Int data added : key=",aedi.key_value,", value=",String.valueOf(d_val_extra[ai]));
 							}
 							in.putExtra(aedi.key_value, d_val_extra);						
 						}else if (aedi.data_type.equals(PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_BOOLEAN)) {
@@ -429,14 +421,14 @@ public class TaskExecutor implements Runnable {
 							for (int ai=0;ai<d_val_array.length;ai++) {
 								if (d_val_array[ai].equals("true")) d_val_extra[ai]=true;
 								else d_val_extra[ai]=false;
-								if (ep.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra array Boolean data added : key=",aedi.key_value,", value=",String.valueOf(d_val_extra[ai]));
+								if (gp.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   Extra array Boolean data added : key=",aedi.key_value,", value=",String.valueOf(d_val_extra[ai]));
 							}
 							in.putExtra(aedi.key_value, d_val_extra);						
 						}
 					}
 				}
 			} else {
-				if (ep.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   No data was supplied");
+				if (gp.settingDebugLevel>=1) util.addDebugMsg(1, "I", "   No data was supplied");
 			} 
 			tmp.context.startActivity(in);
 			tr.active_thread_ctrl.setThreadResultSuccess();
@@ -452,18 +444,18 @@ public class TaskExecutor implements Runnable {
 	final static private void executeBuiltinAction(TaskManagerParms tmp,
 			EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
 			ActionResponse ar,String bia, 
-			String dlg_id, String en, String tn, String next_action) {
+			String dlg_id, String en, String tn, String next_action, GlobalParameters gp) {
 		ar.action_resp=ActionResponse.ACTION_SUCCESS;
 		if (bia.startsWith(BUILTIN_ACTION_PRIMITIVE_PREFIX)) {
-			executeBuiltinActionPrimitive(tmp,ep,util,tr,ar,bia,dlg_id,en,tn);
+			executeBuiltinActionPrimitive(tmp,ep,util,tr,ar,bia,dlg_id,en,tn, gp);
 		} else if (bia.startsWith(BUILTIN_ACTION_ABORT_PREFIX)) {
 			executeBuiltinActionAbort(tmp,ep,util,tr,ar,bia,en,tn);
 		} else if (bia.startsWith(BUILTIN_ACTION_SKIP_PREFIX)) {
 			executeBuiltinActionSkip(tmp,ep,util,tr,ar,bia,en,tn, next_action);
 		} else if (bia.startsWith(BUILTIN_ACTION_CANCEL_PREFIX)) {
-			executeBuiltinActionCancel(tmp,ep,util,tr,ar,bia,dlg_id,en,tn);
+			executeBuiltinActionCancel(tmp,ep,util,tr,ar,bia,dlg_id,en,tn, gp);
 		} else if (bia.startsWith(BUILTIN_ACTION_BLOCK_PREFIX)) {
-			executeBuiltinActionBlockAction(tmp,ep,util,tr,ar,bia,dlg_id,en,tn);
+			executeBuiltinActionBlockAction(tmp,ep,util,tr,ar,bia,dlg_id,en,tn, gp);
 		} else {
 			ar.action_resp=ActionResponse.ACTION_ERROR;
 			ar.resp_msg_text=String.format(tmp.teMsgs.msgs_thread_task_unknoww_action, bia);
@@ -474,13 +466,13 @@ public class TaskExecutor implements Runnable {
 	final static private void executeBuiltinActionPrimitive(TaskManagerParms tmp,
 			EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
 			ActionResponse ar,String bia, 
-			String dlg_id, String en, String tn) {
+			String dlg_id, String en, String tn, GlobalParameters gp) {
 		if (bia.equals(BUILTIN_ACTION_WIFI_ON)) {
 			tr.active_thread_ctrl.setThreadMessage(BUILTIN_ACTION_WIFI_ON);
-			setWifiOn(tmp,ep,util,tr,ar);
+			setWifiOn(tmp,ep,util,tr,ar, gp);
 		} else if (bia.equals(BUILTIN_ACTION_WIFI_OFF)) {
 			tr.active_thread_ctrl.setThreadMessage(BUILTIN_ACTION_WIFI_OFF);
-			setWifiOff(tmp,ep,util,tr,ar);
+			setWifiOff(tmp,ep,util,tr,ar, gp);
 		} else if (bia.equals(BUILTIN_ACTION_WIFI_DISABLE_CONNECTED_SSID)) {
 			tr.active_thread_ctrl.setThreadMessage(BUILTIN_ACTION_WIFI_DISABLE_CONNECTED_SSID);
 			setWifiDisableSsid(tmp, ep, util, tr, ar);
@@ -489,10 +481,10 @@ public class TaskExecutor implements Runnable {
 			setWifiRemoveSsid(tmp, ep, util, tr, ar);
 		} else if (bia.equals(BUILTIN_ACTION_BLUETOOTH_ON)) {
 			tr.active_thread_ctrl.setThreadMessage(BUILTIN_ACTION_BLUETOOTH_ON);
-			setBluetoothOn(tmp,ep,util,tr,ar);
+			setBluetoothOn(tmp,ep,util,tr,ar, gp);
 		} else if (bia.equals(BUILTIN_ACTION_BLUETOOTH_OFF)) {
 			tr.active_thread_ctrl.setThreadMessage(BUILTIN_ACTION_BLUETOOTH_OFF);
-			setBluetoothOff(tmp,ep,util,tr,ar);
+			setBluetoothOff(tmp,ep,util,tr,ar, gp);
 		} else if (bia.equals(BUILTIN_ACTION_WAIT_1_SEC)) {
 			waitTimeTc(tr,1*1000);
 			if (!tr.active_thread_ctrl.isEnabled()) {
@@ -519,24 +511,17 @@ public class TaskExecutor implements Runnable {
 			}
 		} else if (bia.equals(BUILTIN_ACTION_SWITCH_TO_HOME)) {
 			setScreenSwitchToHome(tmp, ep, util, tr, ar);
-		} else if (bia.equals(BUILTIN_ACTION_SCREEN_LOCKED)) {
-			setScreenLocked(tmp, util, tr, ar);
-		} else if (bia.equals(BUILTIN_ACTION_SCREEN_KEYGUARD_DISABLED)) {
-			setKeyguardDisabled(tmp, ep, util, tr, ar);
-		} else if (bia.equals(BUILTIN_ACTION_SCREEN_KEYGUARD_ENABLED)) {
-			setKeyguardEnabled(tmp, ep, util, tr, ar);
 		} else if (bia.equals(BUILTIN_ACTION_SCREEN_ON)) {
-//			setKg(tmp);
 			if (Build.VERSION.SDK_INT>=17) setScreenOnAsync(tmp,tr,ar);
 			else setScreenOnSync(tmp,tr,ar);
 		} else if (bia.equals(BUILTIN_ACTION_SCREEN_ON_ASYNC)) {
 			setScreenOnAsync(tmp,tr,ar);
 		} else if (bia.equals(BUILTIN_ACTION_PLAYBACK_DEFAULT_ALARM)) {
-			playBackDefaultAlarm(tmp, ep, util, tr, ar);
+			playBackDefaultAlarm(tmp, ep, util, tr, ar, gp);
 		} else if (bia.equals(BUILTIN_ACTION_PLAYBACK_DEFAULT_NOTIFICATION)) {
-			playBackDefaultNotification(tmp, ep, util, tr, ar);
+			playBackDefaultNotification(tmp, ep, util, tr, ar, gp);
 		} else if (bia.equals(BUILTIN_ACTION_PLAYBACK_DEFAULT_RINGTONE)) {
-			playBackDefaultRingtone(tmp, ep, util, tr, ar);
+			playBackDefaultRingtone(tmp, ep, util, tr, ar, gp);
 		} else if (bia.equals(BUILTIN_ACTION_VIBRATE)) {
 			vibrateDefaultPattern(tmp.context,ar);
 		} else if (bia.equals(BUILTIN_ACTION_RESTART_SCHEDULER)) {
@@ -616,10 +601,6 @@ public class TaskExecutor implements Runnable {
 			} else if (bia.equals(BUILTIN_ACTION_ABORT_IF_SCREEN_ON)) {
 				if (ep.screenIsOn) ar.action_resp=ActionResponse.ACTION_ABORT;
 			} else if (bia.equals(BUILTIN_ACTION_ABORT_IF_SCREEN_OFF)) {
-				if (!ep.screenIsOn) ar.action_resp=ActionResponse.ACTION_ABORT;
-			} else if (bia.equals(BUILTIN_ACTION_ABORT_IF_TRUSTED)) {
-				if (!isTrusted(tmp,ep,util,tr,ar)) ar.action_resp=ActionResponse.ACTION_ABORT;
-			} else if (bia.equals(BUILTIN_ACTION_ABORT_IF_NOT_TRUSTED)) {
 				if (!ep.screenIsOn) ar.action_resp=ActionResponse.ACTION_ABORT;
 			} else if (bia.equals(BUILTIN_ACTION_ABORT_IF_PROXIMITY_DETECTED)) {
 				if (ep.proximitySensorAvailable) {
@@ -715,10 +696,6 @@ public class TaskExecutor implements Runnable {
 			if (ep.screenIsOn) ar.action_resp=ActionResponse.ACTION_SKIP;
 		} else if (bia.equals(BUILTIN_ACTION_SKIP_IF_SCREEN_OFF)) {
 			if (!ep.screenIsOn) ar.action_resp=ActionResponse.ACTION_SKIP;
-		} else if (bia.equals(BUILTIN_ACTION_SKIP_IF_TRUSTED)) {
-			if (isTrusted(tmp,ep,util,tr,ar)) ar.action_resp=ActionResponse.ACTION_SKIP;
-		} else if (bia.equals(BUILTIN_ACTION_SKIP_IF_NOT_TRUSTED)) {
-			if (!isTrusted(tmp,ep,util,tr,ar)) ar.action_resp=ActionResponse.ACTION_SKIP;
 		} else if (bia.equals(BUILTIN_ACTION_SKIP_IF_PROXIMITY_DETECTED)) {
 			if (ep.proximitySensorAvailable) {
 				if (ep.proximitySensorValue==0) ar.action_resp=ActionResponse.ACTION_SKIP;
@@ -789,81 +766,87 @@ public class TaskExecutor implements Runnable {
 	final static private void executeBuiltinActionCancel(TaskManagerParms tmp,
 	    		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
 				ActionResponse ar,String bia, 
-				String dlg_id, String en, String tn) {
+				String dlg_id, String en, String tn, GlobalParameters gp) {
 			try {
-				TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util);
+				TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util, gp);
 				if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_BOOT_COMPLETED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BOOT_COMPLETED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_WIFI_ON)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_WIFI_ON;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_WIFI_CONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_WIFI_CONNECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_WIFI_DISCONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_WIFI_DISCONNECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_WIFI_OFF)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_WIFI_OFF;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_BLUETOOTH_ON)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BLUETOOTH_ON;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_BLUETOOTH_CONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BLUETOOTH_CONNECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_BLUETOOTH_DISCONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BLUETOOTH_DISCONNECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_BLUETOOTH_OFF)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BLUETOOTH_OFF;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_PROXIMITY_DETECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PROXIMITY_DETECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_PROXIMITY_UNDETECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PROXIMITY_UNDETECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_LIGHT_DETECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_LIGHT_DETECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_LIGHT_UNDETECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_LIGHT_UNDETECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_SCREEN_LOCKED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_SCREEN_LOCKED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_SCREEN_UNLOCKED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_SCREEN_UNLOCKED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
+                } else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_SCREEN_ON)) {
+                    tr.cmd_tgt_event_name=BUILTIN_EVENT_SCREEN_ON;
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
+                } else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_SCREEN_OFF)) {
+                    tr.cmd_tgt_event_name=BUILTIN_EVENT_SCREEN_OFF;
+                    TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_POWER_SOURCE_CHANGED_AC)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_POWER_SOURCE_CHANGED_AC;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_POWER_SOURCE_CHANGED_BATTERY)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_POWER_SOURCE_CHANGED_BATTERY;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_PHONE_CALL_STATE_IDLE)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PHONE_CALL_STATE_IDLE;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_PHONE_CALL_STATE_OFF_HOOK)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PHONE_CALL_STATE_OFF_HOOK;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_PHONE_CALL_STATE_RINGING)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PHONE_CALL_STATE_RINGING;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_AIRPLANE_MODE_ON)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_AIRPLANE_MODE_ON;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_AIRPLANE_MODE_OFF)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_AIRPLANE_MODE_OFF;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_MOBILE_NETWORK_CONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_MOBILE_NETWORK_CONNECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_MOBILE_NETWORK_DISCONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_MOBILE_NETWORK_DISCONNECTED;
-					TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
+					TaskManager.cancelTaskByEventId(tmp, ep, util, tr, gp);
 	//			} else if (bia.equals(BUILTIN_ACTION_CANCEL_EVENT_NETWORK_CONNECTED)) {
 	//				tr.cmd_tgt_event_name=BUILTIN_EVENT_NETWORK_CONNECTED;
 	//				TaskManager.cancelTaskByEventId(tmp, ep, util, tr);
@@ -875,81 +858,81 @@ public class TaskExecutor implements Runnable {
 					ar.resp_msg_text=String.format(tmp.teMsgs.msgs_thread_task_unknoww_action, bia);
 				}
 			} finally {
-				TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util);
+				TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util, gp);
 			}
 	};
 
 	final static private void executeBuiltinActionBlockAction(TaskManagerParms tmp,
 	    		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
 				ActionResponse ar,String bia, 
-				String dlg_id, String en, String tn) {
+				String dlg_id, String en, String tn, GlobalParameters gp) {
 			try {
-				TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util);
+				TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util, gp);
 				if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_CLEAR)) {
-					TaskManager.clearBlockActionList(tmp, ep, util);
+					TaskManager.clearBlockActionList(tmp, ep, util, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_BLOCK_ALL)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_ALL;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_BOOT_COMPLETED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BOOT_COMPLETED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_WIFI_ON)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_WIFI_ON;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_WIFI_CONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_WIFI_CONNECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_WIFI_DISCONNECT)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_WIFI_DISCONNECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_WIFI_OFF)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_WIFI_OFF;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_BLUETOOTH_ON)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BLUETOOTH_ON;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_BLUETOOTH_CONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BLUETOOTH_CONNECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_BLUETOOTH_DISCONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BLUETOOTH_DISCONNECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_BLUETOOTH_OFF)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_BLUETOOTH_OFF;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_PROXIMITY_DETECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PROXIMITY_DETECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_PROXIMITY_UNDETECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PROXIMITY_UNDETECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_LIGHT_DETECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_LIGHT_DETECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_LIGHT_UNDETECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_LIGHT_UNDETECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_PHONE_CALL_STATE_IDLE)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PHONE_CALL_STATE_IDLE;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_PHONE_CALL_STATE_OFF_HOOK)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PHONE_CALL_STATE_OFF_HOOK;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_PHONE_CALL_STATE_RINGING)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_PHONE_CALL_STATE_RINGING;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_AIRPLANE_MODE_ON)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_AIRPLANE_MODE_ON;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_AIRPLANE_MODE_OFF)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_AIRPLANE_MODE_OFF;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_MOBILE_NETWORK_CONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_MOBILE_NETWORK_CONNECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 				} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_MOBILE_NETWORK_DISCONNECTED)) {
 					tr.cmd_tgt_event_name=BUILTIN_EVENT_MOBILE_NETWORK_DISCONNECTED;
-					TaskManager.addBlockActionListItem(tmp, ep, util, tr);
+					TaskManager.addBlockActionListItem(tmp, ep, util, tr, gp);
 	//			} else if (bia.equals(BUILTIN_ACTION_BLOCK_EVENT_NETWORK_CONNECTED)) {
 	//				tr.cmd_tgt_event_name=BUILTIN_EVENT_NETWORK_CONNECTED;
 	//				TaskManager.addBlockActionItem(tmp, ep, util, tr);
@@ -961,15 +944,15 @@ public class TaskExecutor implements Runnable {
 					ar.resp_msg_text=String.format(tmp.teMsgs.msgs_thread_task_unknoww_action, bia);
 				}
 			} finally {
-				TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util);
+				TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util, gp);
 			}
 	};
 	
 	final static private void executeBeanShellScriptAction(final TaskManagerParms tmp,
 			final EnvironmentParms ep, final CommonUtilities util, final TaskResponse tr,
-			final ActionResponse ar, final TaskActionItem tai) {
+			final ActionResponse ar, final TaskActionItem tai, GlobalParameters gp) {
 //		Log.v("","bsh start");
-		BshExecEnvListItem bsli=TaskManager.acqBshExecEnvItem(tmp,ep,util,tr,ar,tai);
+		BshExecEnvListItem bsli=TaskManager.acqBshExecEnvItem(tmp,ep,util,tr,ar,tai, gp);
 //		Log.v("","bsh prepare");
 		tr.active_thread_ctrl.setExtraDataObject(new Object[]{Thread.currentThread(),bsli.interpreter});
 		String script_text="cd(\""+LocalMountPoint.getExternalStorageDir()+"\");\n"+
@@ -1012,7 +995,7 @@ public class TaskExecutor implements Runnable {
 //		} catch (EvalError e) {
 //			e.printStackTrace();
 //		}
-		TaskManager.relBshExecEnvItem(tmp,ep,util,bsli);
+		TaskManager.relBshExecEnvItem(tmp,ep,util,bsli, gp);
 	};
 	
 	public static void executeShellCommandWithSu(final TaskManagerParms tmp,
@@ -1065,30 +1048,30 @@ public class TaskExecutor implements Runnable {
 	final static private void executePlayBackMusic(TaskManagerParms tmp,
 			EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
 			ActionResponse ar,String action, String dlg_id, 
-			String fp, String vol_left, String vol_right) {
+			String fp, String vol_left, String vol_right, GlobalParameters gp) {
 		util.addLogMsg("I",String.format(tmp.teMsgs.msgs_thread_task_exec_play_sound,ar.current_action, fp));
 		playBackMusic(tmp, ep, util, tr, ar, action, dlg_id, 
-				fp, vol_left, vol_right);
+				fp, vol_left, vol_right, gp);
 	}
 
 	final static private void executePlayBackRingtone(TaskManagerParms tmp,
 			EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
 			ActionResponse ar,String action, String dlg_id,
 			String rt, String rn, String rp,
-			String vol_left, String vol_right) {
+			String vol_left, String vol_right, GlobalParameters gp) {
 		util.addLogMsg("I",String.format(tmp.teMsgs.msgs_thread_task_exec_play_ringtone,ar.current_action, rt,rn));
 		tr.active_action_name=action;
 		playBackRingtone(tmp, ep, util, tr, ar, dlg_id,
-				rt, rn, rp, vol_left, vol_right);
+				rt, rn, rp, vol_left, vol_right, gp);
 	}
 
 	final static private void executeTaskAction(TaskManagerParms tmp,
 			EnvironmentParms ep, CommonUtilities util,TaskResponse tr, ActionResponse ar,
 			String action_nm, String dlg_id,
-			String task_type, String task_target) {
+			String task_type, String task_target, GlobalParameters gp) {
 		util.addLogMsg("I",
 				String.format(tmp.teMsgs.msgs_thread_task_exec_task, action_nm,task_type,task_target));
-		taskTriggerTaskControl(tmp, ep, util, tr, ar, action_nm, dlg_id, task_type, task_target);
+		taskTriggerTaskControl(tmp, ep, util, tr, ar, action_nm, dlg_id, task_type, task_target, gp);
 	}
 
 	final static private void executeTimeAction(TaskManagerParms tmp,
@@ -1172,7 +1155,7 @@ public class TaskExecutor implements Runnable {
     final static public void taskTriggerTaskControl(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util,TaskResponse tr, ActionResponse ar,
 			String action_nm, String dlg_id,
-			String task_type, String task_target) {
+			String task_type, String task_target, GlobalParameters gp) {
 		tr.active_action_name=action_nm;
 		tr.active_dialog_id=dlg_id;
 		tr.cmd_tgt_task_name=task_target;
@@ -1182,11 +1165,11 @@ public class TaskExecutor implements Runnable {
 			tr.active_notify_event.notifyToListener(true, new Object[] {tr});
 		} else {
 			try {
-				TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util);
+				TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util, gp);
 				TaskManager.cancelSpecificTask(tmp, ep, util,
-						tr.active_group_name, tr.cmd_tgt_task_name);
+						tr.active_group_name, tr.cmd_tgt_task_name, gp);
 			} finally {
-				TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util);
+				TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,ep,tmp, util, gp);
 			}
 		}
 		ar.action_resp=ActionResponse.ACTION_SUCCESS;
@@ -1243,7 +1226,7 @@ public class TaskExecutor implements Runnable {
 	final static public void playBackMusic(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
 			ActionResponse ar,String action, String dlg_id, 
-			String fp, String vol_left, String vol_right) {
+			String fp, String vol_left, String vol_right, GlobalParameters gp) {
 		ar.action_resp=ActionResponse.ACTION_SUCCESS;
 		File lf=new File(fp);
 		if (!lf.exists()) {
@@ -1287,7 +1270,7 @@ public class TaskExecutor implements Runnable {
 			if (Build.VERSION.SDK_INT==21) {
 				TaskManager.closeStopSoundPlayBackNotification(tmp,ep,util, tr);
 			} else {
-				TaskManager.closeMessageDialog(tmp,ep,util,tr);
+				TaskManager.closeMessageDialog(tmp,ep,util,tr, gp);
 			}
 		} else {
 			ar.action_resp=ActionResponse.ACTION_ERROR;
@@ -1430,178 +1413,9 @@ public class TaskExecutor implements Runnable {
 		return true;
 	}
 	
-	final static public boolean isTrusted(TaskManagerParms tmp, 
-			EnvironmentParms ep, final CommonUtilities util,
-			TaskResponse tr, ActionResponse ar) {
-		boolean result=false;
-		if (Build.VERSION.SDK_INT==17) {
-			util.addDebugMsg(1, "I", "isTrusted ignored, API-17(4.2) not supported");
-			ar.action_resp=ActionResponse.ACTION_ERROR;
-			ar.resp_msg_text="isTrusted ignored, API-17(4.2) not supported";
-			return result;
-		}
-		if (tmp.truestedList.size()>0) {
-//			Log.v("","wifi conn="+ep.isWifiConnected()+", name="+ep.wifiSsid+", addr="+ep.wifiMacAddr);
-			if (ep.isWifiConnected()) {
-				for(int i=0;i<tmp.truestedList.size();i++) {
-					TrustDeviceItem tli=tmp.truestedList.get(i);
-					if (tli.trustedItemType==TrustDeviceItem.TYPE_WIFI_AP) {
-						if (tli.trustedItemName.equals(ep.wifiConnectedSsidName)) {
-							if (tli.trustedItemAddr.equals("")) {
-								result=true;
-								break;
-							} else {
-								if (tli.trustedItemAddr.equals(ep.wifiConnectedSsidAddr)) {
-									result=true;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-//			Log.v("","result="+result+", btc="+ep.isBluetoothConnected()+", name="+ep.blutoothDeviceName+", addr="+ep.blutoothDeviceAddr);
-			if (!result && ep.isBluetoothConnected()) {
-				for(int i=0;i<tmp.truestedList.size();i++) {
-					TrustDeviceItem tli=tmp.truestedList.get(i);
-					if (tli.trustedItemType==TrustDeviceItem.TYPE_BLUETOOTH_DEVICE) {
-						if (tli.trustedItemName.equals(ep.blutoothConnectedDeviceName)) {
-							if (tli.trustedItemAddr.equals("")) {
-								result=true;
-								break;
-							} else {
-								if (tli.trustedItemAddr.equals(ep.blutoothConnectedDeviceAddr)) {
-									result=true;
-									break;
-								}
-							}
-						}
-					}
-				}
-				
-			}
-		}
-		return result;
-	}
-	
-	final static public boolean setScreenLocked(TaskManagerParms tmp, final CommonUtilities util, 
-			TaskResponse tr, ActionResponse ar) {
-		if (!util.screenLockNow()) {
-			String msg=String.format(tmp.teMsgs.msgs_thread_task_screen_lock_ignored,
-					tr.active_event_name, tr.active_task_name);
-			util.addLogMsg("W", msg);
-			ar.action_resp=ActionResponse.ACTION_WARNING;
-			ar.resp_msg_text=msg;
-			return true;
-		}
-		return false;
-	};
-	
-	final static public boolean setKeyguardDisabled(TaskManagerParms tmp, 
-			EnvironmentParms ep, final CommonUtilities util, 
-			TaskResponse tr, ActionResponse ar) {
-		boolean result=false;
-		if (Build.VERSION.SDK_INT==17) {
-			util.addDebugMsg(1, "I", "disableKeyguard ignored, API-17(4.2) not supported");
-			ar.action_resp=ActionResponse.ACTION_ERROR;
-			ar.resp_msg_text="disableKeyguard ignored, API-17(4.2) not supported";
-		} else {
-			tmp.enableKeyguard=false;
-			if (!ep.screenIsLocked) {
-				tmp.setKeyguardDisabled();
-				tmp.pendingRequestForEnableKeyguard=false;
-				util.addDebugMsg(1, "I", "disableKeyguard issued immediately");
-				result=true;
-			} else {
-				util.addDebugMsg(1, "I", "disableKeyguard will be issued during USER_PRESENT processed");
-				tmp.pendingRequestForEnableKeyguard=true;
-				result=true;
-			}
-			TaskManager.showNotification(tmp, ep, util);
-		}
-
-//		if (tmp.enableKeyguard) {
-//			tmp.enableKeyguard=false;
-//			if (!ep.screenIsLocked) {
-//				tmp.setKeyguardDisabled();
-//				tmp.pendingRequestForEnableKeyguard=false;
-//				util.addDebugMsg(1, "I", "disableKeyguard issued immediately");
-//				result=true;
-//			} else {
-//				util.addDebugMsg(1, "I", "disableKeyguard will be issued during USER_PRESENT processed");
-//				tmp.pendingRequestForEnableKeyguard=true;
-//				result=true;
-//			}
-//			TaskManager.showNotification(tmp, ep, util);
-//		} else {
-//			util.addDebugMsg(1, "I", "disableKeyguard request ignored, because keyguard is already disabled");
-//		}
-		return result;
-	};
-
-	final static public boolean setKeyguardEnabled(TaskManagerParms tmp, 
-			EnvironmentParms ep, final CommonUtilities util, 
-			TaskResponse tr, ActionResponse ar) {
-		boolean result=false;
-		if (Build.VERSION.SDK_INT==17) {
-			util.addDebugMsg(1, "I", "reenableKeyguard ignored, API-17(4.2) not supported");
-			ar.action_resp=ActionResponse.ACTION_ERROR;
-			ar.resp_msg_text="reenableKeyguard ignored, API-17(4.2) not supported";
-		} else {
-			tmp.enableKeyguard=true;
-			if (ep.screenIsLocked && ep.screenIsOn) {
-				tmp.pendingRequestForEnableKeyguard=true;
-				util.addDebugMsg(1, "I", "reenableKeyguard will be issued during SCREEN_OFF processed");
-				result=true;
-			} else {
-				tmp.setKeyguardEnabled();
-				if (ep.screenIsLocked) util.screenLockNow();
-				tmp.pendingRequestForEnableKeyguard=false;
-				util.addDebugMsg(1, "I", "reenableKeyguard issued immediately");
-				result=true;
-			}
-			TaskManager.showNotification(tmp, ep, util);
-		}
-//		if (!tmp.enableKeyguard) {
-//			tmp.enableKeyguard=true;
-//			if (ep.screenIsLocked && ep.screenIsOn) {
-//				tmp.pendingRequestForEnableKeyguard=true;
-//				util.addDebugMsg(1, "I", "reenableKeyguard will be issued during SCREEN_OFF processed");
-//				result=true;
-//			} else {
-//				tmp.setKeyguardEnabled();
-//				if (ep.screenIsLocked) util.screenLockNow();
-//				tmp.pendingRequestForEnableKeyguard=false;
-//				util.addDebugMsg(1, "I", "reenableKeyguard issued immediately");
-//				result=true;
-//			}
-//			TaskManager.showNotification(tmp, ep, util);
-//		} else {
-//			util.addDebugMsg(1, "I", "reenableKeyguard request ignored, because keyguard is already enabled");
-//		}
-		
-//		if (Build.VERSION.SDK_INT>=21) {
-//			tmp.setKeyguardEnabled();
-//			tmp.pendingRequestForEnableKeyguard=false;
-//			if (ep.settingForceLockWhenKeyguardEnabled) util.screenLockNow();
-//			util.addDebugMsg(1, "I", "reenableKeyguard issued immediately");
-//		} else {
-//			if (ep.screenIsLocked && !ep.screenIsOn) {
-//				tmp.setKeyguardEnabled();
-//				tmp.pendingRequestForEnableKeyguard=false;
-//				if (ep.settingForceLockWhenKeyguardEnabled) util.screenLockNow();
-//				util.addDebugMsg(1, "I", "reenableKeyguard issued immediately");
-//			} else {
-//				util.addDebugMsg(1, "I", "reenableKeyguard was delayed");
-//				tmp.pendingRequestForEnableKeyguard=true;
-//			}
-//		}
-		return result;
-	};
-
 	final static public boolean playBackDefaultAlarm(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-    		ActionResponse ar) {
+    		ActionResponse ar, GlobalParameters gp) {
 		if (!isRingerModeNormal(ep)) {
 			ar.action_resp=ActionResponse.ACTION_WARNING;
 			ar.resp_msg_text=tmp.teMsgs.msgs_thread_task_exec_ignore_sound_ringer_not_normal;
@@ -1611,7 +1425,7 @@ public class TaskExecutor implements Runnable {
 //		Uri uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 		if (uri!=null) {
 			playBackRingtone(tmp,ep,util,tr,ar,tr.active_dialog_id, 
-					PROFILE_ACTION_RINGTONE_TYPE_ALARM, "", uri.getEncodedPath(),"-1", "-1");			
+					PROFILE_ACTION_RINGTONE_TYPE_ALARM, "", uri.getEncodedPath(),"-1", "-1", gp);
 		} else {
 			ar.action_resp=ActionResponse.ACTION_WARNING;
 			ar.resp_msg_text="Default alarm does not exists";
@@ -1620,7 +1434,7 @@ public class TaskExecutor implements Runnable {
 	}
 	final static public boolean playBackDefaultNotification(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-    		ActionResponse ar) {
+    		ActionResponse ar, GlobalParameters gp) {
 		if (!isRingerModeNormal(ep)) {
 			ar.action_resp=ActionResponse.ACTION_WARNING;
 			ar.resp_msg_text=tmp.teMsgs.msgs_thread_task_exec_ignore_sound_ringer_not_normal;
@@ -1630,7 +1444,7 @@ public class TaskExecutor implements Runnable {
 //		Uri uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		if (uri!=null) {
 			playBackRingtone(tmp,ep,util,tr,ar,tr.active_dialog_id, 
-					PROFILE_ACTION_RINGTONE_TYPE_NOTIFICATION, "", uri.getEncodedPath(),"-1", "-1");			
+					PROFILE_ACTION_RINGTONE_TYPE_NOTIFICATION, "", uri.getEncodedPath(),"-1", "-1", gp);
 		} else {
 			ar.action_resp=ActionResponse.ACTION_WARNING;
 			ar.resp_msg_text="Default notification does not exists";
@@ -1640,7 +1454,7 @@ public class TaskExecutor implements Runnable {
 	}
 	final static public boolean playBackDefaultRingtone(TaskManagerParms tmp,
 			EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-			ActionResponse ar) {
+			ActionResponse ar, GlobalParameters gp) {
 		if (!isRingerModeNormal(ep)) {
 			ar.action_resp=ActionResponse.ACTION_WARNING;
 			ar.resp_msg_text=tmp.teMsgs.msgs_thread_task_exec_ignore_sound_ringer_not_normal;
@@ -1650,7 +1464,7 @@ public class TaskExecutor implements Runnable {
 //		Uri uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
 		if (uri!=null) {
 			playBackRingtone(tmp,ep,util,tr,ar,tr.active_dialog_id, 
-					PROFILE_ACTION_RINGTONE_TYPE_RINGTONE, "", uri.getEncodedPath(),"-1", "-1");			
+					PROFILE_ACTION_RINGTONE_TYPE_RINGTONE, "", uri.getEncodedPath(),"-1", "-1", gp);
 		} else {
 			ar.action_resp=ActionResponse.ACTION_WARNING;
 			ar.resp_msg_text="Default ringtone does not exists";
@@ -1688,7 +1502,7 @@ public class TaskExecutor implements Runnable {
 			EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
 			ActionResponse ar, String dlg_id,
 			String rt, String rn, String rp,
-			String vol_left, String vol_right) {
+			String vol_left, String vol_right, GlobalParameters gp) {
 		ar.action_resp=ActionResponse.ACTION_SUCCESS;
 		if (!isRingerModeNormal(ep)) {
 			ar.action_resp=ActionResponse.ACTION_WARNING;
@@ -1728,7 +1542,7 @@ public class TaskExecutor implements Runnable {
 				if (Build.VERSION.SDK_INT==21) {
 					TaskManager.closeStopSoundPlayBackNotification(tmp,ep,util,tr);
 				} else {
-					TaskManager.closeMessageDialog(tmp,ep,util,tr);
+					TaskManager.closeMessageDialog(tmp,ep,util,tr, gp);
 				}
 			}
 		} else {
@@ -1766,7 +1580,8 @@ public class TaskExecutor implements Runnable {
 		ar.action_resp=ActionResponse.ACTION_SUCCESS;
 		ar.resp_msg_text="";
     };
-    
+
+    final public static String NOTIFICATION_CHANNEL_DEFAULT="Default";
 	final static private void showMessageNotification(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
     		String m_text, int led_color, int led_on, int led_off, boolean sound) {
@@ -1790,11 +1605,30 @@ public class TaskExecutor implements Runnable {
 			pi.cancel();
 			nb.setContentIntent(pi);
 		}
-		if (sound) nb.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND);
+        if (Build.VERSION.SDK_INT>=26) {
+            nb.setChannelId(NOTIFICATION_CHANNEL_DEFAULT);
+        }
+
+        if (sound) nb.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND);
 		else nb.setDefaults(Notification.DEFAULT_VIBRATE);
 		if (led_color!=0) nb.setLights(led_color, led_on, led_off);
     	Notification nf=nb.build();
-    	nm.notify("MSG",tmp.msgNotificationId, nf);
+
+        if (Build.VERSION.SDK_INT>=26) {
+            NotificationChannel def_ch = new NotificationChannel(
+                    NOTIFICATION_CHANNEL_DEFAULT,
+                    NOTIFICATION_CHANNEL_DEFAULT,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            def_ch.enableLights(false);
+            def_ch.setSound(null,null);
+            def_ch.enableVibration(false);
+            def_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            nm.deleteNotificationChannel(NOTIFICATION_CHANNEL_DEFAULT);
+            nm.createNotificationChannel(def_ch);
+        }
+
+        nm.notify("MSG",tmp.msgNotificationId, nf);
     	synchronized(ep) {
         	if (tmp.msgNotificationId>=MAX_NOTIFICATION_COUNT) tmp.msgNotificationId=1;
         	else tmp.msgNotificationId++;
@@ -2056,10 +1890,10 @@ public class TaskExecutor implements Runnable {
 
     final static public void setBluetoothOff(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-			ActionResponse ar) {
+			ActionResponse ar, GlobalParameters gp) {
 			if (BluetoothAdapter.getDefaultAdapter()!=null) {
 		        if (BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-		        	if (ep.settingDebugLevel>=1) util.addDebugMsg(1,"I","setBluetoothOff Bluetooth off");
+		        	if (gp.settingDebugLevel>=1) util.addDebugMsg(1,"I","setBluetoothOff Bluetooth off");
 		        	BluetoothAdapter.getDefaultAdapter().disable();
 		        	ar.action_resp=ActionResponse.ACTION_SUCCESS;
 		        	ar.resp_msg_text="";
@@ -2068,7 +1902,7 @@ public class TaskExecutor implements Runnable {
 					ar.resp_msg_text="Bluetooth already off";
 		        }
 			} else {
-				if (ep.settingDebugLevel>=1) util.addDebugMsg(1,"I","setBluetoothOff BluetoothAdapter not available, Bluetooth off ignored");
+				if (gp.settingDebugLevel>=1) util.addDebugMsg(1,"I","setBluetoothOff BluetoothAdapter not available, Bluetooth off ignored");
 				ar.action_resp=ActionResponse.ACTION_WARNING;
 				ar.resp_msg_text="Bluetooth not available";
 			}
@@ -2076,10 +1910,10 @@ public class TaskExecutor implements Runnable {
 
 	final static public void setBluetoothOn(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-			ActionResponse ar) {
+			ActionResponse ar, GlobalParameters gp) {
 			if (BluetoothAdapter.getDefaultAdapter()!=null) {
 		        if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-		        	if (ep.settingDebugLevel>=1) util.addDebugMsg(1,"I","setBluetoothOn Bluetooth on");
+		        	if (gp.settingDebugLevel>=1) util.addDebugMsg(1,"I","setBluetoothOn Bluetooth on");
 		        	BluetoothAdapter.getDefaultAdapter().enable();
 		        	ar.action_resp=ActionResponse.ACTION_SUCCESS;
 		        	ar.resp_msg_text="";
@@ -2088,7 +1922,7 @@ public class TaskExecutor implements Runnable {
 					ar.resp_msg_text="Bluetooth already on";
 		        }
 			} else {
-				if (ep.settingDebugLevel>=1) util.addDebugMsg(1,"I","setBluetoothOn BluetoothAdapter not available, Bluetooth on ignored");
+				if (gp.settingDebugLevel>=1) util.addDebugMsg(1,"I","setBluetoothOn BluetoothAdapter not available, Bluetooth on ignored");
 				ar.action_resp=ActionResponse.ACTION_WARNING;
 				ar.resp_msg_text="Bluetooth not available";
 			}
@@ -2096,11 +1930,11 @@ public class TaskExecutor implements Runnable {
 
 	final static public void setWifiOn(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-			ActionResponse ar) {
+			ActionResponse ar, GlobalParameters gp) {
 		WifiManager wm = (WifiManager)tmp.context.getSystemService(Context.WIFI_SERVICE);
 		int ws=-1;
 		if (wm!=null) ws=wm.getWifiState();
-		if (ep.settingDebugLevel>=1) 
+		if (gp.settingDebugLevel>=1)
 			util.addDebugMsg(1,"I","setWifiOn WIFI On entered, wifiIsActive="+ep.wifiIsActive+
 					", wifiMgrStatus="+ws);
     	if (!ep.wifiIsActive) {
@@ -2109,12 +1943,12 @@ public class TaskExecutor implements Runnable {
             		ar.action_resp=ActionResponse.ACTION_SUCCESS;
             		ar.resp_msg_text="setWifiOn WIFI On Success";
         		} else {
-        			if (ep.settingDebugLevel>=1) util.addDebugMsg(1,"I","setWifiOn WifiManager error, WIFI On ignored");
+        			if (gp.settingDebugLevel>=1) util.addDebugMsg(1,"I","setWifiOn WifiManager error, WIFI On ignored");
     				ar.action_resp=ActionResponse.ACTION_WARNING;
     				ar.resp_msg_text="setWifiOn WifiManager error";
         		}
     		} else {
-    			if (ep.settingDebugLevel>=1) util.addDebugMsg(1,"I","setWifiOn WifiManager not available, WIFI On ignored");
+    			if (gp.settingDebugLevel>=1) util.addDebugMsg(1,"I","setWifiOn WifiManager not available, WIFI On ignored");
 				ar.action_resp=ActionResponse.ACTION_WARNING;
 				ar.resp_msg_text="setWifiOn WIFI not available";
     		}
@@ -2126,11 +1960,11 @@ public class TaskExecutor implements Runnable {
     
     final static public void setWifiOff(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
-			ActionResponse ar) {
+			ActionResponse ar, GlobalParameters gp) {
     	WifiManager wm = (WifiManager)tmp.context.getSystemService(Context.WIFI_SERVICE);
 		int ws=-1;
 		if (wm!=null) ws=wm.getWifiState();
-		if (ep.settingDebugLevel>=1) 
+		if (gp.settingDebugLevel>=1)
 			util.addDebugMsg(1,"I","setWifiOff WIFI Off entered, wifiIsActive="+ep.wifiIsActive+
 					", wifiMgrStatus="+ws);
     	if (ep.wifiIsActive) {
@@ -2139,7 +1973,7 @@ public class TaskExecutor implements Runnable {
         		ar.action_resp=ActionResponse.ACTION_SUCCESS;
         		ar.resp_msg_text="setWifiOff WIFI Off Success";
     		} else {
-    			if (ep.settingDebugLevel>=1) util.addDebugMsg(1,"I","setWifiOff WifiManager not available, WIFI Off ignored");
+    			if (gp.settingDebugLevel>=1) util.addDebugMsg(1,"I","setWifiOff WifiManager not available, WIFI Off ignored");
     			ar.action_resp=ActionResponse.ACTION_WARNING;
     			ar.resp_msg_text="setWifiOff WIFI not available";
     		}

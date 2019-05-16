@@ -1,8 +1,5 @@
 package com.sentaroh.android.TaskAutomation;
 
-import com.sentaroh.android.TaskAutomation.Common.EnvironmentParms;
-import com.sentaroh.android.TaskAutomation.Common.TaskManagerParms;
-
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;

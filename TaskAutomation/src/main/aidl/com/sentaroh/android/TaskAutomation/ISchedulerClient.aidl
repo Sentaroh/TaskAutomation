@@ -13,7 +13,6 @@ interface ISchedulerClient{
 	void aidlResetScheduler();
 	void aidlClearTaskHistory();
 	String[] aidlGetTaskHistoryList();
-	void aidlScreenOff();
 	void aidlMessageDialogMoveToFront();
 	
 	void aidlImmediateTaskExecution(in byte[] task, in byte[] time,

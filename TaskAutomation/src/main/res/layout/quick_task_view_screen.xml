@@ -25,51 +25,5 @@
             android:gravity="center_vertical"
             android:text="@string/msgs_quick_hdr_screen_proximity_undetect" />
 
-        <CheckedTextView
-            android:id="@+id/quick_task_view_screen_proximity_detected"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:gravity="center_vertical"
-            android:text="@string/msgs_quick_hdr_screen_proximity_detect" />
-
-        <CheckedTextView
-            android:id="@+id/quick_task_view_screen_proximity_detected_ignore_landscape"
-            android:layout_marginLeft="30dp"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:gravity="center_vertical"
-            android:text="@string/msgs_quick_hdr_screen_proximity_detect_ignore_landscape" />
-        
-        <CheckedTextView
-            android:id="@+id/quick_task_view_screen_light_detected"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:gravity="center_vertical"
-            android:text="@string/msgs_quick_hdr_screen_light_detect" />
-
-        <CheckedTextView
-            android:id="@+id/quick_task_view_screen_light_undetected"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:gravity="center_vertical"
-            android:text="@string/msgs_quick_hdr_screen_light_undetect" />
-
-        <CheckedTextView
-            android:id="@+id/quick_task_view_screen_trust_device"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:gravity="center_vertical"
-            android:text="@string/msgs_quick_hdr_screen_trust_device" />
-        
     </LinearLayout>
 </LinearLayout>

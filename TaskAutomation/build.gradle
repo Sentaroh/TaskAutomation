@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.sentaroh.android.TaskAutomation"
-        minSdkVersion 10
-        targetSdkVersion 11
+        minSdkVersion 21
+        targetSdkVersion 26
 
         versionCode 147
         versionName "2.15"
@@ -66,8 +66,12 @@ android {
 dependencies {
 //    implementation project(':Utilities')
 //    implementation(name:'Utilities-1.0.5', ext:'aar')
-    implementation files('libs/Utilities-1.0.10.aar')
+    implementation files('libs/Utilities-1.0.15.aar')
 //    implementation project(':TaskAutomationInterface')
-    implementation 'com.android.support:appcompat-v7:22.2.1'
+
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:preference-v7:26.1.0'
+
     implementation files('libs/bsh2-2.1b5.jar')
 }

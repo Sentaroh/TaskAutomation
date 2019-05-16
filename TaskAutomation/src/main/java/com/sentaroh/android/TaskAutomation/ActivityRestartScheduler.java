@@ -23,7 +23,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import com.sentaroh.android.TaskAutomation.Common.EnvironmentParms;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.ThemeColorList;
 import com.sentaroh.android.Utilities.ThemeUtil;
@@ -40,6 +39,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -65,6 +65,7 @@ public class ActivityRestartScheduler extends Activity {
 	private Handler uiHandler=null;
 	
 	private ThemeColorList mThemeColorList=null;
+    private GlobalParameters mGp=null;
 	
 	@Override  
 	protected void onSaveInstanceState(Bundle outState) {  
@@ -81,6 +82,9 @@ public class ActivityRestartScheduler extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
         super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_message);
@@ -92,7 +96,8 @@ public class ActivityRestartScheduler extends Activity {
         restartStatus=0;
         envParms=new EnvironmentParms();
         envParms.loadSettingParms(context);
-        util=new CommonUtilities(context.getApplicationContext(), "RestartSched",envParms);
+        mGp= GlobalWorkArea.getGlobalParameters(context);
+        util=new CommonUtilities(context.getApplicationContext(), "RestartSched",envParms, mGp);
 
         util.addDebugMsg(1,"I","onCreate entered");
         
@@ -285,7 +290,7 @@ public class ActivityRestartScheduler extends Activity {
 				final String grp,final String task,
 				final String action, final String shell_cmd, final String dialog_id, final int atc,
 				final int resp_cd, final String msg) throws RemoteException {
-			if (envParms.settingDebugLevel>=1)
+			if (mGp.settingDebugLevel>=1)
 				util.addDebugMsg(2, "I", "Notify received ",
 						"Resp=",resp,", Task=",task,", action=",action,", " +
 								"dialog_id=",dialog_id);

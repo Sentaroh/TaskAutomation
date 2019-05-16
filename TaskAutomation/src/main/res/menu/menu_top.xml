@@ -5,29 +5,25 @@
           android:title="@string/msgs_menu_show_history" 
           android:icon="@drawable/task"
           appv7:showAsAction="ifRoom|withText"/>
--->          
-    
-<!--      
+-->
+    <item android:id="@+id/menu_top_browse_logfile"
+        android:title="@string/msgs_menu_browse_logfile"
+        android:icon="@drawable/browse_text_bw"
+        appv7:showAsAction="ifRoom|withText"/>
+
     <item android:id="@+id/menu_top_export_profile"
           android:title="@string/msgs_menu_export_profile" 
-          android:icon="@+android:drawable/ic_menu_save"
           />
+
     <item android:id="@+id/menu_top_import_profile"
           android:title="@string/msgs_menu_import_profile" 
-          android:icon="@+android:drawable/ic_menu_set_as"
           />
--->
-          
+
     <item android:id="@+id/menu_top_toggle_scheduler"
           android:title="@string/msgs_menu_toggle_scheduler_enable" 
           appv7:showAsAction="ifRoom|withText"/>
 
-    <item android:id="@+id/menu_top_browse_logfile"
-          android:title="@string/msgs_menu_browse_logfile" 
-          android:icon="@drawable/browse_text_bw"
-          appv7:showAsAction="ifRoom|withText"/>
-    
-<!--      
+<!--
     <item android:id="@+id/menu_top_quick_task"
           android:title="@string/msgs_menu_quick_task" 
           />
@@ -37,17 +33,23 @@
           android:icon="@+android:drawable/ic_menu_send"
           />
 -->
+
+    <item android:id="@+id/menu_top_log_management"
+        android:title="@string/msgs_log_management_title"
+        />
+
+
+    <item android:id="@+id/menu_top_settings"
+        android:title="@string/msgs_menu_settings"
+        android:icon="@android:drawable/ic_menu_preferences"
+        />
+
     <item android:id="@+id/menu_top_restart_scheduler"
           android:title="@string/msgs_menu_restart_scheduler" 
           />
           
     <item android:id="@+id/menu_top_uninstall"
           android:title="@string/msgs_menu_uninstall" 
-          />
-    
-    <item android:id="@+id/menu_top_settings"
-          android:title="@string/msgs_menu_settings" 
-          android:icon="@android:drawable/ic_menu_preferences"
           />
     
     <item android:id="@+id/menu_top_about"

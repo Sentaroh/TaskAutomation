@@ -23,12 +23,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.TaskAutomation.Common.CommonConstants.*;
-import static com.sentaroh.android.TaskAutomation.Config.QuickTaskConstants.QUICK_TASK_CURRENT_VERSION;
-import static com.sentaroh.android.TaskAutomation.Config.QuickTaskConstants.QUICK_TASK_GROUP_NAME;
-import static com.sentaroh.android.TaskAutomation.Config.QuickTaskConstants.QUICK_TASK_VERSION_KEY;
-import static com.sentaroh.android.TaskAutomation.WidgetConstants.DEVICE_BTN_PREFIX;
-import static com.sentaroh.android.TaskAutomation.WidgetConstants.WIDGET_INTENT_PREFIX;
+import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
+import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.QUICK_TASK_CURRENT_VERSION;
+import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.QUICK_TASK_GROUP_NAME;
+import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.QUICK_TASK_VERSION_KEY;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -50,7 +48,6 @@ import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -81,20 +78,6 @@ import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
-import com.sentaroh.android.TaskAutomation.Common.ActivityExtraDataItem;
-import com.sentaroh.android.TaskAutomation.Common.BluetoothDeviceListItem;
-import com.sentaroh.android.TaskAutomation.Common.EnvironmentParms;
-import com.sentaroh.android.TaskAutomation.Common.ProfileListItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskActionItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskHistoryItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskListHolder;
-import com.sentaroh.android.TaskAutomation.Common.TaskListItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskLookupListItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskManagerParms;
-import com.sentaroh.android.TaskAutomation.Common.TaskResponse;
-import com.sentaroh.android.TaskAutomation.Config.ProfileUtilities;
-import com.sentaroh.android.TaskAutomation.Config.QuickTaskMaintenance;
-import com.sentaroh.android.TaskAutomation.Config.SampleProfile;
 import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
@@ -157,12 +140,11 @@ public final class SchedulerService extends Service {
 	
 	static private Service mSvcInstance=null;
 	
-	static private WidgetService mWidgetSvc=null;
-	
 	static private WifiManager mWifiMgr=null;
 	
 	static private Handler mUiHandler=null;
 
+	private static GlobalParameters mGp=null;
 	@Override
 	public void onConfigurationChanged(Configuration newconfig) {
 		mUtil.addDebugMsg(1,"I","onConfigurationChanged entered,"+
@@ -206,11 +188,12 @@ public final class SchedulerService extends Service {
 
 		mEnvParms=new EnvironmentParms();
 		mTaskMgrParms=new TaskManagerParms();
-		
+
+        mGp=GlobalWorkArea.getGlobalParameters(mContext);
 
 		mTaskMgrParms.svcMsgs.loadString(mContext);
 		mEnvParms.loadSettingParms(mContext);
-        mUtil=new CommonUtilities(mContext, "SchedSvc", mEnvParms);
+        mUtil=new CommonUtilities(mContext, "SchedSvc", mEnvParms, mGp);
 		mWakelockForSleep=((PowerManager)mContext.getSystemService(Context.POWER_SERVICE))
     			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
     					| PowerManager.ON_AFTER_RELEASE, "TaskAutomation-Sensor");
@@ -233,33 +216,31 @@ public final class SchedulerService extends Service {
 
 		mUtil.addLogMsg("I",mTaskMgrParms.svcMsgs.msgs_svc_started, " ", String.valueOf(android.os.Process.myPid()));
 
-	    TaskManager.initTaskMgrParms(mEnvParms,mTaskMgrParms, mContext, mUtil);
+	    TaskManager.initTaskMgrParms(mEnvParms,mTaskMgrParms, mContext, mUtil, mGp);
 	    initialyzeThreadResponseNotifyEvent(mContext);
-		TaskManager.initNotification(mTaskMgrParms, mEnvParms);
+		TaskManager.initNotification(mTaskMgrParms, mEnvParms, mGp);
 
         mTaskMgrParms.locationUtil=new LocationUtilities(mTaskMgrParms,mEnvParms,mUtil);
 
-		startBasicEventReceiver(mContext);
+        if (mGp.settingEnableMonitor) startSvcMonitor();
+
+        startBasicEventReceiver(mContext);
 
 		initialyzeTaskEnvironmentParms(mContext);
 
-		mWidgetSvc=new WidgetService(mContext,mTaskMgrParms, mEnvParms, mUtil);
-		
 		if (!isProfileFileExisted()) {
-			SampleProfile.addSampleProfile(mProfileArrayList,true,true);
-			QuickTaskMaintenance.buildQuickTaskProfile(mContext, mProfileArrayList, 
-					mUtil, QUICK_TASK_GROUP_NAME);
+//			SampleProfile.addSampleProfile(mProfileArrayList,true,true);
+//			QuickTaskMaintenance.buildQuickTaskProfile(mContext, mProfileArrayList,
+//					mUtil, QUICK_TASK_GROUP_NAME);
 			ProfileUtilities.sortProfileArrayList(mUtil, mProfileArrayList);
-			ProfileUtilities.setQuickTaskProfileActivated(mUtil,mProfileArrayList,true);
+//			ProfileUtilities.setQuickTaskProfileActivated(mUtil,mProfileArrayList,true);
 			mUtil.saveProfileToFileByService(mProfileArrayList);
 			mContext.deleteFile(SERVICE_TASK_LIST_FILE_NAME);
 			buildTaskList();
 		} else restoreTaskList();
 
-		startSvcMonitor();
-		
 		setHeartBeat(mContext);
-    	if (mEnvParms.settingEnableScheduler) {
+    	if (mGp.settingEnableScheduler) {
     		initialExecuteSchedulerTask(mContext);
     	}
 //    	startMagneticFieldSensorReceiver();
@@ -305,48 +286,22 @@ public final class SchedulerService extends Service {
     	if (in!=null && in.getAction()!=null) t_act=in.getAction();
     	else t_act="";
     	final String action=t_act;
-		if (mEnvParms.settingDebugLevel>=2 && !action.equals(BROADCAST_SERVICE_HEARTBEAT))
+		if (mGp.settingDebugLevel>=2 && !action.equals(BROADCAST_SERVICE_HEARTBEAT))
 			mUtil.addDebugMsg(2,"I","onStartCommand entered, action=",action,", flag=",String.valueOf(flags));
-		if (action.startsWith(WIDGET_INTENT_PREFIX)) {
-			mWidgetSvc.startWidgetIntentThread(action);
-		} else if (action.startsWith(DEVICE_BTN_PREFIX)) {
-			mWidgetSvc.processDeviceButton(action);
-		} else if (action.startsWith(CANCEL_ALL_SOUND_PLAYBACK_STOP_REQUEST)) {
+		if (action.startsWith(CANCEL_ALL_SOUND_PLAYBACK_STOP_REQUEST)) {
 			cancelSoundPlayBackTask();
 		} else {
 			if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 				analyzeConnectivityChanged(in);
-//			} else if (action.equals("android.intent.action.ACTION_IDLE_MAINTENANCE_START")) {
-//				mUtil.addDebugMsg(1,"I","onStartCommand entered, action=",action,", flag=",String.valueOf(flags));
-//			} else if (action.equals("com.android.server.task.controllers.IdleController.ACTION_TRIGGER_IDLE")) {
-//				mUtil.addDebugMsg(1,"I","onStartCommand entered, action=",action,", flag=",String.valueOf(flags));
-			} else if (action.equals(BROADCAST_RELOAD_DEVICE_ADMIN)) {
-				mEnvParms.settingDeviceAdmin=
-						CommonUtilities.getPrefMgr(mContext).getBoolean(mContext.getString(R.string.settings_main_device_admin),false);
-						
 			} else if (action.equals(BROADCAST_BUILD_TASK_LIST)) {
 	    		buildTaskList();
-	    		if (mEnvParms.settingEnableScheduler) {
+	    		if (mGp.settingEnableScheduler) {
 	    			rescheduleTimerEventTask(null);
 	    			stopLightSensorReceiver();
 	    			stopProximitySensorReceiver();
 	    			startLightSensorReceiver();
 	    			startProximitySensorReceiver();
 	    		}
-    		} else if (action.equals(BROADCAST_DISABLE_KEYGUARD)) {
-    			if (mEnvParms.settingScreenKeyguardControlEnabled) {
-        			mTaskMgrParms.setKeyguardDisabled();
-        			mUtil.addDebugMsg(1,"I","disableKeyguard issued");
-    			} else {
-    				mUtil.addDebugMsg(1,"I","disableKeyguard ignored, Keyguard control is disabled");
-    			}
-    		} else if (action.equals(BROADCAST_ENABLE_KEYGUARD)) {
-    			if (mEnvParms.settingScreenKeyguardControlEnabled) {
-        			mTaskMgrParms.setKeyguardEnabled();
-        			mUtil.addDebugMsg(1,"I","reenableKeyguard issued");
-    			} else {
-    				mUtil.addDebugMsg(1,"I","EnableKeyguard ignored, Keyguard control is disabled");
-    			}
     		} else if (action.equals(BROADCAST_START_ACTIVITY_TASK_STATUS)) {
     			Intent in_b=new Intent(mContext.getApplicationContext(),ActivityTaskStatus.class);
 				in_b.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -355,53 +310,32 @@ public final class SchedulerService extends Service {
     			cancelHeartBeat(mContext);
     			setHeartBeat(mContext);
 	    		resourceCleanup(mTaskMgrParms, mEnvParms, mUtil);
-    		} else if (action.equals(BROADCAST_LOAD_TRUST_LIST)) {
-    			mTaskMgrParms.truestedList=CommonUtilities.loadTrustedDeviceList(mContext);
-    			if (mTaskMgrParms.truestedList==null || mTaskMgrParms.truestedList.size()==0) mEnvParms.settingScreenKeyguardControlEnabled=false;
     		} else if (action.equals(BROADCAST_START_SCHEDULER)) {
     			mEnvParms.loadSettingParms(mContext);
-    			mTaskMgrParms.truestedList=CommonUtilities.loadTrustedDeviceList(mContext);
-    			if (mTaskMgrParms.truestedList==null || mTaskMgrParms.truestedList.size()==0) mEnvParms.settingScreenKeyguardControlEnabled=false;
-//	    		initialExecuteSchedulerTask();
 	    	} else if (action.equals(BROADCAST_RESTART_SCHEDULER)) {
 	    		restartScheduler();
-//	    	} else if (action.equals(BROADCAST_RESET_SCHEDULER)) {
-//	    		boolean ena_sched=in.getBooleanExtra("settingEnableScheduler", false);
-//	    		envParms.setSettingEnableScheduler(appContext,ena_sched);
-//    			resetScheduler();
 	    	} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-	    		if (mEnvParms.settingEnableScheduler) {
-//    				initialExecuteSchedulerTask(appContext);
-//	    			addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList,BUILTIN_EVENT_BOOT_COMPLETED);
+	    		if (mGp.settingEnableScheduler) {
 	    			scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_BOOT_COMPLETED);
 	    		}
 	    	} else if (action.equals(Intent.ACTION_SHUTDOWN)) {
-//	    		mUtil.resetLogReceiver();
 	    	} else if (action.equals(Intent.ACTION_LOCALE_CHANGED)) {
 	    		mTaskMgrParms.teMsgs.loadString(mContext);
 	    		mTaskMgrParms.svcMsgs.loadString(mContext);
 	    		mEnvParms.batteryChargeStatusString=parseBatteryChargeStatus(mLastBatteryStatusSt);
-	    		mWidgetSvc.processBatteryStatusChanged();
-	    		TaskManager.buildNotification(mTaskMgrParms, mEnvParms);
-	    		TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
+	    		TaskManager.buildNotification(mTaskMgrParms, mEnvParms, mGp);
+	    		TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
     		} else if (action.equals(BROADCAST_TIMER_EXPIRED)) {
-	    		if (mEnvParms.settingEnableScheduler) {
-//	    			addTaskScheduleQueueTime(mTaskMgrParms,mTimerEventTaskList);
+	    		if (mGp.settingEnableScheduler) {
 	    			scheduleTimeEventTask(mTimerEventTaskList);
     				rescheduleTimerEventTask(null);
 	    		}
     		} 
 		}
-		if (!mEnvParms.settingEnableScheduler && !mWidgetSvc.isWidgetActive()) {
+		if (!mGp.settingEnableScheduler) {
 			//Scheduler not required
-			if (mEnvParms.settingScreenKeyguardControlEnabled) {
-				mTaskMgrParms.setKeyguardEnabled();
-			} else {
-				mUtil.addDebugMsg(1,"I","EnableKeyguard ignored, Keyguard control is disabled");
-			}
-			mTaskMgrParms.pendingRequestForEnableKeyguard=mTaskMgrParms.enableKeyguard=false;
     		mUtil.addDebugMsg(1,"I","Scheduler will be terminated");
-			stopSvcMonitor();
+            stopSvcMonitor();
 			stopSelf();
 		}
 		relSvcWakeLock();
@@ -545,7 +479,7 @@ public final class SchedulerService extends Service {
     
 	static final private synchronized void resourceCleanup(final TaskManagerParms taskMgrParms,
     		final EnvironmentParms envParms, final CommonUtilities util) {
-		mUtil.flushLog();
+		mUtil.flushLog(mContext, mGp);
 		final long c_time=System.currentTimeMillis();
     	if (taskMgrParms.resourceCleanupTime<=c_time) {
     		final WakeLock wl=((PowerManager)mContext.getSystemService(Context.POWER_SERVICE))
@@ -557,14 +491,14 @@ public final class SchedulerService extends Service {
     			@SuppressWarnings("unchecked")
 				@Override
     			public void run() {
-    				TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util);
-    				TaskManager.acqLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util);
-    				TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util);
+    				TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util, mGp);
+    				TaskManager.acqLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util, mGp);
+    				TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util, mGp);
 
-    				TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+    				TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, mGp);
 		    		if (taskMgrParms.activeTaskList.size()==0 && taskMgrParms.taskQueueList.size()==0) {
 	    				util.addDebugMsg(1, "I", "Resource cleanup started");
-						if (envParms.statsHighTaskCountThisPeriod<envParms.settingMaxTaskCount) {
+						if (envParms.statsHighTaskCountThisPeriod<mGp.settingMaxTaskCount) {
 							if (envParms.statsHighTaskCountThisPeriod>envParms.statsHighTaskCountWoMaxTask)
 								envParms.statsHighTaskCountWoMaxTask=envParms.statsHighTaskCountThisPeriod;
 						}
@@ -580,7 +514,7 @@ public final class SchedulerService extends Service {
 		    	    	taskMgrParms.taskHistoryList=t_hist;
 
 		    	    	TaskManager.removeTaskExecThreadPool(envParms, taskMgrParms, util);
-		    	    	TaskManager.buildTaskExecThreadPool(envParms, taskMgrParms, util);
+		    	    	TaskManager.buildTaskExecThreadPool(envParms, taskMgrParms, util, mGp);
 
 		    	    	TaskManager.removeTaskCtrlThreadPool(envParms, taskMgrParms, util);
 		    	    	TaskManager.buildTaskCtrlThreadPool(envParms, taskMgrParms, util);
@@ -596,7 +530,7 @@ public final class SchedulerService extends Service {
 		    	    	int bsh_method_cnt=0;
 		    	    	synchronized(taskMgrParms.bshExecEnvList) {
 			    	    	bsh_method_cnt=taskMgrParms.bshExecEnvList.size();
-		    	    		TaskManager.buildBshEnvironmentList(taskMgrParms, envParms, util);
+		    	    		TaskManager.buildBshEnvironmentList(taskMgrParms, envParms, util, mGp);
 		    	    	}
 	            		System.gc();
 						util.addLogMsg("I", "Resource cleanup ended.",
@@ -609,11 +543,11 @@ public final class SchedulerService extends Service {
 //								envParms.statsUseOutsideThreadPoolCountTaskCtrl=
 //								envParms.statsUseOutsideThreadPoolCountTaskExec=0;
 					}
-		    		TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+		    		TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, mGp);
 					
-		    		TaskManager.relLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util);
-		    		TaskManager.relLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util);
-		    		TaskManager.relLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util);
+		    		TaskManager.relLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util, mGp);
+		    		TaskManager.relLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util, mGp);
+		    		TaskManager.relLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms,util, mGp);
 	    			wl.release();
     			}
     		};
@@ -649,7 +583,7 @@ public final class SchedulerService extends Service {
 
     private static void initialExecuteSchedulerTask(Context c){
    		mUtil.addDebugMsg(1,"I","Scheduler initial execution was started");
-   		TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
+   		TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
  		mSvcInstance.startForeground(R.string.app_name,mTaskMgrParms.mainNotification);
 		stopLightSensorReceiver();
 		stopProximitySensorReceiver();
@@ -670,9 +604,9 @@ public final class SchedulerService extends Service {
     };
 
     final static private void buildTaskList() {
-		TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
-		TaskManager.acqLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
-		TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
+		TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
+		TaskManager.acqLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
+		TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
 
 		if (!mUtil.getPrefMgr().getString(QUICK_TASK_VERSION_KEY, QUICK_TASK_CURRENT_VERSION).equals(QUICK_TASK_CURRENT_VERSION)) {
 			boolean qta=ProfileUtilities.isQuickTaskProfileActivated(mUtil,mProfileArrayList);
@@ -690,7 +624,7 @@ public final class SchedulerService extends Service {
 			mTaskMgrParms.normalTaskControlThreadPool.execute(r);
 		}
 
-		TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil);
+		TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil, mGp);
 		mRequiredBatteryLevelExecution=false;
 		mRequiredSensorLight=mRequiredSensorProximity=false;
 		if (mTimerEventTaskList.size()!=0 || mBuiltinEventTaskList.size()!=0) {
@@ -714,7 +648,7 @@ public final class SchedulerService extends Service {
 	 		mBuiltinEventTaskList=task_list_builtin;
 	 		mTaskEventTaskList=task_list_task;
 		} else {
-			TaskManager.cancelAllActiveTask(mTaskMgrParms,mEnvParms,mUtil);
+			TaskManager.cancelAllActiveTask(mTaskMgrParms,mEnvParms,mUtil, mGp);
 
 			buildTimeEventTaskList(mProfileArrayList,mTimerEventTaskList);
 	 		buildEventTaskList(mProfileArrayList,mBuiltinEventTaskList,mTaskEventTaskList);
@@ -725,11 +659,11 @@ public final class SchedulerService extends Service {
  		
  		saveTaskList();
  		
- 		TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil);
+ 		TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil, mGp);
 
- 		TaskManager.relLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
-		TaskManager.relLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
-		TaskManager.relLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
+ 		TaskManager.relLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
+		TaskManager.relLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
+		TaskManager.relLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
     };
 
     final static private void buildTaskListLookupTable() {
@@ -792,7 +726,7 @@ public final class SchedulerService extends Service {
  				}
  				if (!found) {
  					TaskListItem c_ati=
- 							TaskManager.getActiveTaskListItem(mTaskMgrParms, mEnvParms, mUtil, ti.group_name, ti.task_name);
+ 							TaskManager.getActiveTaskListItem(mTaskMgrParms, mEnvParms, mUtil, ti.group_name, ti.task_name, mGp);
  					if (c_ati!=null) {
  		 				TaskListItem a_ati=new TaskListItem();
  		 				mUtil.addDebugMsg(2, "I", "buildCancelTaskList added cancel task: group="+ti.group_name+", task="+ti.task_name);
@@ -815,7 +749,7 @@ public final class SchedulerService extends Service {
  			}
  			if (!found) {
 				TaskListItem c_ati=
- 							TaskManager.getActiveTaskListItem(mTaskMgrParms, mEnvParms, mUtil, ti.group_name, ti.task_name);
+ 							TaskManager.getActiveTaskListItem(mTaskMgrParms, mEnvParms, mUtil, ti.group_name, ti.task_name, mGp);
 				if (c_ati!=null) {
 	 				TaskListItem a_ati=new TaskListItem();
 	 				mUtil.addDebugMsg(2, "I", "buildCancelTaskList added valid group: group="+ti.group_name);
@@ -831,7 +765,7 @@ public final class SchedulerService extends Service {
     		for (int i=0;i<mTaskMgrParms.soundPlayBackTaskList.size();i++) {
     			TaskResponse tr=mTaskMgrParms.soundPlayBackTaskList.get(i);
     			TaskManager.cancelSpecificTask(mTaskMgrParms,mEnvParms,mUtil,
-    					tr.active_group_name,tr.active_task_name);
+    					tr.active_group_name,tr.active_task_name, mGp);
     		}
     	}
     };
@@ -839,7 +773,7 @@ public final class SchedulerService extends Service {
     final static private void cancelTaskByTaskList(ArrayList<TaskListItem> task_cancel_list) {
  		for (int i_task=0;i_task<task_cancel_list.size();i_task++) {
 			TaskManager.cancelSpecificTask(mTaskMgrParms,mEnvParms,mUtil,
-					task_cancel_list.get(i_task).group_name,task_cancel_list.get(i_task).task_name);
+					task_cancel_list.get(i_task).group_name,task_cancel_list.get(i_task).task_name, mGp);
 
  		}
     };
@@ -887,7 +821,7 @@ public final class SchedulerService extends Service {
 		
  		for (int i=0;i<c_g_list.size();i++) {
 			TaskManager.cancelSpecificTask(mTaskMgrParms,mEnvParms,mUtil,
-					c_g_list.get(i).group_name,c_g_list.get(i).task_name);
+					c_g_list.get(i).group_name,c_g_list.get(i).task_name, mGp);
  		}
     };
     
@@ -952,7 +886,7 @@ public final class SchedulerService extends Service {
 			    		StringUtil.convDateTimeTo_YearMonthDayHourMin(mEnvParms.taskListBuildTime));
 			    ois.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				mUtil.addDebugMsg(1,"E", "restoreTaskList error, ",e.getMessage());
 				mUtil.addDebugMsg(1,"E", "Rebuild task list has been started");
 				mProfileArrayList=new ArrayList<ProfileListItem>();
@@ -974,81 +908,6 @@ public final class SchedulerService extends Service {
 		}
     };
      
-    final static private void startSvcMonitor() {
-		if (mEnvParms.settingEnableMonitor) {
-	    	mUtil.addDebugMsg(1,"I", "startSvcMonitor Monitor has been started");
-			Intent intent = new Intent(mContext, SchedulerMonitor.class);
-			intent.setAction("Create-Monitor");
-			mContext.startService(intent);
-
-			if (mSvcMonitorConnection==null) setMonitorServiceConnListener();
-			if (mSchedulerMonitor==null) {
-				intent = new Intent(mContext, SchedulerMonitor.class);
-				intent.setAction("Bind-Monitor");
-				mContext.bindService(intent, mSvcMonitorConnection, BIND_AUTO_CREATE);
-			}
-		} else {
-	    	if (mEnvParms.settingDebugLevel!=0) 
-	    		mUtil.addDebugMsg(1,"I", "startSvcMonitor Monitor was not started");
-		}
-    };
-
-    final static private void refreshSvcMonitor() {
-//    	if (envParms.settingDebugLevel!=0) util.addDebugMsg(1,"I", "refreshSvcMonitor entered");
-		if (mEnvParms.settingEnableMonitor) {
-	    	mUtil.addDebugMsg(1,"I", "refreshSvcMonitor Refresh monitor has been started");
-			Intent intent = new Intent(mContext, SchedulerMonitor.class);
-			intent.setAction("Refresh-Monitor");
-			mContext.startService(intent);
-		} else{
-	    	mUtil.addDebugMsg(1,"I", "refreshSvcMonitor Monitor was not refreshed");
-		}
-    };
-
-    final static private void setMonitorServiceConnListener() {
-        mSvcMonitorConnection = new ServiceConnection(){
-    		public void onServiceConnected(ComponentName name, IBinder service) {
-    			mUtil.addDebugMsg(1, "I", "Monitor service was connected");
-    			mSchedulerMonitor = ISchedulerMonitor.Stub.asInterface(service);
-    		}
-    		public void onServiceDisconnected(ComponentName name) {
-    			WakeLock wl= ((PowerManager)mContext.getSystemService(Context.POWER_SERVICE))
-    	    			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
-    	        				| PowerManager.ON_AFTER_RELEASE, "StartMon");
-    			try {
-        			wl.acquire(100);
-        			mUtil.addDebugMsg(1, "I", "Monitor service was disconnected");
-        			mSchedulerMonitor = null;
-        			if (mEnvParms.settingEnableMonitor) {
-        				mUtil.addLogMsg("W", mTaskMgrParms.svcMsgs.msgs_main_monitor_issued);
-        				mUtil.addDebugMsg(1, "I", "Bind service was issued.");
-
-        				Intent intent = new Intent(mContext, SchedulerMonitor.class);
-        				intent.setAction("Service-Restart");
-//        				bindService(intent, svcConnMonitor, BIND_AUTO_CREATE);
-        				mContext.startService(intent);
-        			} else {
-        				mUtil.addLogMsg("W", mTaskMgrParms.svcMsgs.msgs_main_monitor_ignored);
-        			}
-    			} finally {
-//        			wl.release();
-    			}
-    		}
-    	};
-    }; 
-    
-    final static private void stopSvcMonitor() {
-    	if (mSchedulerMonitor!=null && mSvcMonitorConnection!=null) {
-	    	mUtil.addDebugMsg(1,"I", "stopSvcMonitor Monitor has been stopped");
-    		mContext.unbindService(mSvcMonitorConnection);
-    		mSvcMonitorConnection=null;
-    		mSchedulerMonitor=null;
-    	}
-		Intent intent = new Intent(mContext, SchedulerMonitor.class);
-		intent.setAction("Service-Stop");
-		mContext.stopService(intent);
-    };
-
 	@Override
     public IBinder onBind(Intent in) {
 		String action="";
@@ -1060,11 +919,9 @@ public final class SchedulerService extends Service {
 	@Override
 	public boolean onUnbind(Intent in) {
 		mUtil.addDebugMsg(1,"I","onUnBind entered, action=",in.getAction());
-    	if (!mEnvParms.settingEnableScheduler) {
-    		if (!mWidgetSvc.isWidgetActive()) {
-    			stopSvcMonitor();
-    			stopSelf();
-    		}
+    	if (!mGp.settingEnableScheduler) {
+            stopSvcMonitor();
+            stopSelf();
     	}
 		return true;
 	};
@@ -1079,8 +936,6 @@ public final class SchedulerService extends Service {
         
         cancelHeartBeat(mContext);
 
-        mWidgetSvc.removeWidget();
-        
     	TaskManager.removeTaskExecThreadPool(mEnvParms,mTaskMgrParms,mUtil);
     	
     	TaskManager.removeTaskCtrlThreadPool(mEnvParms,mTaskMgrParms,mUtil);
@@ -1093,11 +948,11 @@ public final class SchedulerService extends Service {
     	
     	TaskManager.cancelNotification(mTaskMgrParms);
 
-    	mUtil.resetLogReceiver();
+    	mUtil.resetLogReceiver(mContext);
     	
 //        util=null;
 
-        if (mEnvParms.settingExitClean) {
+        if (mGp.settingExitClean) {
 			System.gc();
 			new Handler().postDelayed(new Runnable(){
 				@Override
@@ -1127,9 +982,9 @@ public final class SchedulerService extends Service {
         final public void aidlCancelAllActiveTask() throws RemoteException {
         	mUtil.addDebugMsg(2,"I", "aidlCancelAllActiveTask entered, cnt=",
         			String.valueOf(mTaskMgrParms.activeTaskList.size()));
-			TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil);
-        	TaskManager.cancelAllActiveTask(mTaskMgrParms,mEnvParms,mUtil);
-			TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil);
+			TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil, mGp);
+        	TaskManager.cancelAllActiveTask(mTaskMgrParms,mEnvParms,mUtil, mGp);
+			TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil, mGp);
             return ;
         };
 
@@ -1138,16 +993,16 @@ public final class SchedulerService extends Service {
         		throws RemoteException {
         	mUtil.addDebugMsg(2,"I","aidlCancelSpecifiTask entered, cnt=",
         			String.valueOf(mTaskMgrParms.activeTaskList.size()));
-			TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil);
-        	TaskManager.cancelSpecificTask(mTaskMgrParms,mEnvParms,mUtil,grp,task_name);
-			TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil);
+			TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil, mGp);
+        	TaskManager.cancelSpecificTask(mTaskMgrParms,mEnvParms,mUtil,grp,task_name, mGp);
+			TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil, mGp);
             return ;
         };
         
 		@Override
 		final public String[] aidlGetActiveTaskList() throws RemoteException {
 			//event+tab+task+tab+SOUND/NOSOUND+tab+time			
-			String[] rv=TaskManager.buildActiveTaskStringArray(mTaskMgrParms,mEnvParms,mUtil);
+			String[] rv=TaskManager.buildActiveTaskStringArray(mTaskMgrParms,mEnvParms,mUtil, mGp);
 			int tc=0;
 			if (rv!=null) tc=rv.length;
 			mUtil.addDebugMsg(2,"I", "aidlGetActiveTask result=",String.valueOf(tc));
@@ -1156,7 +1011,7 @@ public final class SchedulerService extends Service {
 
 		@Override
 		final public void aidlClearTaskHistory() throws RemoteException {
-			TaskManager.clearTaskHistoryList(mTaskMgrParms,mEnvParms,mUtil);
+			TaskManager.clearTaskHistoryList(mTaskMgrParms,mEnvParms,mUtil, mGp);
 		};
 
 		@Override
@@ -1166,14 +1021,8 @@ public final class SchedulerService extends Service {
 
 		@Override
 		final public String[] aidlGetTaskHistoryList() throws RemoteException {
-			TaskManager.buildTaskHistoryStringArray(mTaskMgrParms, mEnvParms, mUtil);
+			TaskManager.buildTaskHistoryStringArray(mTaskMgrParms, mEnvParms, mUtil, mGp);
 			return mTaskMgrParms.task_history_string_array; 
-		};
-
-		@Override
-		final public void aidlScreenOff() throws RemoteException {
-			mUtil.addDebugMsg(2,"I", "aidlScreenOff entered");
-			lockScreen();
 		};
 
 		@Override
@@ -1229,29 +1078,29 @@ public final class SchedulerService extends Service {
 			boolean s_light=mRequiredSensorLight;
 			boolean s_proximity=mRequiredSensorProximity;
 			boolean s_battery=mRequiredBatteryLevelExecution;
-			TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE, testEnvParms, mTaskMgrParms, mUtil);
+			TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE, testEnvParms, mTaskMgrParms, mUtil, mGp);
 			if (prof_task.get(0).getTaskTriggerList().get(0).startsWith(BUILTIN_PREFIX)) {
 				ArrayList<TaskListItem> bitl=new ArrayList<TaskListItem>();
 				ArrayList<TaskListItem> ttl=new ArrayList<TaskListItem>();
 				buildEventTaskList(prof_list,bitl,ttl);
 				bitl.get(0).event_name="*Immediate";
 				bitl.get(0).task_action_notification=true;
-				TaskManager.startTask(mTaskMgrParms,testEnvParms,mUtil,bitl.get(0));
+				TaskManager.startTask(mTaskMgrParms,testEnvParms,mUtil,bitl.get(0), mGp);
 			} else if (prof_task.get(0).getTaskTriggerList().get(0).equals(TRIGGER_EVENT_TASK)) {
 				ArrayList<TaskListItem> bitl=new ArrayList<TaskListItem>();
 				ArrayList<TaskListItem> ttl=new ArrayList<TaskListItem>();
 				buildEventTaskList(prof_list,bitl,ttl);
 				ttl.get(0).event_name="*Immediate";
 				ttl.get(0).task_action_notification=true;
-				TaskManager.startTask(mTaskMgrParms,testEnvParms,mUtil,ttl.get(0));
+				TaskManager.startTask(mTaskMgrParms,testEnvParms,mUtil,ttl.get(0), mGp);
 			} else {
 				ArrayList<TaskListItem> tetl=new ArrayList<TaskListItem>();
 				buildTimeEventTaskList(prof_list,tetl);
 				tetl.get(0).event_name="*Immediate";
 				tetl.get(0).task_action_notification=true;
-				TaskManager.startTask(mTaskMgrParms,testEnvParms,mUtil,tetl.get(0));
+				TaskManager.startTask(mTaskMgrParms,testEnvParms,mUtil,tetl.get(0), mGp);
 			}
-			TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE, testEnvParms, mTaskMgrParms, mUtil);
+			TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE, testEnvParms, mTaskMgrParms, mUtil, mGp);
 //			initiateQueuedTask();
 			mRequiredSensorLight=s_light;
 			mRequiredSensorProximity=s_proximity;
@@ -1270,10 +1119,10 @@ public final class SchedulerService extends Service {
 		final public void aidlCopyProfileToService(byte[] buf) {
 			mUtil.addDebugMsg(2,"I", "aidlCopyProfileToService entered");
 			ArrayList<ProfileListItem> prof_list=ProfileUtilities.deSerializeProfilelist(buf);
-    		TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
+    		TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
     		mProfileArrayList=prof_list;
 		    saveTaskList();
-    		TaskManager.relLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
+    		TaskManager.relLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
 			mUtil.saveProfileToFileByService(prof_list);
 			mUtil.addDebugMsg(2,"I", "aidlCopyProfileToService ended, size=",String.valueOf(prof_list.size()));
 		};
@@ -1281,9 +1130,9 @@ public final class SchedulerService extends Service {
 		@Override
 		final public byte[] aidlCopyProfileFromService() {
 			mUtil.addDebugMsg(2,"I", "aidlCopyProfileFromService entered");
-    		TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil);
+    		TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil, mGp);
     		byte[] buf=ProfileUtilities.serializeProfilelist(mProfileArrayList);
-    		TaskManager.relLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil);
+    		TaskManager.relLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil, mGp);
     		return buf;
 		};
 
@@ -1297,25 +1146,27 @@ public final class SchedulerService extends Service {
     };
 
 	final static private void resetScheduler() {
-		int p_ss=mEnvParms.settingEnableScheduler ? 1 : 0;
-		int p_ms=mEnvParms.settingEnableMonitor ? 1 : 0;
+		int p_ss=mGp.settingEnableScheduler ? 1 : 0;
+		int p_ms=mGp.settingEnableMonitor ? 1 : 0;
+		mGp.loadSettingParms(mContext);
 		mEnvParms.loadSettingParms(mContext);
-		int n_ss=mEnvParms.settingEnableScheduler ? 1 : 0;
-		int n_ms=mEnvParms.settingEnableMonitor ? 1 : 0;
+		int n_ss=mGp.settingEnableScheduler ? 1 : 0;
+		int n_ms=mGp.settingEnableMonitor ? 1 : 0;
 		listInitSettingsParm();
 
-		if (p_ms!=n_ms) {
-			if (mEnvParms.settingEnableMonitor) startSvcMonitor();
-			else stopSvcMonitor();
-		} else {
-			if (mEnvParms.settingEnableMonitor) {
-				refreshSvcMonitor();
-			}
-		}
-		TaskManager.buildNotification(mTaskMgrParms, mEnvParms);
-		TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
+        if (p_ms!=n_ms) {
+            if (mGp.settingEnableMonitor) startSvcMonitor();
+            else stopSvcMonitor();
+        } else {
+            if (mGp.settingEnableMonitor) {
+                refreshSvcMonitor();
+            }
+        }
+
+        TaskManager.buildNotification(mTaskMgrParms, mEnvParms, mGp);
+		TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
 		mSvcInstance.startForeground(R.string.app_name,mTaskMgrParms.mainNotification);
-    	if (mEnvParms.settingEnableScheduler) {
+    	if (mGp.settingEnableScheduler) {
 			stopProximitySensorReceiver();
 			stopLightSensorReceiver();
     		if (p_ss!=n_ss) initialExecuteSchedulerTask(mContext);
@@ -1326,12 +1177,6 @@ public final class SchedulerService extends Service {
 		} else {
 			stopProximitySensorReceiver();
 			stopLightSensorReceiver();
-			if (mEnvParms.settingScreenKeyguardControlEnabled) {
-				mTaskMgrParms.setKeyguardEnabled();
-			} else {
-				mUtil.addDebugMsg(1,"I","EnableKeyguard ignored, Keyguard control is disabled");
-			}
-			mTaskMgrParms.pendingRequestForEnableKeyguard=mTaskMgrParms.enableKeyguard=false;
 		}
 	};
 
@@ -1356,7 +1201,7 @@ public final class SchedulerService extends Service {
     		        String reason=ni.getReason();
     		        String type_name=ni.getTypeName();
     		        String sub_type_name=ni.getSubtypeName();
-    		        if (mEnvParms.settingDebugLevel>=2)
+    		        if (mGp.settingDebugLevel>=2)
     		        	mUtil.addDebugMsg(2,"I", "extra_info="+extra_info+", name="+type_name+
     		        		", sub_name="+sub_type_name+", reason="+reason+
     						", available="+available+", connected="+connected+
@@ -1415,7 +1260,7 @@ public final class SchedulerService extends Service {
 //	};
 	final static private void restartScheduler() {
 		TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,
-				mEnvParms, mTaskMgrParms, mUtil);
+				mEnvParms, mTaskMgrParms, mUtil, mGp);
 		deleteTaskList();
 //		mTaskMgrParms.setKeyguardEnabled();
 		
@@ -1427,18 +1272,6 @@ public final class SchedulerService extends Service {
 				android.os.Process.killProcess(android.os.Process.myPid());
 			}
 		}, 500);
-	};
-
-	final static private boolean lockScreen() {
-		boolean result=false;
-        DevicePolicyManager dpm = 
-        		(DevicePolicyManager)mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        ComponentName darcn = new ComponentName(mContext, DevAdmReceiver.class);
-        if (dpm.isAdminActive(darcn)) {
-        	dpm.lockNow();
-        	result=true;
-        } else result=false;
-        return result;
 	};
 
 	@SuppressLint("InlinedApi")
@@ -1570,13 +1403,10 @@ public final class SchedulerService extends Service {
 			if(AudioManager.RINGER_MODE_CHANGED_ACTION.equals(action)){
 				mUtil.addDebugMsg(1,"I", "RingerMode from="+mEnvParms.currentRingerMode+", new="+mAudioManager.getRingerMode());
 				mEnvParms.currentRingerMode=mAudioManager.getRingerMode();
-				mWidgetSvc.processRingerModeChanged();
 			} else if (action.equals(Intent.ACTION_AIRPLANE_MODE_CHANGED)) {
 				int nv=getAirplaneModeOn();
 				if (nv!=mEnvParms.airplane_mode_on) {
 					mEnvParms.airplane_mode_on=nv;
-//					if (nv==0) addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList, BUILTIN_EVENT_AIRPLANE_MODE_OFF);
-//					else addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList, BUILTIN_EVENT_AIRPLANE_MODE_ON);
 					if (nv==0) scheduleBuiltinEventTask(mBuiltinEventTaskList, BUILTIN_EVENT_AIRPLANE_MODE_OFF);
 					else scheduleBuiltinEventTask(mBuiltinEventTaskList, BUILTIN_EVENT_AIRPLANE_MODE_ON);
 				}
@@ -1585,25 +1415,10 @@ public final class SchedulerService extends Service {
 		}
     };
 
-//    final static private class DeviceButtonReceiver extends BroadcastReceiver {
-//		@Override
-//		final public void onReceive(Context c, Intent in) {
-//			mUtil.addDebugMsg(1,"I", "DeviceButtonReceiver entered, action=",in.getAction());
-//			mWidgetSvc.processDeviceButton(in);
-//		}
-//    };
-//    
     final static private class  BatteryStatusReceiver  extends BroadcastReceiver {
 		@Override
 		final public void onReceive(Context c, Intent in) {
-//			WakeLock wl=((PowerManager)mAppContext.getSystemService(Context.POWER_SERVICE))
-//	    			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TaskAutomation-Battery");
-//			wl.acquire(100);
-//			util.sendDebugLogMsg(2,"I","Battery receiver entered");
 			mLastBatteryStatusSt=in.getIntExtra("status", 0);
-//			int health = in.getIntExtra("health", 0);
-//			int voltage = in.getIntExtra("voltage", 0);
-//			int temperature = in.getIntExtra("temperature", 0);
 			mLastBatteryStatusBl = in.getIntExtra("level", 0);
 			mLastBatteryStatusBs = in.getIntExtra("scale", 0);
 			analyzeBatteryStatusValue(mLastBatteryStatusSt,mLastBatteryStatusBl,mLastBatteryStatusBs);
@@ -1634,7 +1449,6 @@ public final class SchedulerService extends Service {
 		if (st==BatteryManager.BATTERY_PLUGGED_AC||
 				st==BatteryManager.BATTERY_PLUGGED_USB ||
 				st==BatteryManager.BATTERY_STATUS_FULL )
-//				st==BatteryManager.BATTERY_STATUS_NOT_CHARGING) 
 				n_ps=CURRENT_POWER_SOURCE_AC;
 			else n_ps=CURRENT_POWER_SOURCE_BATTERY;
 		if (n_ps==CURRENT_POWER_SOURCE_AC) {
@@ -1659,7 +1473,7 @@ public final class SchedulerService extends Service {
 						mEnvParms.battery_comsumption_data_end_time=sctm;
 						mEnvParms.battery_comsumption_data_end_level=bl;
 						mEnvParms.saveBatteryComsumptionData(mContext);
-						if (mEnvParms.settingDebugLevel>=1) {
+						if (mGp.settingDebugLevel>=1) {
 							long rate=-1;
 							long diff_time=(mEnvParms.battery_comsumption_data_end_time-mEnvParms.battery_comsumption_data_begin_time);
 							long diff_level=(mEnvParms.battery_comsumption_data_begin_level-mEnvParms.battery_comsumption_data_end_level);
@@ -1680,9 +1494,8 @@ public final class SchedulerService extends Service {
 			}
 		}
 		String n_bcs=parseBatteryChargeStatus(st);
-//		mUtil.addDebugMsg(1,"I","Battery receiver bl=",String.valueOf(bl));
 		if (mEnvParms.batteryLevel==-1) {
-			if (mEnvParms.settingDebugLevel>=1)
+			if (mGp.settingDebugLevel>=1)
 				mUtil.addDebugMsg(1,"I","Initial battery status, level=",String.valueOf(n_bl),
 					", source=",n_ps,", charge=",n_bcs,
 					", notify_high=",String.valueOf(mBatteryLevelHighNotified),
@@ -1692,12 +1505,10 @@ public final class SchedulerService extends Service {
 			mEnvParms.batteryLevel=n_bl;
 			mEnvParms.batteryPowerSource=n_ps;
 			checkBatteryNotification(true, false, true);
-			mWidgetSvc.processBatteryStatusChanged();
 
-			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
+//			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
 		} else if (!n_ps.equals(mEnvParms.batteryPowerSource) || (n_bl!=mEnvParms.batteryLevel) ||
 				(n_bcs!=mEnvParms.batteryChargeStatusString)) {
-//			if (envParms.settingDebugLevel>=1)
 			mUtil.addLogMsg("I","Battery status changed,",
 					" Level=(", String.valueOf(mEnvParms.batteryLevel), ",", String.valueOf(n_bl),")",
 					", Power=(",mEnvParms.batteryPowerSource, ",", n_ps,")", 
@@ -1713,9 +1524,8 @@ public final class SchedulerService extends Service {
 			mEnvParms.batteryLevel=n_bl;
 			mEnvParms.batteryPowerSource=n_ps;
 			checkBatteryNotification(change_bcs, change_ps, change_bl);
-			mWidgetSvc.processBatteryStatusChanged();
 
-			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
+//			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
 		}
 		//Level reset
 		if (n_bl<BATTERY_LEVEL_THRESHOLD_HIGH) mBatteryLevelHighNotified=false;
@@ -1727,82 +1537,58 @@ public final class SchedulerService extends Service {
     		boolean change_ps, boolean change_bl) {
 		if (change_bcs &&
 				mEnvParms.batteryChargeStatusString.equals(mTaskMgrParms.svcMsgs.msgs_widget_battery_status_charge_full)) {
-//			addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_FULLY_CHARGED);
 			scheduleBuiltinEventTask(mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_FULLY_CHARGED);
 		}
 		if (change_ps) {
 			if (mEnvParms.batteryPowerSource.equals(CURRENT_POWER_SOURCE_AC)) {
-//				addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList,BUILTIN_EVENT_POWER_SOURCE_CHANGED_AC);
 				scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_POWER_SOURCE_CHANGED_AC);
 			} else {
-//				addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList,BUILTIN_EVENT_POWER_SOURCE_CHANGED_BATTERY);
 				scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_POWER_SOURCE_CHANGED_BATTERY);
 			}
 		}
 		if (change_bl) {
 			if (mRequiredBatteryLevelExecution) {
-//				addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_LEVEL_CHANGED);
 				scheduleBuiltinEventTask(mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_LEVEL_CHANGED);
 			}
 			if (mEnvParms.batteryLevel<=BATTERY_LEVEL_THRESHOLD_CRITICAL && !mBatteryLevelCriticalNotified) {
 				mBatteryLevelCriticalNotified=true;
-//				addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_LEVEL_CRITICAL);
 				scheduleBuiltinEventTask(mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_LEVEL_CRITICAL);
 			}
 			if (mEnvParms.batteryLevel<=BATTERY_LEVEL_THRESHOLD_LOW && !mBatteryLevelLowNotified) {
 				mBatteryLevelLowNotified=true;
-//				addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_LEVEL_LOW);
 				scheduleBuiltinEventTask(mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_LEVEL_LOW);
 			}
 			if (mEnvParms.batteryLevel>=BATTERY_LEVEL_THRESHOLD_HIGH &&
 					mEnvParms.batteryChargeStatusString.equals(mTaskMgrParms.svcMsgs.msgs_widget_battery_status_charge_charging) &&
 					!mBatteryLevelHighNotified) {
 				mBatteryLevelHighNotified=true;
-//				addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_LEVEL_HIGH);
 				scheduleBuiltinEventTask(mBuiltinEventTaskList, BUILTIN_EVENT_BATTERY_LEVEL_HIGH);
 			}
 		}
     	
     }
-//    private String getCurrentPowerSource() {
-//    	String cps=util.getPrefMgr().getString(PREFS_CURRENT_POWER_SOURCE_KEY, "UNKOWN");
-//    	if (envParms.settingDebugLevel!=0) util.addDebugMsg(3, "I", "getCurrentPowerSource result="+cps);
-//		return cps;
-//    };
-//    private void setCurrentPowerSource(String ps) {
-//    	if (envParms.settingDebugLevel!=0) util.addDebugMsg(3, "I", "setCurrentPowerSource result="+ps);
-//		prefsMgutil.getPrefMgr().putString(PREFS_CURRENT_POWER_SOURCE, ps).commit();
-//		util.getPrefMgr().edit().putString(PREFS_CURRENT_POWER_SOURCE_KEY, ps).apply();
-//    };
-    
+
     final static private class WifiReceiver  extends BroadcastReceiver {
 		@SuppressLint({ "InlinedApi", "NewApi" })
 		@Override
 		final public void onReceive(Context c, Intent in) {
-//			WakeLock wl=((PowerManager)mAppContext.getSystemService(Context.POWER_SERVICE))
-//	    			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TaskAutomation-Wifi");
-//			wl.acquire(100);
-
-//			String action = in.getAction();
 			String tssid=mWifiMgr.getConnectionInfo().getSSID();
 			String tmac=mWifiMgr.getConnectionInfo().getBSSID();
 			String wssid="";
 			String ss=mWifiMgr.getConnectionInfo().getSupplicantState().toString();
 			NetworkInfo ni=in.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
-			if (ni!=null) {
-//				WifiP2pManager wpm=(WifiP2pManager)mAppContext.getSystemService(Context.WIFI_P2P_SERVICE);
-//				Log.v("","state="+ni.getState().toString()+", ssid="+tssid);
-				if (mEnvParms.wifiConnectedSsidName.equals("") && ni.getState().equals(NetworkInfo.State.CONNECTED)){
-					tssid=EnvironmentParms.WIFI_DIRECT_SSID;
-					ss="COMPLETED";
-				} else if (mEnvParms.wifiConnectedSsidName.equals(EnvironmentParms.WIFI_DIRECT_SSID) && ni.getState().equals(NetworkInfo.State.DISCONNECTED)){
-					tssid="";
-					ss="DISCONNECTED";
-				}
-			}
-			if (tssid==null || tssid.equals("<unknown ssid>")) wssid="";
+//			if (ni!=null) {
+//				if (mEnvParms.wifiConnectedSsidName.equals("") && ni.getState().equals(NetworkInfo.State.CONNECTED)){
+//				    tssid="<unknown ssid>";
+//					ss="COMPLETED";
+//				} else if (mEnvParms.wifiConnectedSsidName.equals(EnvironmentParms.WIFI_DIRECT_SSID) && ni.getState().equals(NetworkInfo.State.DISCONNECTED)){
+//					tssid="";
+//					ss="DISCONNECTED";
+//				}
+//			}
+			if (tssid==null || tssid.equals("<unknown ssid>")) wssid="<unknown ssid>";
 			else wssid=tssid.replaceAll("\"", "");
-			if (wssid.equals("0x")) wssid="";
+			if (wssid.equals("0x")) wssid="<unknown ssid>";
 			
 			boolean new_wifi_enabled=mWifiMgr.isWifiEnabled();
 			mUtil.addDebugMsg(2,"I","WIFI receiver " +"Action="+in.getAction()+
@@ -1816,40 +1602,18 @@ public final class SchedulerService extends Service {
 				mEnvParms.wifiConnectedSsidName="";
 				mEnvParms.wifiConnectedSsidAddr="";
 				mEnvParms.wifiIsActive=false;
-				mWidgetSvc.processWifiStatusChanged();
-				TaskManager.notifyToEventList(mTaskMgrParms, 
-						mTaskMgrParms.wifiNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_OFF);
-//				addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_OFF);
+				TaskManager.notifyToEventList(mTaskMgrParms,
+						mTaskMgrParms.wifiNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_OFF, mGp);
 				scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_OFF);
 			} else {
-				if (ss.equals("COMPLETED")  
-//						|| ss.equals("ASSOCIATING") 
-//						|| ss.equals("ASSOCIATED")
-						) {
-					if (in.getAction().equals(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)) {
-//						NetworkInfo ni=in.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
-//						Log.v("","state="+ni.getState());
-//						if (ni.getState().equals(NetworkInfo.State.CONNECTED)) {
-//							TaskManager.notifyToEventList(mTaskMgrParms, 
-//									mTaskMgrParms.wifiNotifyEventList, EXTRA_DEVICE_EVENT_DEVICE_CONNECTED);
-//							executeBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_CONNECTED);
-//						} else if (ni.getState().equals(NetworkInfo.State.DISCONNECTED)) {
-//							TaskManager.notifyToEventList(mTaskMgrParms, 
-//									mTaskMgrParms.wifiNotifyEventList, EXTRA_DEVICE_EVENT_DEVICE_DISCONNECTED);
-//							executeBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_DISCONNECTED);
-//						}
-					}
+				if (ss.equals("COMPLETED")  ) {
 					if (mEnvParms.wifiConnectedSsidName.equals("") && !wssid.equals("")) {
 						mUtil.addDebugMsg(1,"I","WIFI receiver, Connected WIFI Access point ssid=",wssid);
 						mEnvParms.wifiConnectedSsidName=wssid;
 						mEnvParms.wifiConnectedSsidAddr=tmac;
 						mEnvParms.wifiIsActive=true; //2013/09/04
-//						mUtil.setSavedWifiSsidName(wssid);
-//						mUtil.setSavedWifiSsidAddr(tmac);
-						mWidgetSvc.processWifiStatusChanged();
-						TaskManager.notifyToEventList(mTaskMgrParms, 
-								mTaskMgrParms.wifiNotifyEventList, EXTRA_DEVICE_EVENT_DEVICE_CONNECTED);
-//						addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_CONNECTED);
+						TaskManager.notifyToEventList(mTaskMgrParms,
+								mTaskMgrParms.wifiNotifyEventList, EXTRA_DEVICE_EVENT_DEVICE_CONNECTED, mGp);
 						scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_CONNECTED);
 					}
 				} else if (ss.equals("INACTIVE") ||
@@ -1857,37 +1621,26 @@ public final class SchedulerService extends Service {
 						ss.equals("UNINITIALIZED") ||
 						ss.equals("INTERFACE_DISABLED") ||
 						ss.equals("SCANNING")) {
-//					Log.v("","ss="+ss+", previousWifiActive="+previousWifiActive+
-//							", !wifiMgr.isWifiEnabled="+!wifiMgr.isWifiEnabled()+
-//							", wssid="+wssid+", previousSSID="+previousSSID);
 					if (mEnvParms.wifiIsActive) {
 						if (!mEnvParms.wifiConnectedSsidName.equals("")) {
 							mUtil.addDebugMsg(1,"I","WIFI receiver, Disconnected WIFI Access point ssid=", mEnvParms.wifiConnectedSsidName);
 							mEnvParms.wifiConnectedSsidName="";
 							mEnvParms.wifiConnectedSsidAddr="";
-//							mUtil.setSavedWifiSsidName("");
-//							mUtil.setSavedWifiSsidAddr("");
 							mEnvParms.wifiIsActive=true;
-							mWidgetSvc.processWifiStatusChanged();
-							TaskManager.notifyToEventList(mTaskMgrParms, 
-									mTaskMgrParms.wifiNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_DISCONNECTED);
-//							addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_DISCONNECTED);
-							scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_DISCONNECTED);							
+							TaskManager.notifyToEventList(mTaskMgrParms,
+									mTaskMgrParms.wifiNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_DISCONNECTED, mGp);
+							scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_DISCONNECTED);
 						}
 					} else {
 						if (new_wifi_enabled) {
 							mUtil.addDebugMsg(1,"I","WIFI receiver, WIFI On");
 							mEnvParms.wifiConnectedSsidName="";
 							mEnvParms.wifiConnectedSsidAddr="";
-//							mUtil.setSavedWifiSsidName("");
-//							mUtil.setSavedWifiSsidAddr("");
 							mEnvParms.wifiIsActive=true;
-							mWidgetSvc.processWifiStatusChanged();
-							TaskManager.notifyToEventList(mTaskMgrParms, 
-									mTaskMgrParms.wifiNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_ON);
-//							addTaskScheduleQueueBuiltin(mTaskMgrParms,mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_ON);
+							TaskManager.notifyToEventList(mTaskMgrParms,
+									mTaskMgrParms.wifiNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_ON, mGp);
 							scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_ON);
-						} //else mWidgetSvc.processWifiStatusChanged();
+						}
 					}
 				}
 			}
@@ -1906,17 +1659,15 @@ public final class SchedulerService extends Service {
 					mEnvParms.bluetoothIsActive=false;
 					mEnvParms.clearBluetoothConnectedDeviceList();
 					mEnvParms.blutoothConnectedDeviceName=mEnvParms.blutoothConnectedDeviceAddr="";
-					mWidgetSvc.processBluetoothStatusChanged();
-					TaskManager.notifyToEventList(mTaskMgrParms, 
-							mTaskMgrParms.bluetoothNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_OFF);
+					TaskManager.notifyToEventList(mTaskMgrParms,
+							mTaskMgrParms.bluetoothNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_OFF, mGp);
 					scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_BLUETOOTH_OFF);
 				} else if (bs==BluetoothAdapter.STATE_ON) {
 					mEnvParms.bluetoothIsActive=true;
 					mEnvParms.clearBluetoothConnectedDeviceList();
 					mEnvParms.blutoothConnectedDeviceName=mEnvParms.blutoothConnectedDeviceAddr="";
-					mWidgetSvc.processBluetoothStatusChanged();
-					TaskManager.notifyToEventList(mTaskMgrParms, 
-							mTaskMgrParms.bluetoothNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_ON);
+					TaskManager.notifyToEventList(mTaskMgrParms,
+							mTaskMgrParms.bluetoothNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_ON, mGp);
 					scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_BLUETOOTH_ON);
 				}
 			} else {
@@ -1927,9 +1678,8 @@ public final class SchedulerService extends Service {
 					mUtil.putSavedBluetoothConnectedDeviceList(mEnvParms.getBluetoothConnectedDeviceList());
 					mEnvParms.blutoothConnectedDeviceName=device.getName();
 					mEnvParms.blutoothConnectedDeviceAddr=device.getAddress();
-					mWidgetSvc.processBluetoothStatusChanged();
-					TaskManager.notifyToEventList(mTaskMgrParms, 
-							mTaskMgrParms.bluetoothNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_CONNECTED);
+					TaskManager.notifyToEventList(mTaskMgrParms,
+							mTaskMgrParms.bluetoothNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_CONNECTED, mGp);
 					scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_BLUETOOTH_CONNECTED);
 				} else if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
 					mUtil.addDebugMsg(1,"I","Bluetooth disconnected, dev=",device.getName()+", addr="+device.getAddress());
@@ -1937,8 +1687,6 @@ public final class SchedulerService extends Service {
 					mUtil.putSavedBluetoothConnectedDeviceList(mEnvParms.getBluetoothConnectedDeviceList());
 	 	 			ArrayList<BluetoothDeviceListItem>bdl=mEnvParms.getBluetoothConnectedDeviceList();
 	 	 			if (bdl.size()>0) {
-//	 	 	 			mEnvParms.blutoothLastEventDeviceName=bdl.get(bdl.size()-1).btName;
-//	 	 	 			mEnvParms.blutoothLastEventDeviceAddr=bdl.get(bdl.size()-1).btAddr;
 	 	 	 			mEnvParms.blutoothConnectedDeviceName=bdl.get(bdl.size()-1).btName;
 	 	 	 			mEnvParms.blutoothConnectedDeviceAddr=bdl.get(bdl.size()-1).btAddr;
 	 	 			} else {
@@ -1946,9 +1694,8 @@ public final class SchedulerService extends Service {
 						mEnvParms.blutoothConnectedDeviceAddr="";
 	 	 			}
 
-					mWidgetSvc.processBluetoothStatusChanged();
-					TaskManager.notifyToEventList(mTaskMgrParms, 
-							mTaskMgrParms.bluetoothNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_DISCONNECTED);
+					TaskManager.notifyToEventList(mTaskMgrParms,
+							mTaskMgrParms.bluetoothNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_DISCONNECTED, mGp);
 					scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_BLUETOOTH_DISCONNECTED);
 				}
 			}
@@ -1960,9 +1707,7 @@ public final class SchedulerService extends Service {
 		@Override 
 		final public void onReceive(Context c, Intent in) {
 			String action = in.getAction();
-			if (mEnvParms.settingDebugLevel>=1) mUtil.addDebugMsg(1,"I","Sleep receiver entered, action=",action,
-					", enableKeyguard="+mTaskMgrParms.enableKeyguard,
-					", pendingRequestForEnableKeyguard="+mTaskMgrParms.pendingRequestForEnableKeyguard,
+			if (mGp.settingDebugLevel>=1) mUtil.addDebugMsg(1,"I","Sleep receiver entered, action=",action,
 					", isKeyguardEffective()="+mUtil.isKeyguardEffective()+
 					", screenIsOn="+mEnvParms.screenIsOn+
 					", proximitySensorValue="+mEnvParms.proximitySensorValue);
@@ -1972,16 +1717,14 @@ public final class SchedulerService extends Service {
 				if (!kge) {
 					relWakeLockForSleep();
 			 		stopLightSensorReceiver();
-//			 		stopProximitySensorReceiver();
 			 		startLightSensorReceiver();
-//			 		startProximitySensorReceiver();
 			 		if (mEnvParms.screenIsLocked) {
 						mEnvParms.screenIsLocked=false;
 			 			scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_SCREEN_UNLOCKED);
-			 			if (Build.VERSION.SDK_INT>=21) {
-				 			TaskManager.buildNotification(mTaskMgrParms, mEnvParms);
-				 			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
-			 			}
+//			 			if (Build.VERSION.SDK_INT>=21) {
+//				 			TaskManager.buildNotification(mTaskMgrParms, mEnvParms, mGp);
+//				 			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
+//			 			}
 			 		}
 			 		if (mEnvParms.proximitySensorActive && mEnvParms.proximitySensorValue==0) {
 			 			mUiHandler.postDelayed(new Runnable(){
@@ -1996,47 +1739,27 @@ public final class SchedulerService extends Service {
 			 			scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_PROXIMITY_DETECTED);
 			 		}
 				}
+                scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_SCREEN_ON);
 			} else if(action.equals(Intent.ACTION_SCREEN_OFF)) {
-//				if (mTaskMgrParms.pendingRequestForEnableKeyguard && mTaskMgrParms.enableKeyguard) {
-				if (mTaskMgrParms.enableKeyguard && mEnvParms.settingEnableScheduler) {
-					mUtil.addDebugMsg(1,"I","reenableKeyguard issued during screen off");
-					if (mEnvParms.settingScreenKeyguardControlEnabled) {
-						mTaskMgrParms.setKeyguardEnabled();
-					} else {
-						mUtil.addDebugMsg(1,"I","EnableKeyguard ignored, Keyguard control is disabled");
-					}
-					mTaskMgrParms.pendingRequestForEnableKeyguard=false;
-				}
 				mEnvParms.screenIsOn=false;
 				if (!mEnvParms.screenIsLocked) {
 					mEnvParms.screenIsLocked=true;
 					acqWakeLockForSleep();
 			 		stopLightSensorReceiver();
-//			 		stopProximitySensorReceiver();
 			 		startLightSensorReceiver();
 					setIgnoreProxitySensorValue();
-//			 		startProximitySensorReceiver();
 			 		scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_SCREEN_LOCKED);
-		 			if (Build.VERSION.SDK_INT>=21) {
-			 			TaskManager.buildNotification(mTaskMgrParms, mEnvParms);
-			 			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
-		 			}
+//		 			if (Build.VERSION.SDK_INT>=21) {
+//			 			TaskManager.buildNotification(mTaskMgrParms, mEnvParms, mGp);
+//			 			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
+//		 			}
 				} else {
 			 		stopLightSensorReceiver();
 			 		startLightSensorReceiver();
 				}
+                scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_SCREEN_OFF);
 			} else if(action.equals(Intent.ACTION_USER_PRESENT)) {
 //				if (mTaskMgrParms.pendingRequestForEnableKeyguard && !mTaskMgrParms.enableKeyguard) {
-				if (!mTaskMgrParms.enableKeyguard && mEnvParms.settingEnableScheduler) {
-					//無効化する前にパスワードやパターンを入れてクリアする必要がある
-					mUtil.addDebugMsg(1,"I","disableKeyguard issued during user present");
-					if (mEnvParms.settingScreenKeyguardControlEnabled) {
-						mTaskMgrParms.setKeyguardDisabled();
-					} else {
-						mUtil.addDebugMsg(1,"I","DisableKeyguard ignored, Keyguard control is disabled");
-					}
-					mTaskMgrParms.pendingRequestForEnableKeyguard=false;
-				}
 				mEnvParms.screenIsOn=true;
 				mEnvParms.screenIsLocked=false;
 				relWakeLockForSleep();
@@ -2045,10 +1768,10 @@ public final class SchedulerService extends Service {
 		 		startLightSensorReceiver();
 //		 		startProximitySensorReceiver();
 		 		scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_SCREEN_UNLOCKED);
-	 			if (Build.VERSION.SDK_INT>=21) {
-		 			TaskManager.buildNotification(mTaskMgrParms, mEnvParms);
-		 			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
-	 			}
+//	 			if (Build.VERSION.SDK_INT>=21) {
+//		 			TaskManager.buildNotification(mTaskMgrParms, mEnvParms, mGp);
+//		 			TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
+//	 			}
 			}
 		}	
     };
@@ -2078,17 +1801,17 @@ public final class SchedulerService extends Service {
 			wl.acquire();
 
     		int nv=Integer.valueOf((int) event.values[0]);
-        	if (mEnvParms.settingDebugLevel>=1) mUtil.addDebugMsg(1,"I","Proximity sensor current=",
+        	if (mGp.settingDebugLevel>=1) mUtil.addDebugMsg(1,"I","Proximity sensor current=",
     				String.valueOf(mEnvParms.proximitySensorValue),", new=",String.valueOf(nv));
         	if (mEnvParms.proximitySensorValue==nv) {
-        		if (mEnvParms.settingDebugLevel>=1) mUtil.addDebugMsg(1,"I","Proximity sensor ignored");
+        		if (mGp.settingDebugLevel>=1) mUtil.addDebugMsg(1,"I","Proximity sensor ignored");
         	} else {
     			mEnvParms.proximitySensorValue=nv;
     			if (!isIgnoreProxitySensorValue()) {
         			if (mEnvParms.proximitySensorValue>=1) scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_PROXIMITY_UNDETECTED);
         			else scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_PROXIMITY_DETECTED);
     			} else {
-    				if (mEnvParms.settingDebugLevel>=1) 
+    				if (mGp.settingDebugLevel>=1) 
     					mUtil.addDebugMsg(1,"I","Proximity sensor ignored, disable flag active");
     			}
         	}
@@ -2195,12 +1918,12 @@ public final class SchedulerService extends Service {
         		if (mEnvParms.lightSensorValue<1) nv=0;
         		else nv=1;
     		} else {
-        		if (mEnvParms.lightSensorValue>=mEnvParms.settingLightSensorDetectThreshHold) nv=1;
+        		if (mEnvParms.lightSensorValue>=mGp.settingLightSensorDetectThreshHold) nv=1;
         		else nv=0;
     		}
     		if (nv!=mLastLightSensorDetectedValue) {
     			if ((mLastLightDetectedTime+
-    					mEnvParms.settingLightSensorDetectIgnoreTime*1000)<sctm) {
+    					mGp.settingLightSensorDetectIgnoreTime*1000)<sctm) {
     				if (nv==1) {
     					mEnvParms.lightSensorDetected=true;
     					scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_LIGHT_DETECTED);
@@ -2218,18 +1941,18 @@ public final class SchedulerService extends Service {
     };
     
     static private void startLightSensorReceiver() {
-    	if (mEnvParms.settingLightSensorUseThread) startLightSensorReceiverThread();
+    	if (mGp.settingLightSensorUseThread) startLightSensorReceiverThread();
     	else startLightSensorReceiverNonThread();
     };
     
     static private void stopLightSensorReceiver() {
-    	if (mEnvParms.settingLightSensorUseThread) stopLightSensorReceiverThread();
+    	if (mGp.settingLightSensorUseThread) stopLightSensorReceiverThread();
     	else stopLightSensorReceiverNonThread();
     };
     
 	static private void startLightSensorReceiverThread() {
 		mTcLightSensorListener.setDisabled();
-		if (mRequiredSensorLight && mSensorLight!=null && mEnvParms.settingEnableScheduler) {
+		if (mRequiredSensorLight && mSensorLight!=null && mGp.settingEnableScheduler) {
 			
 			mEnvParms.lightSensorActive=true;
 			mTcLightSensorListener.setEnabled();
@@ -2240,7 +1963,7 @@ public final class SchedulerService extends Service {
 					Thread.currentThread().setPriority(Thread.NORM_PRIORITY+1);
 					mUtil.addDebugMsg(1, "I", "Light sensor receiver thread has been started.");
 					if (mEnvParms.lightSensorActive) {
-						long mon_intv=mEnvParms.settingLightSensorMonitorIntervalTime-mEnvParms.settingLightSensorMonitorActiveTime;
+						long mon_intv=mGp.settingLightSensorMonitorIntervalTime-mGp.settingLightSensorMonitorActiveTime;
 						while (mTcLightSensorListener.isEnabled()) {
 					        synchronized(mTcLightSensorListener) {
 								try {
@@ -2248,7 +1971,7 @@ public final class SchedulerService extends Service {
 										mSensorManager.registerListener(mReceiverLligh, 
 											mSensorLight, SensorManager.SENSOR_DELAY_UI);
 				    		        mTcLightSensorListener.
-				    		        	wait(mEnvParms.settingLightSensorMonitorActiveTime);
+				    		        	wait(mGp.settingLightSensorMonitorActiveTime);
 				    		        if (mEnvParms.lightSensorActive) 
 				    		        	mSensorManager.unregisterListener(mReceiverLligh);
 									mTcLightSensorListener.wait(mon_intv);
@@ -2288,7 +2011,7 @@ public final class SchedulerService extends Service {
 
 	@SuppressLint("NewApi")
 	static private void startLightSensorReceiverNonThread() {
-		if (mRequiredSensorLight && mSensorLight!=null && mEnvParms.settingEnableScheduler) {
+		if (mRequiredSensorLight && mSensorLight!=null && mGp.settingEnableScheduler) {
 			mEnvParms.lightSensorActive=true;
 			boolean result=mSensorManager.registerListener(mReceiverLligh, 
 								mSensorLight, SensorManager.SENSOR_DELAY_UI);
@@ -2304,7 +2027,7 @@ public final class SchedulerService extends Service {
     };
 
 	static private void startProximitySensorReceiver() {
-		if (mRequiredSensorProximity && mSensorProximity!=null && mEnvParms.settingEnableScheduler) {
+		if (mRequiredSensorProximity && mSensorProximity!=null && mGp.settingEnableScheduler) {
 			mEnvParms.proximitySensorActive=true;
 			mSensorManager.registerListener(mReceiverProximity, mSensorProximity, SensorManager.SENSOR_DELAY_UI);
 			mUtil.addDebugMsg(1, "I", "Proximity sensor receiver was started.");
@@ -2352,22 +2075,22 @@ public final class SchedulerService extends Service {
     };
 
     static private void acqWakeLockForSleep() {
-    	if (mEnvParms.settingDebugLevel>=3) mUtil.addDebugMsg(3, "I", "acqWakeLockForSleep Light="+mEnvParms.lightSensorActive,
+    	if (mGp.settingDebugLevel>=3) mUtil.addDebugMsg(3, "I", "acqWakeLockForSleep Light="+mEnvParms.lightSensorActive,
 //    			", Magnetic-field=",String.valueOf(mEnvParms.magneticFieldSensorActive)+
     			", Proximity=",String.valueOf(mEnvParms.proximitySensorActive),
     			", Telephony=",String.valueOf(mEnvParms.telephonyIsAvailable),
     			", Airplane=",String.valueOf(mEnvParms.airplane_mode_on),
     			", Held=",String.valueOf(mWakelockForSleep.isHeld()));
-    	if (TaskManager.isAcqWakeLockRequired(mEnvParms)) {
+    	if (TaskManager.isAcqWakeLockRequired(mEnvParms, mGp)) {
     		if (!mWakelockForSleep.isHeld()) mWakelockForSleep.acquire();
     	}
-    	if (mEnvParms.settingDebugLevel>=2) 
+    	if (mGp.settingDebugLevel>=2) 
     		mUtil.addDebugMsg(2, "I", "acqWakeLockForSleep Result=",String.valueOf(mWakelockForSleep.isHeld()));
     };
     
     static private void relWakeLockForSleep() {
     	if (mWakelockForSleep.isHeld()) mWakelockForSleep.release();
-    	if (mEnvParms.settingDebugLevel>=2) 
+    	if (mGp.settingDebugLevel>=2) 
     		mUtil.addDebugMsg(2, "I", "relWakeLockForSleep released");
     };
     static private void acqSvcWakeLock() {
@@ -2381,7 +2104,7 @@ public final class SchedulerService extends Service {
 //    private static boolean mBuiltinEventTaskThreadActive=false;
     final static private void scheduleBuiltinEventTask(
     		final ArrayList<TaskListItem> bietl, final String event) {
-    	if (!mEnvParms.settingEnableScheduler) return;
+    	if (!mGp.settingEnableScheduler) return;
 		final WakeLock wl=((PowerManager)mContext.getSystemService(Context.POWER_SERVICE))
     			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
     					| PowerManager.ON_AFTER_RELEASE, "TaskAutomation-executeBuiltinEventTask");
@@ -2407,8 +2130,8 @@ public final class SchedulerService extends Service {
 
     final static private synchronized void scheduleBuiltinEventTaskThread(
     		final ArrayList<TaskListItem> bietl, final String event) {
-		TaskManager.acqLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil);
-    	if (mEnvParms.settingDebugLevel>=1) mUtil.addDebugMsg(1,"I","executeBuitinEventTaskThread entered cnt=",
+		TaskManager.acqLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil, mGp);
+    	if (mGp.settingDebugLevel>=1) mUtil.addDebugMsg(1,"I","executeBuitinEventTaskThread entered cnt=",
     			String.valueOf(bietl.size()),", event=",event);
     	long b_time=System.currentTimeMillis(),e_time=0;
     	long cnt_sched=0;
@@ -2419,17 +2142,17 @@ public final class SchedulerService extends Service {
         	String btn;
         	for (int i=tlui.start_pos;i<(tlui.end_pos+1);i++) {
     			etl=bietl.get(i);
-        		TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil);
-    	    	btn=TaskManager.isEventIsBlocked(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,event);
-        		TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil);
+        		TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil, mGp);
+    	    	btn=TaskManager.isEventIsBlocked(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,event, mGp);
+        		TaskManager.relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil, mGp);
     	    	if (btn==null) {
-    	    		ati=TaskManager.getActiveTaskListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name);
+    	    		ati=TaskManager.getActiveTaskListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name, mGp);
     	    		boolean already_started=false;
     	    		if (ati==null) {
-    					tqli=TaskManager.getTaskQueueListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name);
+    					tqli=TaskManager.getTaskQueueListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name, mGp);
     					if (tqli==null) {
         	    			cnt_sched++;
-    						TaskManager.scheduleTask(mTaskMgrParms,mEnvParms,mUtil,etl);
+    						TaskManager.scheduleTask(mTaskMgrParms,mEnvParms,mUtil,etl, mGp);
     					} else already_started=true;
     				} else already_started=true;
     	    		if (already_started)
@@ -2442,13 +2165,13 @@ public final class SchedulerService extends Service {
         	}
     	}
 		e_time=System.currentTimeMillis()-b_time;
-		TaskManager.relLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil);
+		TaskManager.relLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil, mGp);
 		int a_time=0;
 		if (cnt_sched>0) {
 			a_time=(int)(e_time/cnt_sched);
 			if (mEnvParms.statsHighAverageTaskScheduleTime<a_time) mEnvParms.statsHighAverageTaskScheduleTime=a_time;
 		}
-    	if (mEnvParms.settingDebugLevel>=1) 
+    	if (mGp.settingDebugLevel>=1) 
     		mUtil.addDebugMsg(1,"I","executeBuitinEventTaskThread exited.",
     				" Scheduled task(s)=",String.valueOf(cnt_sched),
     				", Elapsed time=",String.valueOf(e_time), 
@@ -2472,11 +2195,11 @@ public final class SchedulerService extends Service {
     };
     
     final static private void scheduleTimeEventTask(ArrayList<TaskListItem> tetl) {
-    	if (!mEnvParms.settingEnableScheduler) return;
+    	if (!mGp.settingEnableScheduler) return;
     	long b_time=System.currentTimeMillis(),e_time=0;
     	long cnt_sched=0;
-		TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil);
-    	if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2,"I","executeTimeEventTask entered cnt=",
+		TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil, mGp);
+    	if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2,"I","executeTimeEventTask entered cnt=",
     			String.valueOf(tetl.size()));
     	long ct=System.currentTimeMillis()/(60*1000)*(1000*60);
     	TaskListItem etl;
@@ -2485,13 +2208,13 @@ public final class SchedulerService extends Service {
 			etl=tetl.get(i);
 			if (etl.sched_time==ct) {
 				etl.timer_update_required=true;
-				ati=TaskManager.getActiveTaskListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name);
+				ati=TaskManager.getActiveTaskListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name, mGp);
 	    		boolean already_started=false;
 	    		if (ati==null) {
-					tqli=TaskManager.getTaskQueueListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name);
+					tqli=TaskManager.getTaskQueueListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name, mGp);
 					if (tqli==null) {
 		    			cnt_sched++;
-						TaskManager.scheduleTask(mTaskMgrParms,mEnvParms,mUtil,etl);
+						TaskManager.scheduleTask(mTaskMgrParms,mEnvParms,mUtil,etl, mGp);
 					} else already_started=true;
 				} else already_started=true;
 	    		if (already_started)
@@ -2500,13 +2223,13 @@ public final class SchedulerService extends Service {
 			}
 		}
 		e_time=System.currentTimeMillis()-b_time;
-		TaskManager.relLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil);
+		TaskManager.relLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_READ,mEnvParms,mTaskMgrParms,mUtil, mGp);
 		int a_time=0;
 		if (cnt_sched>0) {
 			a_time=(int)(e_time/cnt_sched);
 			if (mEnvParms.statsHighAverageTaskScheduleTime<a_time) mEnvParms.statsHighAverageTaskScheduleTime=a_time;
 		}
-    	if (mEnvParms.settingDebugLevel>=1) 
+    	if (mGp.settingDebugLevel>=1) 
     		mUtil.addDebugMsg(1,"I","executeTimeEventTask exited.",
     				" Scheduled task(s)=",String.valueOf(cnt_sched),
     				", Elapsed time=",String.valueOf(e_time), 
@@ -2519,11 +2242,11 @@ public final class SchedulerService extends Service {
 				"Negative response was received. task=",tr.active_task_name,
 				", event=",tr.active_event_name,", action=",tr.active_action_name,
 				", sub_resp=",tr.resp_id, ", msg=", tr.resp_msg_text);
-		TaskManager.rescheduleTask(mTaskMgrParms,mEnvParms,mUtil);
+		TaskManager.rescheduleTask(mTaskMgrParms,mEnvParms,mUtil, mGp);
 	};
 
 	static private void processThreadPositiveResponse(ThreadCtrl tc, Context c, TaskResponse tr) {
-		if (mEnvParms.settingDebugLevel>=2) mUtil.addDebugMsg(2,"I", 
+		if (mGp.settingDebugLevel>=2) mUtil.addDebugMsg(2,"I", 
 				"Positive response was received. task=", tr.active_task_name,
 				", event=",tr.active_event_name, ", action=", tr.active_action_name,
 				", dlg_id=",tr.active_dialog_id,
@@ -2554,9 +2277,9 @@ public final class SchedulerService extends Service {
 			if (etl.group_name.equals(tr.active_group_name) && 
 					etl.task_name.equals(tr.cmd_tgt_task_name)) {
 				started=true;
-	    		TaskListItem ati=TaskManager.getActiveTaskListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name);
+	    		TaskListItem ati=TaskManager.getActiveTaskListItem(mTaskMgrParms,mEnvParms,mUtil,etl.group_name,etl.task_name, mGp);
 				if (ati==null) {
-					TaskManager.scheduleTask(mTaskMgrParms,mEnvParms,mUtil,etl);
+					TaskManager.scheduleTask(mTaskMgrParms,mEnvParms,mUtil,etl, mGp);
 //					initiateQueuedTask();
 				} else mUtil.addLogMsg("W", 
 						String.format(mTaskMgrParms.svcMsgs.msgs_svc_task_already_started,
@@ -2570,15 +2293,15 @@ public final class SchedulerService extends Service {
     };
 
     static private void rescheduleTimerEventTask(String tgt_time_event_name) {
-		TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
+		TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
 		updateTimerEventTaskListScheduleTime(mTimerEventTaskList,tgt_time_event_name);
 		setTimeEventTaskTimer(mTimerEventTaskList);
-		TaskManager.relLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil);
+		TaskManager.relLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
     };
     
 	static private void setTimeEventTaskTimer(ArrayList<TaskListItem>tetl) {
 //		TaskManager.acqTaskEventListLock(taskMgrParms,util);
-    	if (mEnvParms.settingDebugLevel!=0) 
+    	if (mGp.settingDebugLevel!=0) 
     		mUtil.addDebugMsg(2,"I","scheduleNextWakeUp entered, candidate action count=",
     				String.valueOf(tetl.size()));
 		long min_time=0;
@@ -2610,7 +2333,7 @@ public final class SchedulerService extends Service {
 			mEnvParms.nextScheduleTime=min_time;
 			mEnvParms.nextScheduleTimeString=StringUtil.convDateTimeTo_MonthDayHourMin(mEnvParms.nextScheduleTime);
 		}
-		TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil);
+//		TaskManager.showNotification(mTaskMgrParms, mEnvParms, mUtil, mGp);
 //		TaskManager.relTaskEventListLock(taskMgrParms,util);
     };
 
@@ -2684,7 +2407,7 @@ public final class SchedulerService extends Service {
 				return cl.event_name.compareTo(nl.event_name);
 			}
 		});
-		if (mEnvParms.settingDebugLevel!=0) {
+		if (mGp.settingDebugLevel!=0) {
 			mUtil.addDebugMsg(1,"I", "buildEventTaskList required sensor" ,
 					", Accelerometer=",String.valueOf(mRequiredSensorAccelerometer),
 					", Proximity=",String.valueOf(mRequiredSensorProximity),
@@ -2722,7 +2445,7 @@ public final class SchedulerService extends Service {
 		if (apn.startsWith(BUILTIN_PREFIX)) {
 			bial.action_type=PROFILE_ACTION_TYPE_BUILTIN;
 			bial.action_builtin_action=apn;
-			if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+			if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 					", event=",event_id,
 					", group=",tpli.getProfileGroup(),
 					", task_prof=",tpli.getProfileName(),
@@ -2739,7 +2462,7 @@ public final class SchedulerService extends Service {
 				bial.action_activity_data_type=apli.getActionActivityDataType();
 				bial.action_activity_data_uri=apli.getActionActivityUriData();
 				bial.action_activity_data_extra_list=apli.getActionActivityExtraData();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2759,7 +2482,7 @@ public final class SchedulerService extends Service {
 				bial.action_sound_file_name=apli.getActionSoundFileName();
 				bial.action_sound_vol_left=apli.getActionSoundVolLeft();
 				bial.action_sound_vol_right=apli.getActionSoundVolRight();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2775,7 +2498,7 @@ public final class SchedulerService extends Service {
 				bial.action_ringtone_path=apli.getActionRingtonePath();
 				bial.action_ringtone_vol_left=apli.getActionRingtoneVolLeft();
 				bial.action_ringtone_vol_right=apli.getActionRingtoneVolRight();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2793,7 +2516,7 @@ public final class SchedulerService extends Service {
 				bial.action_compare_result_action=apli.getActionCompareResultAction();
 				if (bial.action_compare_target.equals(PROFILE_ACTION_TYPE_COMPARE_TARGET_LIGHT)) 
 					mRequiredSensorLight=true;
-				if (mEnvParms.settingDebugLevel!=0) {
+				if (mGp.settingDebugLevel!=0) {
 					String c_val="", sep="";
 					for (int i=0;i<bial.action_compare_value.length;i++) {
 						if (bial.action_compare_value[i]!=null && !bial.action_compare_value[i].equals("")) {
@@ -2819,7 +2542,7 @@ public final class SchedulerService extends Service {
 				bial.action_message_use_vib=apli.isActionMessageUseVibration();
 				bial.action_message_use_led=apli.isActionMessageUseLed();
 				bial.action_message_led_color=apli.getActionMessageLedColor();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2834,7 +2557,7 @@ public final class SchedulerService extends Service {
 			} else if (bial.action_type.equals(PROFILE_ACTION_TYPE_TIME)) {
 				bial.action_time_type=apli.getActionTimeType();
 				bial.action_time_target=apli.getActionTimeTarget();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2846,7 +2569,7 @@ public final class SchedulerService extends Service {
 			} else if (bial.action_type.equals(PROFILE_ACTION_TYPE_TASK)) {
 				bial.action_task_type=apli.getActionTaskType();
 				bial.action_task_target=apli.getActionTaskTarget();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2859,7 +2582,7 @@ public final class SchedulerService extends Service {
 				bial.action_wait_target=apli.getActionWaitTarget();
 				bial.action_wait_timeout_value=apli.getActionWaitTimeoutValue();
 				bial.action_wait_timeout_units=apli.getActionWaitTimeoutUnits();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2871,7 +2594,7 @@ public final class SchedulerService extends Service {
 						);
 			} else if (bial.action_type.equals(PROFILE_ACTION_TYPE_BSH_SCRIPT)) {
 				bial.action_bsh_script=apli.getActionBeanShellScriptScript();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2882,7 +2605,7 @@ public final class SchedulerService extends Service {
 			} else if (bial.action_type.equals(PROFILE_ACTION_TYPE_SHELL_COMMAND)) {
 				bial.action_shell_cmd=apli.getActionShellCmd();
 				bial.action_shell_cmd_with_su=apli.isActionShellCmdWithSu();
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(2, "I","Task action list added",
 						", event=",event_id,
 						", group=",tpli.getProfileGroup(),
 						", task_prof=",tpli.getProfileName(),
@@ -2987,7 +2710,7 @@ public final class SchedulerService extends Service {
 			    }
 			}
 		}
-		if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I", "buildTimeEventExecList result, task=",String.valueOf(tetl.size()));
+		if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I", "buildTimeEventExecList result, task=",String.valueOf(tetl.size()));
 	};
 
 	static private void setTimeEventExecActionList(ProfileListItem task_profile_item,
@@ -3120,7 +2843,7 @@ public final class SchedulerService extends Service {
 						", selected=",s_ev);
 			}
 		}
-		if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I", "updateScheduleTime result, action count=",String.valueOf(tetl.size()));
+		if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I", "updateScheduleTime result, action count=",String.valueOf(tetl.size()));
 	};
 	
 	static private long convertEpocToUtc(String year, String month, String day,
@@ -3202,7 +2925,7 @@ public final class SchedulerService extends Service {
 				}
 				br.close();
 			} else {
-				if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(1, "W", 
+				if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(1, "W", 
 						"profile not found, empty profile list created. fn=",
 								mContext.getFilesDir().toString(),"/",pf);
 			}
@@ -3217,7 +2940,7 @@ public final class SchedulerService extends Service {
 		prof_list.addAll(action);
 		ProfileUtilities.sortProfileArrayList(mUtil,prof_list);
 
-		if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I","buildProfileList result",
+		if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I","buildProfileList result",
 				", task=",String.valueOf(task.size()),
 				", time=",String.valueOf(time.size()),
 				", action=",String.valueOf(action.size())
@@ -3227,7 +2950,7 @@ public final class SchedulerService extends Service {
 	
     @SuppressLint("NewApi")
 	static private void setTimer(String action, long time ) {
-    	if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I", 
+    	if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I", 
     			"setTimer entered, time=",StringUtil.convDateTimeTo_YearMonthDayHourMin(time));
 		Intent iw = new Intent();
 		iw.setAction(action);
@@ -3240,7 +2963,7 @@ public final class SchedulerService extends Service {
     };
 
     static private void cancelTimer(String action) {
-    	if (mEnvParms.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I", "cancelTimer entered");
+    	if (mGp.settingDebugLevel!=0) mUtil.addDebugMsg(1,"I", "cancelTimer entered");
 		Intent iw = new Intent();
 		iw.setAction(action);
 		PendingIntent piw = PendingIntent.getBroadcast(mContext, 0, iw,
@@ -3254,7 +2977,7 @@ public final class SchedulerService extends Service {
 //		Intent iw = new Intent();
     	Intent iw = new Intent(context,SchedulerService.class);
 		iw.setAction(BROADCAST_SERVICE_HEARTBEAT);
-		long time=System.currentTimeMillis()+mEnvParms.settingHeartBeatIntervalTime;
+		long time=System.currentTimeMillis()+mGp.settingHeartBeatIntervalTime;
 //		PendingIntent piw = PendingIntent.getBroadcast(context, 0, iw,
 //				PendingIntent.FLAG_UPDATE_CURRENT);
 		PendingIntent piw = PendingIntent.getService(context, 0, iw,
@@ -3263,7 +2986,7 @@ public final class SchedulerService extends Service {
 	    if (Build.VERSION.SDK_INT>=23) amw.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, piw);
 	    else amw.set(AlarmManager.RTC_WAKEUP, time, piw);
 
-//	    amw.setRepeating(AlarmManager.RTC_WAKEUP, time, mEnvParms.settingHeartBeatIntervalTime,piw);
+//	    amw.setRepeating(AlarmManager.RTC_WAKEUP, time, mGp.settingHeartBeatIntervalTime,piw);
     };
     
 	final static private void cancelHeartBeat(Context context) {
@@ -3283,22 +3006,98 @@ public final class SchedulerService extends Service {
     	mUtil.addDebugMsg(1,"I","initSettingParms "+Build.MANUFACTURER + " - " + Build.MODEL);
     	mUtil.addDebugMsg(1,"I","General parameters");
   		mUtil.addDebugMsg(1,"I","   localRootDir=",mEnvParms.localRootDir);
-  		mUtil.addDebugMsg(1,"I","   settingDebugLevel=",String.valueOf(mEnvParms.settingDebugLevel));
-  		mUtil.addDebugMsg(1,"I","   settingLogMsgDir=",mEnvParms.settingLogMsgDir);
-  		mUtil.addDebugMsg(1,"I","   settingLogOption=",String.valueOf(mEnvParms.settingLogOption));
-  		mUtil.addDebugMsg(1,"I","   settingEnableScheduler=",String.valueOf(mEnvParms.settingEnableScheduler));
-  		mUtil.addDebugMsg(1,"I","   settingMaxTaskCount=",String.valueOf(mEnvParms.settingMaxTaskCount));
-  		mUtil.addDebugMsg(1,"I","   settingThreadPoolCount=",String.valueOf(mEnvParms.settingTaskExecThreadPoolCount));
-  		mUtil.addDebugMsg(1,"I","   settingEnableMonitor=",String.valueOf(mEnvParms.settingEnableMonitor));
-  		mUtil.addDebugMsg(1,"I","   settingWakeLockAlways=",String.valueOf(mEnvParms.settingWakeLockOption));
-  		mUtil.addDebugMsg(1,"I","   settingWakeLockLightSensor=",String.valueOf(mEnvParms.settingWakeLockLightSensor));
-  		mUtil.addDebugMsg(1,"I","   settingWakeLockProximitySensor=",String.valueOf(mEnvParms.settingWakeLockProximitySensor));
-  		mUtil.addDebugMsg(1,"I","   settingHeartBeatIntervalTime=",String.valueOf(mEnvParms.settingHeartBeatIntervalTime));
+  		mUtil.addDebugMsg(1,"I","   settingDebugLevel=",String.valueOf(mGp.settingDebugLevel));
+  		mUtil.addDebugMsg(1,"I","   settingLogMsgDir=",mGp.settingLogMsgDir);
+  		mUtil.addDebugMsg(1,"I","   settingLogOption=",String.valueOf(mGp.settingLogOption));
+  		mUtil.addDebugMsg(1,"I","   settingEnableScheduler=",String.valueOf(mGp.settingEnableScheduler));
+  		mUtil.addDebugMsg(1,"I","   settingMaxTaskCount=",String.valueOf(mGp.settingMaxTaskCount));
+  		mUtil.addDebugMsg(1,"I","   settingThreadPoolCount=",String.valueOf(mGp.settingTaskExecThreadPoolCount));
+  		mUtil.addDebugMsg(1,"I","   settingEnableMonitor=",String.valueOf(mGp.settingEnableMonitor));
+  		mUtil.addDebugMsg(1,"I","   settingWakeLockAlways=",String.valueOf(mGp.settingWakeLockOption));
+  		mUtil.addDebugMsg(1,"I","   settingWakeLockLightSensor=",String.valueOf(mGp.settingWakeLockLightSensor));
+  		mUtil.addDebugMsg(1,"I","   settingWakeLockProximitySensor=",String.valueOf(mGp.settingWakeLockProximitySensor));
+  		mUtil.addDebugMsg(1,"I","   settingHeartBeatIntervalTime=",String.valueOf(mGp.settingHeartBeatIntervalTime));
     	mUtil.addDebugMsg(1,"I","Light sensor parameteres");
-    	mUtil.addDebugMsg(1,"I","   LightSensorUseThread=",String.valueOf(mEnvParms.settingLightSensorUseThread));
-    	mUtil.addDebugMsg(1,"I","   MonitorIntervalTime=",String.valueOf(mEnvParms.settingLightSensorMonitorIntervalTime));
-    	mUtil.addDebugMsg(1,"I","   MonitorActiveTime=",String.valueOf(mEnvParms.settingLightSensorMonitorActiveTime));
-    	mUtil.addDebugMsg(1,"I","   DetectThreshHold=",String.valueOf(mEnvParms.settingLightSensorDetectThreshHold));
-    	mUtil.addDebugMsg(1,"I","   LightSensorDetectIgnoreTime=",String.valueOf(mEnvParms.settingLightSensorDetectIgnoreTime));
+    	mUtil.addDebugMsg(1,"I","   LightSensorUseThread=",String.valueOf(mGp.settingLightSensorUseThread));
+    	mUtil.addDebugMsg(1,"I","   MonitorIntervalTime=",String.valueOf(mGp.settingLightSensorMonitorIntervalTime));
+    	mUtil.addDebugMsg(1,"I","   MonitorActiveTime=",String.valueOf(mGp.settingLightSensorMonitorActiveTime));
+    	mUtil.addDebugMsg(1,"I","   DetectThreshHold=",String.valueOf(mGp.settingLightSensorDetectThreshHold));
+    	mUtil.addDebugMsg(1,"I","   LightSensorDetectIgnoreTime=",String.valueOf(mGp.settingLightSensorDetectIgnoreTime));
     };
+
+    final static private void startSvcMonitor() {
+        if (mGp.settingEnableMonitor) {
+            mUtil.addDebugMsg(1,"I", "startSvcMonitor Monitor has been started");
+            Intent intent = new Intent(mContext, SchedulerMonitor.class);
+            intent.setAction("Create-Monitor");
+            mContext.startService(intent);
+
+            if (mSvcMonitorConnection==null) setMonitorServiceConnListener();
+            if (mSchedulerMonitor==null) {
+                intent = new Intent(mContext, SchedulerMonitor.class);
+                intent.setAction("Bind-Monitor");
+                mContext.bindService(intent, mSvcMonitorConnection, BIND_AUTO_CREATE);
+            }
+        } else {
+            if (mGp.settingDebugLevel!=0)
+                mUtil.addDebugMsg(1,"I", "startSvcMonitor Monitor was not started");
+        }
+    };
+
+    final static private void refreshSvcMonitor() {
+//    	if (envParms.settingDebugLevel!=0) util.addDebugMsg(1,"I", "refreshSvcMonitor entered");
+        if (mGp.settingEnableMonitor) {
+            mUtil.addDebugMsg(1,"I", "refreshSvcMonitor Refresh monitor has been started");
+            Intent intent = new Intent(mContext, SchedulerMonitor.class);
+            intent.setAction("Refresh-Monitor");
+            mContext.startService(intent);
+        } else{
+            mUtil.addDebugMsg(1,"I", "refreshSvcMonitor Monitor was not refreshed");
+        }
+    };
+
+    final static private void setMonitorServiceConnListener() {
+        mSvcMonitorConnection = new ServiceConnection(){
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mUtil.addDebugMsg(1, "I", "Monitor service was connected");
+                mSchedulerMonitor = ISchedulerMonitor.Stub.asInterface(service);
+            }
+            public void onServiceDisconnected(ComponentName name) {
+                WakeLock wl= ((PowerManager)mContext.getSystemService(Context.POWER_SERVICE))
+                        .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+                                | PowerManager.ON_AFTER_RELEASE, "StartMon");
+                try {
+                    wl.acquire(100);
+                    mUtil.addDebugMsg(1, "I", "Monitor service was disconnected");
+                    mSchedulerMonitor = null;
+                    if (mGp.settingEnableMonitor) {
+                        mUtil.addLogMsg("W", mTaskMgrParms.svcMsgs.msgs_main_monitor_issued);
+                        mUtil.addDebugMsg(1, "I", "Bind service was issued.");
+
+                        Intent intent = new Intent(mContext, SchedulerMonitor.class);
+                        intent.setAction("Service-Restart");
+//        				bindService(intent, svcConnMonitor, BIND_AUTO_CREATE);
+                        mContext.startService(intent);
+                    } else {
+                        mUtil.addLogMsg("W", mTaskMgrParms.svcMsgs.msgs_main_monitor_ignored);
+                    }
+                } finally {
+//        			wl.release();
+                }
+            }
+        };
+    };
+
+    final static private void stopSvcMonitor() {
+        if (mSchedulerMonitor!=null && mSvcMonitorConnection!=null) {
+            mUtil.addDebugMsg(1,"I", "stopSvcMonitor Monitor has been stopped");
+            mContext.unbindService(mSvcMonitorConnection);
+            mSvcMonitorConnection=null;
+            mSchedulerMonitor=null;
+        }
+        Intent intent = new Intent(mContext, SchedulerMonitor.class);
+        intent.setAction("Service-Stop");
+        mContext.stopService(intent);
+    };
+
 }

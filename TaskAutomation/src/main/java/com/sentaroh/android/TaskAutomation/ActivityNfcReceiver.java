@@ -1,7 +1,8 @@
 package com.sentaroh.android.TaskAutomation;
 
-import static com.sentaroh.android.TaskAutomation.Common.CommonConstants.APPLICATION_TAG;
-import static com.sentaroh.android.TaskAutomation.Common.CommonConstants.BROADCAST_LOG_SEND;
+import static com.sentaroh.android.TaskAutomation.CommonConstants.APPLICATION_TAG;
+import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_SEND;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,6 +10,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -61,6 +63,9 @@ public class ActivityNfcReceiver extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
         super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 //        setContentView(R.layout.activity_message);

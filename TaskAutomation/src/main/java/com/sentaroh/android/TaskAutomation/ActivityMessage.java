@@ -23,9 +23,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.TaskAutomation.Common.CommonConstants.*;
+import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
 
-import com.sentaroh.android.TaskAutomation.Common.EnvironmentParms;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 
@@ -43,6 +42,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -86,6 +86,8 @@ public class ActivityMessage extends Activity {
     @SuppressLint("ResourceAsColor")
 	@Override
     public void onCreate(Bundle savedInstanceState) {
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
         super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_message);
@@ -95,7 +97,8 @@ public class ActivityMessage extends Activity {
         restartStatus=0;
         envParms=new EnvironmentParms();
         envParms.loadSettingParms(context);
-        util=new CommonUtilities(context.getApplicationContext(), "MessageDlg",envParms);
+        GlobalParameters mGp= GlobalWorkArea.getGlobalParameters(context);
+        util=new CommonUtilities(context.getApplicationContext(), "MessageDlg",envParms, mGp);
 
         util.addDebugMsg(1,"I","onCreate entered");
 

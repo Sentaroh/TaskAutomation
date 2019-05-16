@@ -29,6 +29,7 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -54,9 +55,16 @@ public class SchedulerReceiver extends BroadcastReceiver{
 			Intent in = new Intent(context, SchedulerService.class);
             if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
                 CommonUtilities.clearSavedBluetoothConnectedDeviceList(context);
+                in.setAction(action);
+                if (Build.VERSION.SDK_INT>=26) {
+                    context.startForegroundService(in);
+                } else {
+                    context.startService(in);
+                }
+            } else {
+                in.setAction(action);
+                context.startService(in);
             }
-            in.setAction(action);
-            context.startService(in);
 		}
 	};
 	

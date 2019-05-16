@@ -23,8 +23,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.TaskAutomation.Common.CommonConstants.*;
-import static com.sentaroh.android.TaskAutomation.WidgetConstants.*;
+import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -35,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -47,29 +47,21 @@ import android.os.Handler;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
+
 import bsh.EvalError;
 import bsh.Interpreter;
 
-import com.sentaroh.android.TaskAutomation.Common.ActionResponse;
-import com.sentaroh.android.TaskAutomation.Common.BlockActionItem;
-import com.sentaroh.android.TaskAutomation.Common.BshExecEnvListItem;
-import com.sentaroh.android.TaskAutomation.Common.EnvironmentParms;
-import com.sentaroh.android.TaskAutomation.Common.TaskActionItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskHistoryItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskListItem;
-import com.sentaroh.android.TaskAutomation.Common.TaskManagerParms;
-import com.sentaroh.android.TaskAutomation.Common.TaskResponse;
 import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 
 //    @SuppressWarnings("unused") 
 	final public class TaskManager {
 		
-		final static public boolean isAcqWakeLockRequired(EnvironmentParms envParms) {
+		final static public boolean isAcqWakeLockRequired(EnvironmentParms envParms, GlobalParameters gp) {
 			boolean result=false;
-			if (envParms.settingWakeLockOption.equals(WAKE_LOCK_OPTION_ALWAYS)) {
+			if (gp.settingWakeLockOption.equals(WAKE_LOCK_OPTION_ALWAYS)) {
 				result=true;
-			} else if (envParms.settingWakeLockOption.equals(WAKE_LOCK_OPTION_SYSTEM)) {
+			} else if (gp.settingWakeLockOption.equals(WAKE_LOCK_OPTION_SYSTEM)) {
 		    	if (envParms.lightSensorActive || envParms.proximitySensorActive) {
 		    		if (envParms.airplane_mode_on==1 && envParms.telephonyIsAvailable) {
 		    			result=true;
@@ -78,8 +70,8 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 		    		}
 				}
 			} else {
-				if ((envParms.settingWakeLockLightSensor && envParms.lightSensorActive) || 
-						(envParms.settingWakeLockProximitySensor && envParms.proximitySensorActive)) {
+				if ((gp.settingWakeLockLightSensor && envParms.lightSensorActive) || 
+						(gp.settingWakeLockProximitySensor && envParms.proximitySensorActive)) {
 					result=true;
 				}
 			}
@@ -90,7 +82,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	final static private void acqRWLock(EnvironmentParms envParms, 
     			CommonUtilities util, 
     			ReentrantReadWriteLock lock,
-    			String id, int l_mode) {
+    			String id, int l_mode, GlobalParameters gp) {
     		boolean l_r=false;
 //    		Thread.dumpStack();
     		String l_mode_string=id+" Write";
@@ -100,12 +92,12 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     		else l_r=lock.writeLock().tryLock();
     		
 			if (l_r) {
-	    		if (envParms.settingDebugLevel>=3) {
+	    		if (gp.settingDebugLevel>=3) {
 	    			util.addDebugMsg(3, "I", l_mode_string," Lock acquired, Thread name=",Thread.currentThread().getName());
 	    		}
 			} else {
 				long b_time=System.currentTimeMillis();
-	    		if (envParms.settingDebugLevel>=2) {
+	    		if (gp.settingDebugLevel>=2) {
 	    			util.addDebugMsg(2, "I", l_mode_string," Lock wait detected, Thread name=",Thread.currentThread().getName()+
 	    					", Lock="+lock.toString());
 	    		}
@@ -113,7 +105,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 	    		if (l_mode==LOCK_MODE_READ) lock.readLock().lock();
 	    		else lock.writeLock().lock();
 	    		
-	    		if (envParms.settingDebugLevel>=2) {
+	    		if (gp.settingDebugLevel>=2) {
 	    			util.addDebugMsg(2, "I", l_mode_string," Lock wait time="+(System.currentTimeMillis()-b_time)+"(ms), Thread name=", Thread.currentThread().getName());
 	    		}
 			}
@@ -121,13 +113,13 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	final static private void relRWLock(EnvironmentParms envParms, 
     			CommonUtilities util, 
     			ReentrantReadWriteLock lock,
-    			String id, int l_mode) {
+    			String id, int l_mode, GlobalParameters gp) {
 //    		Thread.dumpStack();
     		String l_mode_string=id+" Write";
     		if (l_mode==LOCK_MODE_READ) l_mode_string=id+" Read";
     		if (l_mode==LOCK_MODE_READ) lock.readLock().unlock();
     		else lock.writeLock().unlock();
-    		if (envParms.settingDebugLevel>=3) {
+    		if (gp.settingDebugLevel>=3) {
     			util.addDebugMsg(3, "I", l_mode_string," Lock released, Thread name=",Thread.currentThread().getName());
     		}
     	};
@@ -141,23 +133,23 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	final static int LOCK_MODE_WRITE=2;
     	final static public void acqLock(int l_id, int l_mode,
     			EnvironmentParms envParms,TaskManagerParms taskMgrParms, 
-    			CommonUtilities util) {
+    			CommonUtilities util, GlobalParameters gp) {
 //			Log.v("","acq id="+l_id+", mode="+l_mode);
     		switch (l_id) {
 				case LOCK_ID_EVENT_TASK_LIST:
-	   				acqRWLock(envParms,util, taskMgrParms.lockEventTaskListRW, "EventTaskList",l_mode);
+	   				acqRWLock(envParms,util, taskMgrParms.lockEventTaskListRW, "EventTaskList",l_mode, gp);
 	   				return;
 				case LOCK_ID_TIMER_TASK_LIST:
-					acqRWLock(envParms,util, taskMgrParms.lockTimerTaskListRW, "TimerTaskList",l_mode);
+					acqRWLock(envParms,util, taskMgrParms.lockTimerTaskListRW, "TimerTaskList",l_mode, gp);
 					return;
 				case LOCK_ID_PROFILE_LIST:
-					acqRWLock(envParms,util, taskMgrParms.lockProfileListRW, "ProfileList",l_mode);
+					acqRWLock(envParms,util, taskMgrParms.lockProfileListRW, "ProfileList",l_mode, gp);
 					return;
 				case LOCK_ID_TASK_CONTROL:
-					acqRWLock(envParms,util, taskMgrParms.lockTaskControlRW, "TaskControl",l_mode);
+					acqRWLock(envParms,util, taskMgrParms.lockTaskControlRW, "TaskControl",l_mode, gp);
 					return;
 				case LOCK_ID_TASK_HISTORY:
-					acqRWLock(envParms,util, taskMgrParms.lockTaskHistoryRW, "TaskHistory",l_mode);
+					acqRWLock(envParms,util, taskMgrParms.lockTaskHistoryRW, "TaskHistory",l_mode, gp);
 					return;
 				default:
 					return;
@@ -166,7 +158,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	
     	final static public boolean isLockHeld(int l_id, int l_mode,
     			EnvironmentParms envParms,TaskManagerParms taskMgrParms, 
-    			CommonUtilities util) {
+    			CommonUtilities util, GlobalParameters gp) {
 //			Log.v("","acq id="+l_id+", mode="+l_mode);
     		int hc=0;
     		switch (l_id) {
@@ -199,23 +191,23 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	
     	final static public void relLock(int l_id, int l_mode,
     			EnvironmentParms envParms,TaskManagerParms taskMgrParms, 
-    			CommonUtilities util) {
+    			CommonUtilities util, GlobalParameters gp) {
 //    		Log.v("","rel id="+l_id+", mode="+l_mode);
     		switch (l_id) {
 				case LOCK_ID_EVENT_TASK_LIST:
-					relRWLock(envParms,util, taskMgrParms.lockEventTaskListRW, "EventTaskList",l_mode);
+					relRWLock(envParms,util, taskMgrParms.lockEventTaskListRW, "EventTaskList",l_mode, gp);
 	   				return;
 				case LOCK_ID_TIMER_TASK_LIST:
-					relRWLock(envParms,util, taskMgrParms.lockTimerTaskListRW, "TimerTaskList",l_mode);
+					relRWLock(envParms,util, taskMgrParms.lockTimerTaskListRW, "TimerTaskList",l_mode, gp);
 					return;
 				case LOCK_ID_PROFILE_LIST:
-					relRWLock(envParms,util, taskMgrParms.lockProfileListRW, "ProfileList",l_mode);
+					relRWLock(envParms,util, taskMgrParms.lockProfileListRW, "ProfileList",l_mode, gp);
 					return;
 				case LOCK_ID_TASK_CONTROL:
-					relRWLock(envParms,util, taskMgrParms.lockTaskControlRW, "TaskControl",l_mode);
+					relRWLock(envParms,util, taskMgrParms.lockTaskControlRW, "TaskControl",l_mode, gp);
 					return;
 				case LOCK_ID_TASK_HISTORY:
-					relRWLock(envParms,util, taskMgrParms.lockTaskHistoryRW, "TaskHistory",l_mode);
+					relRWLock(envParms,util, taskMgrParms.lockTaskHistoryRW, "TaskHistory",l_mode, gp);
 					return;
 				default:
 					return;
@@ -224,7 +216,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	
     	final static public void notifyToEventList(
     			TaskManagerParms taskMgrParms, ArrayList<ThreadCtrl> notify_list,
-    			int extra_id) {
+    			int extra_id, GlobalParameters gp) {
     		synchronized(notify_list) {
     			int lsz=notify_list.size();
     			ThreadCtrl tc;
@@ -250,7 +242,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     		}
     	};
 
-       	final static public void initNotification(TaskManagerParms taskMgrParms, EnvironmentParms envParms) {
+       	final static public void initNotification(TaskManagerParms taskMgrParms, EnvironmentParms envParms, GlobalParameters gp) {
        		String appl_ver="";
     		try {
     		    String packegeName = taskMgrParms.context.getPackageName();
@@ -265,7 +257,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 //       				"   "+taskMgrParms.context.getString(R.string.msgs_svc_active_task);
     		taskMgrParms.main_notification_msgs_main_task_scheduler_not_running=
     				taskMgrParms.context.getString(R.string.msgs_main_task_scheduler_not_running);
-    		taskMgrParms.mainNotificationManager = (NotificationManager) 
+    		taskMgrParms.mainNotificationManager = (NotificationManager)
     				taskMgrParms.context.getSystemService(Context.NOTIFICATION_SERVICE);
     		taskMgrParms.mainNotificationManager.cancelAll();
        	    
@@ -273,12 +265,13 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     		in.setAction(BROADCAST_START_ACTIVITY_TASK_STATUS);
     		taskMgrParms.mainNotificationPi= 
        				PendingIntent.getService(taskMgrParms.context, 0, in,PendingIntent.FLAG_UPDATE_CURRENT);
-    		buildNotification(taskMgrParms, envParms);
+    		buildNotification(taskMgrParms, envParms, gp);
        	};
 
-       	final static public void buildNotification(TaskManagerParms taskMgrParms, EnvironmentParms envParms) {
+        final public static String NOTIFICATION_CHANNEL_DEFAULT="Default";
+       	final static public void buildNotification(TaskManagerParms taskMgrParms, EnvironmentParms envParms, GlobalParameters gp) {
        		int icon_id=0;
-       		if (envParms.settingEnableScheduler) icon_id=R.drawable.main_icon_small;
+       		if (gp.settingEnableScheduler) icon_id=R.drawable.main_icon_small;
        		else icon_id=R.drawable.main_icon_stop;
     		taskMgrParms.mainNotificationBuilder = new NotificationCompat.Builder(taskMgrParms.context);
 		   	taskMgrParms.mainNotificationBuilder.setContentIntent(taskMgrParms.mainNotificationPi)
@@ -290,46 +283,35 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 //			    .setContentText("ContentText")
 //		    	.setSubText("subtext")
 //		    	.setLargeIcon(largeIcon)
-			    .setWhen(System.currentTimeMillis())
+//			    .setWhen(System.currentTimeMillis())
 //			    .addAction(action_icon, action_title, action_pi)
 			    ;
-    		
-		   	if (Build.VERSION.SDK_INT>=21 && envParms.screenIsLocked) {
-		        Intent intent_silent = new Intent();
-		    	intent_silent.setAction(HOME_SCREEN_DEVICE_BTN_SILENT);
-		    	PendingIntent pi_silent = PendingIntent.getBroadcast(taskMgrParms.context, 0, intent_silent, 
-		    			PendingIntent.FLAG_UPDATE_CURRENT);
-		    	if (envParms.isRingerModeNormal()) taskMgrParms.mainNotificationBuilder.addAction(R.drawable.ic_32_device_silent_off, null, pi_silent);
-		    	else taskMgrParms.mainNotificationBuilder.addAction(R.drawable.ic_32_device_silent_on, null, pi_silent);
 
-		        Intent intent_sleep = new Intent();
-		    	intent_sleep.setAction(HOME_SCREEN_DEVICE_BTN_BATTERY);
-		    	PendingIntent pi_sleep = PendingIntent.getBroadcast(taskMgrParms.context, 0, intent_sleep, 
-		    			PendingIntent.FLAG_UPDATE_CURRENT);
-		    	taskMgrParms.mainNotificationBuilder.addAction(R.drawable.sleepbtn_32, null, pi_sleep);
-		    	
-//		        Intent intent_wifi = new Intent();
-//		    	intent_wifi.setAction(HOME_SCREEN_DEVICE_BTN_WIFI);
-//		    	PendingIntent pi_wifi = PendingIntent.getBroadcast(taskMgrParms.context, 0, intent_wifi, 
-//		    			PendingIntent.FLAG_UPDATE_CURRENT);
-//		    	if (envParms.isWifiActive()) taskMgrParms.mainNotificationBuilder.addAction(R.drawable.ic_32_device_wifi_on, null, pi_wifi);
-//		    	else taskMgrParms.mainNotificationBuilder.addAction(R.drawable.ic_32_device_wifi_off, null, pi_wifi);
-//
-//		        Intent intent_bt = new Intent();
-//		    	intent_bt.setAction(HOME_SCREEN_DEVICE_BTN_BLUETOOTH);
-//		    	PendingIntent pi_bt = PendingIntent.getBroadcast(taskMgrParms.context, 0, intent_bt, 
-//		    			PendingIntent.FLAG_UPDATE_CURRENT);
-//		    	if (envParms.isBluetoothActive()) taskMgrParms.mainNotificationBuilder.addAction(R.drawable.ic_32_device_bt_on, null, pi_bt);
-//		    	else taskMgrParms.mainNotificationBuilder.addAction(R.drawable.ic_32_device_bt_off, null, pi_bt);
+            if (Build.VERSION.SDK_INT>=26) {
+                taskMgrParms.mainNotificationBuilder.setChannelId(NOTIFICATION_CHANNEL_DEFAULT);
+            }
 
-		   	}
-		   	
-		    taskMgrParms.mainNotification=taskMgrParms.mainNotificationBuilder.build();
-       	};
+            taskMgrParms.mainNotification=taskMgrParms.mainNotificationBuilder.build();
+
+            if (Build.VERSION.SDK_INT>=26) {
+                NotificationChannel def_ch = new NotificationChannel(
+                        NOTIFICATION_CHANNEL_DEFAULT,
+                        NOTIFICATION_CHANNEL_DEFAULT,
+                        NotificationManager.IMPORTANCE_DEFAULT
+                );
+                def_ch.enableLights(false);
+                def_ch.setSound(null,null);
+                def_ch.enableVibration(false);
+                def_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+                taskMgrParms.mainNotificationManager.deleteNotificationChannel(NOTIFICATION_CHANNEL_DEFAULT);
+                taskMgrParms.mainNotificationManager.createNotificationChannel(def_ch);
+            }
+
+        };
 
        	final static public void showNotification(TaskManagerParms taskMgrParms, EnvironmentParms envParms,
-       			CommonUtilities util) {
-       		if (envParms.settingEnableScheduler) {
+       			CommonUtilities util, GlobalParameters gp) {
+       		if (gp.settingEnableScheduler) {
               	synchronized(taskMgrParms.mainNotification) {
     	       		StringBuilder title=new StringBuilder(256)
 	    	       		.append(taskMgrParms.main_notification_msgs_svc_active_task)
@@ -345,29 +327,19 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 		       						envParms.taskListBuildTimeString);
 		    		}
     			   	taskMgrParms.mainNotificationBuilder
-			   	    	.setContentTitle(title)
+//			   	    	.setContentTitle(title)
 			   	    	.setContentText(basic_info);
             		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-            		inboxStyle.setBigContentTitle(title.toString());
+//            		inboxStyle.setBigContentTitle(title.toString());
             		inboxStyle.addLine(basic_info);
 
-            		inboxStyle.addLine(taskMgrParms.svcMsgs.msgs_svc_notification_info_battery_title+" "+
-            				envParms.batteryLevel+"%"+" "+envParms.batteryChargeStatusString);
-            		if (envParms.settingDebugLevel>0) {
-                		if (TaskManager.isAcqWakeLockRequired(envParms)) inboxStyle.addLine(taskMgrParms.svcMsgs.msgs_svc_notification_info_wake_lock_status_hold);
+//            		inboxStyle.addLine(taskMgrParms.svcMsgs.msgs_svc_notification_info_battery_title+" "+
+//            				envParms.batteryLevel+"%"+" "+envParms.batteryChargeStatusString);
+            		if (gp.settingDebugLevel>0) {
+                		if (TaskManager.isAcqWakeLockRequired(envParms, gp)) inboxStyle.addLine(taskMgrParms.svcMsgs.msgs_svc_notification_info_wake_lock_status_hold);
                 		else inboxStyle.addLine(taskMgrParms.svcMsgs.msgs_svc_notification_info_wake_lock_status_not_hold);
             		}
 
-            		if (Build.VERSION.SDK_INT!=17) {
-                		String kg_msg="";
-                		if (taskMgrParms.enableKeyguard) kg_msg=taskMgrParms.svcMsgs.msgs_key_gurad_info_keyguard_ctrl_disabled;
-                		else{
-                			if (envParms.screenIsLocked) kg_msg=taskMgrParms.svcMsgs.msgs_key_gurad_info_keyguard_disabled_after_unlock;
-                			else kg_msg=taskMgrParms.svcMsgs.msgs_key_gurad_info_keyguard_ctrl_enabled;
-                		}
-                		inboxStyle.addLine(kg_msg);
-            		}
-            		
             		taskMgrParms.mainNotificationBuilder.setStyle(inboxStyle);
     			   	
 				    taskMgrParms.mainNotification=taskMgrParms.mainNotificationBuilder.build();
@@ -378,13 +350,13 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     			   	taskMgrParms.mainNotificationBuilder.setContentIntent(taskMgrParms.mainNotificationPi)
     				    .setContentTitle(taskMgrParms.main_notification_msgs_appname)
     				    .setContentText(taskMgrParms.main_notification_msgs_main_task_scheduler_not_running)
-    				    .setWhen(System.currentTimeMillis())
+//    				    .setWhen(System.currentTimeMillis())
     				    ;
             		if (Build.VERSION.SDK_INT>=21) {
                 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle(taskMgrParms.mainNotificationBuilder);
                 		inboxStyle.setBigContentTitle(taskMgrParms.main_notification_msgs_appname);
-                		inboxStyle.addLine(taskMgrParms.svcMsgs.msgs_svc_notification_info_battery_title+" "+
-                				envParms.batteryLevel+"%"+" "+envParms.batteryChargeStatusString);
+//                		inboxStyle.addLine(taskMgrParms.svcMsgs.msgs_svc_notification_info_battery_title+" "+
+//                				envParms.batteryLevel+"%"+" "+envParms.batteryChargeStatusString);
                 		inboxStyle.setSummaryText(taskMgrParms.main_notification_msgs_main_task_scheduler_not_running);
             		}
 
@@ -392,7 +364,6 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 		    		taskMgrParms.mainNotificationManager.notify(R.string.app_name,taskMgrParms.mainNotification);
            		}
        		}
-       		WidgetService.updateLockedScreenWithInfoWidget();
         };
         
        	final static public void cancelNotification(TaskManagerParms taskMgrParms) {
@@ -423,8 +394,8 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         		EnvironmentParms envParms, CommonUtilities util,
     			String resp_time, String resp_id, 
     			String grp, String task, String action, String shell_cmd, String dlg_id, int resp_cd, 
-    			String msg) {
-    		if (envParms.settingDebugLevel>=2) util.addDebugMsg(2, "I", "callBackToActivity entered, resp=", resp_id,
+    			String msg, GlobalParameters gp) {
+    		if (gp.settingDebugLevel>=2) util.addDebugMsg(2, "I", "callBackToActivity entered, resp=", resp_id,
     				", task=",task,", action=",action,", msg=",msg);
     		synchronized(taskMgrParms.callBackList) {
     			int on = taskMgrParms.callBackList.beginBroadcast();
@@ -510,14 +481,14 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 
     	static final public void closeMessageDialog(TaskManagerParms taskMgrParms,
         		EnvironmentParms envParms, CommonUtilities util,
-    			TaskResponse tr) {
+    			TaskResponse tr, GlobalParameters gp) {
         	callBackToActivity(taskMgrParms,envParms,util,
         			tr.resp_time,NTFY_TO_ACTV_CLOSE_DIALOG,
         			tr.active_group_name, tr.active_task_name, tr.active_action_name,
-        			null, tr.active_dialog_id, tr.resp_code, null);
+        			null, tr.active_dialog_id, tr.resp_code, null, gp);
     	};
     	static final public void buildTaskExecThreadPool(final EnvironmentParms envParms, 
-    			final TaskManagerParms taskMgrParms, final CommonUtilities util) {
+    			final TaskManagerParms taskMgrParms, final CommonUtilities util, GlobalParameters gp) {
     		if (taskMgrParms.taskExecutorThreadPool!=null) 
     			removeTaskExecThreadPool(envParms,taskMgrParms,util);
     		SynchronousQueue <Runnable> slq=new SynchronousQueue <Runnable>();
@@ -529,10 +500,10 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 				}
     		};
      	    taskMgrParms.taskExecutorThreadPool =new ThreadPoolExecutor(
-     	    		envParms.settingTaskExecThreadPoolCount+2, 
-     	    		envParms.settingTaskExecThreadPoolCount+2,
+     	    		gp.settingTaskExecThreadPoolCount+2, 
+     	    		gp.settingTaskExecThreadPoolCount+2,
 					10, TimeUnit.SECONDS, slq, rh);
-     	    for (int i=0;i<envParms.settingTaskExecThreadPoolCount+2;i++) {
+     	    for (int i=0;i<gp.settingTaskExecThreadPoolCount+2;i++) {
      	    	final int num=i+1;
      	    	Runnable rt=new Runnable() {
 					@Override
@@ -670,7 +641,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 
     	final static public BshExecEnvListItem acqBshExecEnvItem(final TaskManagerParms taskMgrParms,
     			final EnvironmentParms envParms, final CommonUtilities util, final TaskResponse tr,
-    			final ActionResponse ar, final TaskActionItem tai) {
+    			final ActionResponse ar, final TaskActionItem tai, GlobalParameters gp) {
     		BshExecEnvListItem result=null;
     		synchronized(taskMgrParms.bshExecEnvList) {
     			if (taskMgrParms.bshExecEnvCached) {
@@ -680,18 +651,18 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         					result=li;
         					li.isUsed=true;
         					li.driver.setBeanShellMethod(taskMgrParms, envParms, util, tr, ar, tai);
-        					if (envParms.settingDebugLevel>=2) 
+        					if (gp.settingDebugLevel>=2) 
         						util.addDebugMsg(2,"i","Bsh execution environment assigned, id="+li.driverId+", pos="+i);
         					break;
         				}
         			};
     			}
     			if (result==null) {
-    				BshExecEnvListItem nli=createBshExecEnvItem(taskMgrParms,envParms,util,tr,ar,tai);
+    				BshExecEnvListItem nli=createBshExecEnvItem(taskMgrParms,envParms,util,tr,ar,tai, gp);
     				nli.isUsed=true;
     				if (taskMgrParms.bshExecEnvCached) taskMgrParms.bshExecEnvList.add(nli);
     				result=nli;
-    				if (envParms.settingDebugLevel>=2) 
+    				if (gp.settingDebugLevel>=2) 
     					util.addDebugMsg(2,"i","New Bsh execution environment created and assigned, id="+nli.driverId);
     			}
     		}
@@ -716,7 +687,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	};
     	
     	final static public void buildBshEnvironmentList(final TaskManagerParms taskMgrParms,
-    			final EnvironmentParms envParms, final CommonUtilities util) {
+    			final EnvironmentParms envParms, final CommonUtilities util, GlobalParameters gp) {
     		if (taskMgrParms.bshExecEnvList.size()>0) {
     			for(int i=0;i<taskMgrParms.bshExecEnvList.size();i++) {
 					deleteBshExecEnvListItem(taskMgrParms,envParms, util,
@@ -727,7 +698,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     		taskMgrParms.bshExecEnvList=new ArrayList<BshExecEnvListItem>();
     		if (taskMgrParms.bshExecEnvCached) {
         		for(int i=0;i<2;i++) {
-    				BshExecEnvListItem nli=createBshExecEnvItem(null, null, null, null, null, null);
+    				BshExecEnvListItem nli=createBshExecEnvItem(null, null, null, null, null, null, gp);
     				taskMgrParms.bshExecEnvList.add(nli);
         		}
     		}
@@ -737,9 +708,9 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	final static private BshExecEnvListItem createBshExecEnvItem(
     			final TaskManagerParms taskMgrParms,
     			final EnvironmentParms envParms, final CommonUtilities util, final TaskResponse tr,
-    			final ActionResponse ar, final TaskActionItem tai) {
+    			final ActionResponse ar, final TaskActionItem tai, GlobalParameters gp) {
     		BshExecEnvListItem nli=new BshExecEnvListItem();
-			nli.driver=new BeanShellDriver(taskMgrParms,envParms,util,tr,ar,tai);
+			nli.driver=new BeanShellDriver(taskMgrParms,envParms,util,tr,ar,tai, gp);
 			nli.interpreter=new Interpreter();
 			nli.driverId=System.currentTimeMillis();
 			try {
@@ -751,14 +722,14 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	};
     	
     	final static public void relBshExecEnvItem(final TaskManagerParms taskMgrParms,
-    			final EnvironmentParms envParms, final CommonUtilities util, final BshExecEnvListItem bsli) {
+    			final EnvironmentParms envParms, final CommonUtilities util, final BshExecEnvListItem bsli, GlobalParameters gp) {
     		synchronized(taskMgrParms.bshExecEnvList) {
     			boolean found=false;
     			for(int i=0;i<taskMgrParms.bshExecEnvList.size();i++) {
     				if (taskMgrParms.bshExecEnvList.get(i).driver.equals(bsli.driver)) {
     					found=true;
-						if (taskMgrParms.bshExecEnvList.size()>envParms.settingMaxBshDriverCount) {
-							if (envParms.settingDebugLevel>=2) 
+						if (taskMgrParms.bshExecEnvList.size()>gp.settingMaxBshDriverCount) {
+							if (gp.settingDebugLevel>=2) 
 								util.addDebugMsg(2,"i","Beanshell environment was removed id="+bsli.driverId);
     						taskMgrParms.bshExecEnvList.remove(bsli);
     						deleteBshExecEnvListItem(taskMgrParms,envParms, util,bsli);
@@ -771,7 +742,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     			if (!found) {
 					deleteBshExecEnvListItem(taskMgrParms,envParms, util,bsli);
     			}
-    			if (envParms.settingDebugLevel>=2) 
+    			if (gp.settingDebugLevel>=2) 
     				util.addDebugMsg(2,"i","Beanshell environment list count="+taskMgrParms.bshExecEnvList.size());
     		}
 //    		Log.v("","bsh count="+taskMgrParms.bshInstanceList.size());
@@ -779,7 +750,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 
 
 		static final public void initTaskMgrParms(EnvironmentParms envParms, 
-        		TaskManagerParms taskMgrParms, Context appContext, CommonUtilities util) {
+        		TaskManagerParms taskMgrParms, Context appContext, CommonUtilities util, GlobalParameters gp) {
     		taskMgrParms.resourceCleanupTime=System.currentTimeMillis()+RESOURCE_CLEANUP_INTERVAL;
      	    taskMgrParms.activeTaskList=TaskManager.buildActiveTaskList();
      	    taskMgrParms.blockActionList=TaskManager.buildBlockActionList();
@@ -792,24 +763,15 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
      	    taskMgrParms.teMsgs.loadString(appContext);
      	    taskMgrParms.svcHandler=new Handler();
 
-     	    taskMgrParms.initKeyguardLock();
-     	    
-     	    loadTrustedList(envParms, taskMgrParms, appContext, util);
-     	    
-     	    buildTaskExecThreadPool(envParms,taskMgrParms,util);
+     	    buildTaskExecThreadPool(envParms,taskMgrParms,util, gp);
      	    
      	    buildTaskCtrlThreadPool(envParms,taskMgrParms,util);
      	    
      	    buildHighTaskCtrlThreadPool(envParms,taskMgrParms,util);
      	    
-     	    buildBshEnvironmentList(taskMgrParms, envParms, util);
+     	    buildBshEnvironmentList(taskMgrParms, envParms, util, gp);
         };
 
-        static final public void loadTrustedList(EnvironmentParms envParms, TaskManagerParms taskMgrParms, Context appContext, CommonUtilities util) {
-        	taskMgrParms.truestedList=CommonUtilities.loadTrustedDeviceList(appContext);
-        	if (taskMgrParms.truestedList==null || taskMgrParms.truestedList.size()==0) envParms.settingScreenKeyguardControlEnabled=false;
-        };
-        
         static final public LinkedList<TaskListItem> buildActiveTaskList() {
         	return new LinkedList<TaskListItem>();
         };
@@ -825,52 +787,52 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         };
     	
     	static final public void scheduleTask(TaskManagerParms taskMgrParms,
-        		EnvironmentParms envParms, CommonUtilities util,TaskListItem patl) {
-			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
-    		if (envParms.settingDebugLevel>=2) util.addDebugMsg(2, "I","Schedule Task entered." ,
+        		EnvironmentParms envParms, CommonUtilities util,TaskListItem patl, final GlobalParameters gp) {
+			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
+    		if (gp.settingDebugLevel>=2) util.addDebugMsg(2, "I","Schedule Task entered." ,
 					" Event=",patl.event_name,
 					", Task=",patl.task_name);
-    		if (taskMgrParms.activeTaskList.size()<envParms.settingMaxTaskCount) {
-    			startTask(taskMgrParms,envParms,util,patl);
+    		if (taskMgrParms.activeTaskList.size()<gp.settingMaxTaskCount) {
+    			startTask(taskMgrParms,envParms,util,patl, gp);
 	        	addTaskHistoryListItem(taskMgrParms,envParms,util,
 	            		patl.task_start_time,patl.group_name,patl.event_name,patl.task_name,
-	    				TaskHistoryItem.TASK_HISTORY_TASK_STATUS_STARTED);
+	    				TaskHistoryItem.TASK_HISTORY_TASK_STATUS_STARTED, gp);
     		} else {
     			envParms.statsMaxTaskReacheCount++;
     			taskMgrParms.taskQueueList.add(patl);
     			String create_time=StringUtil.convDateTimeTo_HourMinSecMili(System.currentTimeMillis());
 	        	addTaskHistoryListItem(taskMgrParms,envParms,util,
 	            		create_time,patl.group_name,patl.event_name,patl.task_name,
-	    				TaskHistoryItem.TASK_HISTORY_TASK_STATUS_QUEUED);
+	    				TaskHistoryItem.TASK_HISTORY_TASK_STATUS_QUEUED, gp);
 				util.addLogMsg("W", "Reached the max concurrent task count(",
-						String.valueOf(envParms.settingMaxTaskCount), "), Task start was deleayed.",
+						String.valueOf(gp.settingMaxTaskCount), "), Task start was deleayed.",
     					" Group=", patl.group_name, ", Task="+patl.task_name,
     					", TaskQueue=", String.valueOf(taskMgrParms.taskQueueList.size()));
     		}
-			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
         };
 
         static final public void rescheduleTask(final TaskManagerParms taskMgrParms,
-        		final EnvironmentParms envParms, final CommonUtilities util) {
+        		final EnvironmentParms envParms, final CommonUtilities util, final GlobalParameters gp) {
         	if (taskMgrParms.taskQueueList.size()==0) return;
         	Runnable r=new Runnable(){
         		@Override
         		public void run() {
 //       			TaskListItem atli;
-    				acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
-    	        	while (taskMgrParms.activeTaskList.size()<envParms.settingMaxTaskCount) {
+    				acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
+    	        	while (taskMgrParms.activeTaskList.size()<gp.settingMaxTaskCount) {
     	    			if (taskMgrParms.taskQueueList.size()!=0){
     	    				TaskListItem qtli=taskMgrParms.taskQueueList.get(0);
-    	    				startTask(taskMgrParms,envParms,util,qtli);
+    	    				startTask(taskMgrParms,envParms,util,qtli, gp);
     	    				taskMgrParms.taskQueueList.remove(0);
             	        	updateTaskHistoryListItem(taskMgrParms,envParms,util,
             	        			qtli.task_start_time,qtli.group_name,qtli.event_name,qtli.task_name,
-            	    				TaskHistoryItem.TASK_HISTORY_TASK_STATUS_STARTED,0,null);
+            	    				TaskHistoryItem.TASK_HISTORY_TASK_STATUS_STARTED,0,null, gp);
     	    			} else {
     	    				break;
     	    			}
     	        	}
-    				relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+    				relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
         		}
         	};
         	taskMgrParms.normalTaskControlThreadPool.execute(r);
@@ -881,11 +843,11 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         };
 
         static final public void startTask(final TaskManagerParms taskMgrParms,
-        		final EnvironmentParms envParms, final CommonUtilities util,TaskListItem task_item) {
-        	if (envParms.settingDebugLevel>=2) util.addDebugMsg(2,"I", "startTask entered, Started Event=",
+        		final EnvironmentParms envParms, final CommonUtilities util,TaskListItem task_item, final GlobalParameters gp) {
+        	if (gp.settingDebugLevel>=2) util.addDebugMsg(2,"I", "startTask entered, Started Event=",
         			task_item.event_name, ", Task=", task_item.task_name);
-        	if (envParms.settingDebugLevel>=2) {
-        		boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+        	if (gp.settingDebugLevel>=2) {
+        		boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
             	if (!lh) util.addLogMsg("E","startTask Task_Control Write lock was not held");
         	}
         	
@@ -894,20 +856,15 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         	tr.active_thread_ctrl=new ThreadCtrl();
         	tr.active_thread_ctrl.setThreadResultSuccess();
         	tr.active_thread_ctrl.setEnabled();
-        	final TaskExecutor tet=new TaskExecutor(tr, taskMgrParms, task_item, envParms) ;
+        	final TaskExecutor tet=new TaskExecutor(tr, taskMgrParms, task_item, envParms, gp) ;
         	addActiveTaskListItem(taskMgrParms,
-            		envParms, util, task_item, tr.active_thread_ctrl);
-//			util.addDebugMsg(1, "I", "startTask threadPool ActiveTaskCount="+taskMgrParms.taskThreadPoolExecutor.getActiveCount()+
-//					", Queue size="+taskMgrParms.taskThreadPoolExecutor.getQueue().size()+
-//					", Task count="+taskMgrParms.taskThreadPoolExecutor.getTaskCount()+
-//					", Pool size="+taskMgrParms.taskThreadPoolExecutor.getPoolSize());
-//        	if (taskMgrParms.taskThreadPoolExecutor.getActiveCount()>=THREAD_POOL_SIZE) startTaskOutsideThreadPool(taskMgrParms,envParms, util,tet);
-        	if (taskMgrParms.taskExecutorThreadPool.getActiveCount()<=envParms.settingTaskExecThreadPoolCount) 
+            		envParms, util, task_item, tr.active_thread_ctrl, gp);
+        	if (taskMgrParms.taskExecutorThreadPool.getActiveCount()<=gp.settingTaskExecThreadPoolCount)
         		taskMgrParms.taskExecutorThreadPool.execute(tet);
         	else startTaskOutsideThreadPool(taskMgrParms,envParms,util,tet);
         	
-			showNotification(taskMgrParms,envParms,util);
-        	if (envParms.settingDebugLevel>=2) util.addDebugMsg(2,"I", "startTask exit, Current period high task count=",String.valueOf(envParms.statsHighTaskCountThisPeriod),
+//			showNotification(taskMgrParms,envParms,util, gp);
+        	if (gp.settingDebugLevel>=2) util.addDebugMsg(2,"I", "startTask exit, Current period high task count=",String.valueOf(envParms.statsHighTaskCountThisPeriod),
         			", Number of high task count=", String.valueOf(envParms.statsHighTaskCountWoMaxTask),
         			", Number of Max Tasks reached=", String.valueOf(envParms.statsMaxTaskReacheCount));
         };
@@ -930,12 +887,12 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         
         static final public void cancelSpecificTask(TaskManagerParms taskMgrParms,
 		        		EnvironmentParms envParms, CommonUtilities util,
-		        		String grp, String task_name) {
-        	if (envParms.settingDebugLevel>=2) util.addDebugMsg(2,"I", 
+		        		String grp, String task_name, GlobalParameters gp) {
+        	if (gp.settingDebugLevel>=2) util.addDebugMsg(2,"I", 
         			"cancelSpecifiTask entered, cnt=", envParms.statsActiveTaskCountString,
         			", group=", grp, ", task=", task_name);
-        	if (envParms.settingDebugLevel>=2) {
-        		boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+        	if (gp.settingDebugLevel>=2) {
+        		boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
             	if (!lh) util.addLogMsg("E","cancelSpecificTask Task_Control Write lock was not held");
         	}
     		int atsz=taskMgrParms.activeTaskList.size();
@@ -954,7 +911,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
             		TaskListItem tqti=taskMgrParms.taskQueueList.get(i);
             		if (tqti.group_name.equals(grp) && tqti.task_name.equals(task_name)) {
             			cancelQueuedTask(taskMgrParms, envParms, util, i, 
-            					tqti.group_name,tqti.event_name,tqti.task_name);                		
+            					tqti.group_name,tqti.event_name,tqti.task_name, gp);
             		}
         		}
         	}
@@ -963,23 +920,23 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 
         static final private void cancelQueuedTask(TaskManagerParms taskMgrParms,
         		EnvironmentParms envParms, CommonUtilities util,int del_pos,
-        		String grp, String event, String task ) {
+        		String grp, String event, String task , GlobalParameters gp) {
 			taskMgrParms.taskQueueList.remove(del_pos);
     		String c_time=StringUtil.convDateTimeTo_HourMinSecMili(System.currentTimeMillis());
     		updateTaskHistoryListItem(taskMgrParms,envParms,util,
     				c_time, grp, event, task,
-					TaskHistoryItem.TASK_HISTORY_TASK_STATUS_ENDED,TaskResponse.RESP_CODE_CANCELLED,null);
+					TaskHistoryItem.TASK_HISTORY_TASK_STATUS_ENDED,TaskResponse.RESP_CODE_CANCELLED,null, gp);
     		TaskManager.callBackToActivity(taskMgrParms,envParms,util,
 					c_time,NTFY_TO_ACTV_TASK_ENDED,null, grp, task, null, null,
-					TaskResponse.RESP_CODE_CANCELLED,"Cancelled");
+					TaskResponse.RESP_CODE_CANCELLED,"Cancelled", gp);
 			util.addLogMsg("I", "Queued task was cancelled",", Group=", grp, ", Task=", task);
         	
         };
         
         static final public void cancelTaskByEventId(TaskManagerParms taskMgrParms,
-        		EnvironmentParms envParms, CommonUtilities util, TaskResponse tr) {
-        	if (envParms.settingDebugLevel>=2) {
-            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+        		EnvironmentParms envParms, CommonUtilities util, TaskResponse tr, GlobalParameters gp) {
+        	if (gp.settingDebugLevel>=2) {
+            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
             	if (!lh) util.addLogMsg("E","cancelTaskByEventId Task_Control Write lock was not held");
         	}
     		int atsz=taskMgrParms.activeTaskList.size();
@@ -1001,18 +958,18 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
             		if (tqti.group_name.equals(tr.active_group_name) && 
             				tqti.event_name.equals(tr.cmd_tgt_event_name)) {
             			cancelQueuedTask(taskMgrParms, envParms, util, i, 
-            					tqti.group_name,tqti.event_name,tqti.task_name);                		
+            					tqti.group_name,tqti.event_name,tqti.task_name, gp);
             		}
         		}
         	}
     	};
 
     	static final public void cancelAllActiveTask(TaskManagerParms taskMgrParms,
-		        		EnvironmentParms envParms, CommonUtilities util) {
-    		if (envParms.settingDebugLevel>=2) util.addDebugMsg(2,"I", 
+		        		EnvironmentParms envParms, CommonUtilities util, GlobalParameters gp) {
+    		if (gp.settingDebugLevel>=2) util.addDebugMsg(2,"I", 
         		"cancelAllActiveTask entered, cnt=",envParms.statsActiveTaskCountString);
-        	if (envParms.settingDebugLevel>=2) {
-            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+        	if (gp.settingDebugLevel>=2) {
+            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
             	if (!lh) util.addLogMsg("E","cancelAllActiveTask Task_Control Write lock was not held");
         	}
     		int atsz=taskMgrParms.activeTaskList.size();
@@ -1032,7 +989,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         		for (int i=tqsz-1;i>=0;i--) {
             		TaskListItem tqti=taskMgrParms.taskQueueList.get(i);
         			cancelQueuedTask(taskMgrParms, envParms, util, i, 
-        					tqti.group_name,tqti.event_name,tqti.task_name);                		
+        					tqti.group_name,tqti.event_name,tqti.task_name, gp);
         		}
         	}
             return ;
@@ -1062,9 +1019,9 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 
 		static final public String isEventIsBlocked(TaskManagerParms taskMgrParms,
 				EnvironmentParms envParms, CommonUtilities util,
-				String grp,String event) {
+				String grp,String event, GlobalParameters gp) {
 			String btn=null;
-    		acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms,util);
+    		acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms,util, gp);
 			int alsz=taskMgrParms.blockActionList.size();
 			if (alsz!=0) {
 				BlockActionItem bai=null;
@@ -1079,16 +1036,16 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 	        		}
 	        	}
 			}
-			if (envParms.settingDebugLevel>=2) util.addDebugMsg(2, "I", "checkBlockedEvent result=",btn,
+			if (gp.settingDebugLevel>=2) util.addDebugMsg(2, "I", "checkBlockedEvent result=",btn,
 					", group=", grp, ", event=", event);
-    		relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms,util);
+    		relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms,util, gp);
 			return btn;
 		};
 
 		static final public void addBlockActionListItem(TaskManagerParms taskMgrParms,
-    		EnvironmentParms envParms, CommonUtilities util, TaskResponse tr) {
-        	if (envParms.settingDebugLevel>=2) {
-            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+    		EnvironmentParms envParms, CommonUtilities util, TaskResponse tr, GlobalParameters gp) {
+        	if (gp.settingDebugLevel>=2) {
+            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
             	if (!lh) util.addLogMsg("E","addBlockActionListItem Task_Control Write lock was not held");
         	}
     		BlockActionItem bal=new BlockActionItem();
@@ -1099,9 +1056,9 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     	};
 
     	static final public void removeBlockActionListItem(TaskManagerParms taskMgrParms,
-			EnvironmentParms envParms, CommonUtilities util, String grp,String task_name) {
-        	if (envParms.settingDebugLevel>=2) {
-            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			EnvironmentParms envParms, CommonUtilities util, String grp,String task_name, GlobalParameters gp) {
+        	if (gp.settingDebugLevel>=2) {
+            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
             	if (!lh) util.addLogMsg("E","removeBlockActionListItem Task_Control Write lock was not held");
         	}
 			int balsz=taskMgrParms.blockActionList.size()-1;
@@ -1114,9 +1071,9 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 		};
 
 		static final public void clearBlockActionList(TaskManagerParms taskMgrParms,
-				EnvironmentParms envParms, CommonUtilities util) {
-        	if (envParms.settingDebugLevel>=2) {
-            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+				EnvironmentParms envParms, CommonUtilities util, GlobalParameters gp) {
+        	if (gp.settingDebugLevel>=2) {
+            	boolean lh=isLockHeld(TaskManager.LOCK_ID_TASK_CONTROL,TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
             	if (!lh) util.addLogMsg("E","clearBlockActionList Task_Control Write lock was not held");
         	}
     		taskMgrParms.blockActionList.clear();
@@ -1124,8 +1081,8 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 		
 		static final public void addActiveTaskListItem(TaskManagerParms taskMgrParms,
         		EnvironmentParms envParms, CommonUtilities util, TaskListItem task_item,
-        		ThreadCtrl tc) {
-			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+        		ThreadCtrl tc, GlobalParameters gp) {
+			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
 	    	task_item.task_ctrl_tc=tc;
 	    	task_item.task_start_time=StringUtil.convDateTimeTo_HourMinSecMili(System.currentTimeMillis());
 	    	taskMgrParms.activeTaskList.add(task_item);
@@ -1133,14 +1090,14 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 	    	envParms.statsActiveTaskCountString=String.valueOf(envParms.statsActiveTaskCount);
 	    	if (envParms.statsHighTaskCountThisPeriod<envParms.statsActiveTaskCount)
 	    		envParms.statsHighTaskCountThisPeriod=envParms.statsActiveTaskCount;
-			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
 		};
 
 		static final public TaskListItem removeActiveTaskListItem(TaskManagerParms taskMgrParms,
 		        		EnvironmentParms envParms, CommonUtilities util,
-		        		String grp,String task_name) {
+		        		String grp,String task_name, GlobalParameters gp) {
         	TaskListItem ati=null;
-			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
     		int atsz=taskMgrParms.activeTaskList.size();
     		for (int atl_idx=0;atl_idx<atsz;atl_idx++) {
     			ati=taskMgrParms.activeTaskList.get(atl_idx);
@@ -1149,21 +1106,21 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         			envParms.statsActiveTaskCount=taskMgrParms.activeTaskList.size();
         			envParms.statsActiveTaskCountString=String.valueOf(envParms.statsActiveTaskCount);
             		if (envParms.statsActiveTaskCount==0) {
-            			clearBlockActionList(taskMgrParms,envParms,util);
+            			clearBlockActionList(taskMgrParms,envParms,util, gp);
             		} else {
-            			removeBlockActionListItem(taskMgrParms, envParms, util, grp, task_name);
+            			removeBlockActionListItem(taskMgrParms, envParms, util, grp, task_name, gp);
             		}
     				break;
     			} else ati=null;
     		}
-			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
     		return ati;
         };
 
         static final public TaskListItem getActiveTaskListItem(TaskManagerParms taskMgrParms,
 				EnvironmentParms envParms, CommonUtilities util,
-				String grp, String task) {
-			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util);
+				String grp, String task, GlobalParameters gp) {
+			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util, gp);
 			int atsz=taskMgrParms.activeTaskList.size();
 			TaskListItem ati=null;
 			for (int i=0;i<atsz;i++) {
@@ -1172,13 +1129,13 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 					break;
 				} else ati=null;
 			}
-			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util, gp);
 			return ati;
 		};
         static final public TaskListItem getTaskQueueListItem(TaskManagerParms taskMgrParms,
 				EnvironmentParms envParms, CommonUtilities util,
-				String grp, String task) {
-			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util);
+				String grp, String task, GlobalParameters gp) {
+			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util, gp);
 			int atsz=taskMgrParms.taskQueueList.size();
 			TaskListItem ati=null;
 			for (int i=0;i<atsz;i++) {
@@ -1187,15 +1144,15 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 					break;
 				} else ati=null;
 			}
-			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util, gp);
 			return ati;
 		};
 
 		static final public String[] buildActiveTaskStringArray(TaskManagerParms taskMgrParms,
-		        		EnvironmentParms envParms, CommonUtilities util) {
+		        		EnvironmentParms envParms, CommonUtilities util, GlobalParameters gp) {
     		//event+tab+task+tab+SOUND/NOSOUND+tab+time
     		String[] atsa=null;
-			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util);
+			acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util, gp);
 			StringBuilder sb=new StringBuilder(256);
 			int atlsz=taskMgrParms.activeTaskList.size();
 			int tqsz=taskMgrParms.taskQueueList.size();
@@ -1244,26 +1201,26 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 					lc++;
 				} 
 			}
-			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms, util, gp);
     		return atsa;
     	};
     	
     	static final public void clearTaskHistoryList(TaskManagerParms taskMgrParms,
-        		EnvironmentParms envParms, CommonUtilities util) {
-			acqLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+        		EnvironmentParms envParms, CommonUtilities util, GlobalParameters gp) {
+			acqLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
 			taskMgrParms.taskHistoryList.clear();
 			taskMgrParms.task_history_list_was_updated=true;
-			relLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
         };
 
         static final public void addTaskHistoryListItem(TaskManagerParms taskMgrParms,
         		EnvironmentParms envParms, CommonUtilities util,
         		String add_time, String grp, String event, 
-        		String task, String status) {
+        		String task, String status, GlobalParameters gp) {
 //			util.addDebugMsg(1, "I", "addTaskHistoryListItem entered, ",
 //					", Group=",grp,", Event=",event,", Task=",task,
 //					",Time=",add_time,", Status=",status);
-			acqLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			acqLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
     		TaskHistoryItem thi=new TaskHistoryItem();
     		thi.group_name=grp;
     		thi.event_name=event;
@@ -1275,16 +1232,16 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
         	if (taskMgrParms.taskHistoryList.size()>99) {
         		for (int i=20;i>=0;i--) taskMgrParms.taskHistoryList.remove(0);
         	}
-			relLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
         };
         static final public void updateTaskHistoryListItem(TaskManagerParms taskMgrParms,
         		EnvironmentParms envParms, CommonUtilities util,
         		String upd_time, String grp, String event, 
-        		String task, String status, int resp_cd, String msg) {
+        		String task, String status, int resp_cd, String msg, GlobalParameters gp) {
 //			util.addDebugMsg(1, "I", "updateTaskHistoryListItem entered, ",
 //					", Group=",grp,", Event=",event,", Task=",task,
 //					",Time=",upd_time,", Status=",status,", resp="+resp_cd,", Msg=",msg);
-			acqLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			acqLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
     		int thsz=taskMgrParms.taskHistoryList.size()-1;
     		TaskHistoryItem thli;
     		for (int i=thsz;i>=0;i--) {
@@ -1305,11 +1262,11 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
     				break;
     			}
     		}
-			relLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util);
+			relLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_WRITE,envParms,taskMgrParms, util, gp);
         };
 		final static public String[] buildTaskHistoryStringArray(TaskManagerParms taskMgrParms,
-        		EnvironmentParms envParms, CommonUtilities util) {
-			acqLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms,util);
+        		EnvironmentParms envParms, CommonUtilities util, GlobalParameters gp) {
+			acqLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms,util, gp);
 			if (taskMgrParms.task_history_list_was_updated) {
 				if (taskMgrParms.taskHistoryList.size()==0) {
 					taskMgrParms.task_history_string_array=null;
@@ -1343,7 +1300,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 							String.valueOf(taskMgrParms.taskHistoryList.size()));
 				}
 			}
-			relLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms,util);
+			relLock(TaskManager.LOCK_ID_TASK_HISTORY, TaskManager.LOCK_MODE_READ,envParms,taskMgrParms,util, gp);
 			return taskMgrParms.task_history_string_array;
 		};
     }

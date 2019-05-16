@@ -23,8 +23,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.TaskAutomation.Common.CommonConstants.*;
-import static com.sentaroh.android.TaskAutomation.Config.QuickTaskConstants.*;
+import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
+import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_FLUSH;
+import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_RESET;
+import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_ROTATE;
+import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_SEND;
+import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,14 +36,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -47,40 +47,29 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.ListView;
 
-import com.sentaroh.android.TaskAutomation.Common.BluetoothDeviceListItem;
-import com.sentaroh.android.TaskAutomation.Common.EnvironmentParms;
-import com.sentaroh.android.TaskAutomation.Common.ProfileListItem;
-import com.sentaroh.android.TaskAutomation.Common.TrustDeviceItem;
-import com.sentaroh.android.TaskAutomation.Config.ProfileUtilities;
-import com.sentaroh.android.TaskAutomation.Log.LogFileManagemntListItem;
-import com.sentaroh.android.Utilities.LocalMountPoint;
-import com.sentaroh.android.Utilities.MiscUtil;
-import com.sentaroh.android.Utilities.StringUtil;
-import com.sentaroh.android.Utilities.ZipUtil;
+import com.sentaroh.android.TaskAutomation.Log.LogUtil;
 
 public final class CommonUtilities {
-	private boolean DEBUG_ENABLE=true;
-
 //	private SimpleDateFormat sdfTimeHHMM = new SimpleDateFormat("HH:mm");
 	
 	private Context mContext=null;
 
-	private String mLogIdent="";
-	
    	private EnvironmentParms envParms=null;
-	
-	public CommonUtilities(Context c, String li, EnvironmentParms ep) {
+
+   	private GlobalParameters mGp=null;
+
+   	private String mLogId="";
+
+	public CommonUtilities(Context c, String li, EnvironmentParms ep, GlobalParameters gp) {
 		mContext=c;// ContextはApplicationContext
-		setLogId(li);
+        mGp=gp;
+        mLogId=(li+"                 ").substring(0,16)+" ";
 		envParms=ep;
-        if (envParms.settingDebugLevel==0) DEBUG_ENABLE=false;
-        else DEBUG_ENABLE=true;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -97,33 +86,35 @@ public final class CommonUtilities {
         		Context.MODE_PRIVATE|Context.MODE_MULTI_PROCESS);
     }
 
-	final public void setLogId(String li) {
-		mLogIdent=(li+"                 ").substring(0,16)+" ";
-	};
-	
-	final public void resetLogReceiver() {
-		Intent intent = new Intent(BROADCAST_LOG_RESET);
-		mContext.sendOrderedBroadcast(intent,null);
+	static final public void resetLogReceiver(Context c) {
+        Intent in=new Intent(c, LogReceiver.class);
+        in.setAction(BROADCAST_LOG_RESET);
+        c.sendBroadcast(in);
+    };
+
+	static final public void flushLog(Context c, GlobalParameters mGp) {
+        Intent in=new Intent(c, LogReceiver.class);
+        in.setAction(BROADCAST_LOG_FLUSH);
+        c.sendBroadcast(in);
+        LogUtil.flushLog(c, mGp);
 	};
 
-	final public void flushLog() {
-		Intent intent = new Intent(BROADCAST_LOG_FLUSH);
-		mContext.sendOrderedBroadcast(intent,null);
-	};
+	static final public void rotateLogFile(Context c) {
+        Intent in=new Intent(c, LogReceiver.class);
+        in.setAction(BROADCAST_LOG_ROTATE);
+        c.sendBroadcast(in);
 
-	final public void rotateLogFile() {
-		Intent intent = new Intent(BROADCAST_LOG_ROTATE);
-		mContext.sendOrderedBroadcast(intent,null);
-	};
+    };
 
 	final public void reBuildTaskExecList() {
-		if (DEBUG_ENABLE) addDebugMsg(2, "I", "reBuildTaskExecList entered");
-		Intent intent = new Intent(BROADCAST_BUILD_TASK_LIST);
-		mContext.sendBroadcast(intent);
+        if (mGp.settingDebugLevel==2)  addDebugMsg(2, "I", "reBuildTaskExecList entered");
+        Intent intent = new Intent(mContext, SchedulerService.class);
+        intent.setAction(BROADCAST_BUILD_TASK_LIST);
+        mContext.startService(intent);
 	};
 
 	final public void startScheduler() {
-		if (DEBUG_ENABLE) addDebugMsg(2, "I", "startScheduler entered");
+        if (mGp.settingDebugLevel==2) addDebugMsg(2, "I", "startScheduler entered");
 //		Intent intent = new Intent(BROADCAST_START_SCHEDULER);
 //		mContext.sendBroadcast(intent);
 		Intent intent = new Intent(mContext, SchedulerService.class);
@@ -131,34 +122,26 @@ public final class CommonUtilities {
 		mContext.startService(intent);
 	};
 
-	final public void reloadSchedulerTrustList() {
-		if (DEBUG_ENABLE) addDebugMsg(2, "I", "reloadSchedulerTrustList entered");
-		reloadSchedulerTrustList(mContext);
-	};
-	final static public void reloadSchedulerTrustList(Context c) {
-		Intent intent = new Intent(c, SchedulerService.class);
-		intent.setAction(BROADCAST_LOAD_TRUST_LIST);
-		c.startService(intent);
-	};
-
 	final public void resetScheduler() {
-		if (DEBUG_ENABLE) addDebugMsg(2, "I", "resetScheduler entered");
+        if (mGp.settingDebugLevel==2) addDebugMsg(2, "I", "resetScheduler entered");
 		resetScheduler(mContext);
 	};
 
 	final static public void resetScheduler(Context c) {
-		Intent intent = new Intent(BROADCAST_RESET_SCHEDULER);
-		c.sendBroadcast(intent);
+        Intent intent = new Intent(c, SchedulerService.class);
+        intent.setAction(BROADCAST_RESET_SCHEDULER);
+        c.startService(intent);
 	};
 
 	final public void restartScheduler() {
-		if (DEBUG_ENABLE) addDebugMsg(2, "I", "restartScheduler entered");
+        if (mGp.settingDebugLevel==2)addDebugMsg(2, "I", "restartScheduler entered");
 		restartScheduler(mContext);
 	};
 
 	final static public void restartScheduler(Context c) {
-		Intent intent = new Intent(BROADCAST_RESTART_SCHEDULER);
-		c.sendBroadcast(intent);
+        Intent intent = new Intent(c, SchedulerService.class);
+		intent.setAction(BROADCAST_RESTART_SCHEDULER);
+		c.startService(intent);
 	};
 
     final public static boolean isNetworkConnected(Context context){
@@ -172,13 +155,13 @@ public final class CommonUtilities {
 	
 	final public void putSavedBluetoothConnectedDeviceList(ArrayList<BluetoothDeviceListItem> bdcl) {
 		putSavedBluetoothConnectedDeviceList(mContext,bdcl);
-    	if (DEBUG_ENABLE) 
+        if (mGp.settingDebugLevel==2)
     		addDebugMsg(2, "I", "Bluetooth Connected Device list was saved, count="+bdcl.size());
 	};
 	
 	final public void clearSavedBluetoothConnectedDeviceList() {
 		putSavedBluetoothConnectedDeviceList(mContext, null);
-    	if (DEBUG_ENABLE) 
+        if (mGp.settingDebugLevel==2)
     		addDebugMsg(2, "I", "Bluetooth Connected Device list was cleared");
 	};
 	final static public void clearSavedBluetoothConnectedDeviceList(Context c) {
@@ -202,7 +185,7 @@ public final class CommonUtilities {
 
 	final public ArrayList<BluetoothDeviceListItem> loadSavedBluetoothConnectedDeviceList() {
 		ArrayList<BluetoothDeviceListItem> bdcl=loadSavedBluetoothConnectedDeviceListAddr(mContext);
-    	if (DEBUG_ENABLE) 
+        if (mGp.settingDebugLevel==2)
     		addDebugMsg(2, "I", "Bluetooth Connected Device list was loaded, count="+bdcl.size());
 		return bdcl;
 	};
@@ -267,7 +250,7 @@ public final class CommonUtilities {
         SensorManager sm = (SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = sm.getSensorList(Sensor.TYPE_PROXIMITY);
         for(Sensor sensor: sensors) {
-           	if (DEBUG_ENABLE) addDebugMsg(2,"I", "Proximity sensor list size="+sensors.size()+
+            if (mGp.settingDebugLevel==2) addDebugMsg(2,"I", "Proximity sensor list size="+sensors.size()+
            			", type="+sensor.getType()+", vendor="+sensor.getVendor()+
         			", ver="+sensor.getVersion());
         	if (sensor.getType()==Sensor.TYPE_PROXIMITY) {
@@ -276,9 +259,9 @@ public final class CommonUtilities {
             }
         }
         if (result!=null) {
-        	if (DEBUG_ENABLE) addDebugMsg(2,"I", "Proximity sensor is available, name="+result.getName()+", vendor="+result.getVendor()+", version="+result.getVersion());
+            if (mGp.settingDebugLevel==2)addDebugMsg(2,"I", "Proximity sensor is available, name="+result.getName()+", vendor="+result.getVendor()+", version="+result.getVersion());
         } else {
-        	if (DEBUG_ENABLE) addDebugMsg(2,"I", "Proximity sensor is not available");
+            if (mGp.settingDebugLevel==2)addDebugMsg(2,"I", "Proximity sensor is not available");
         }
         return result;
     };
@@ -288,11 +271,11 @@ public final class CommonUtilities {
 	    final SensorManager sm = (SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors_list = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
         for(Sensor sensor: sensors_list) {
-           	if (DEBUG_ENABLE) addDebugMsg(2,"I", "Accelerometer sensor list size="+sensors_list.size()+
+            if (mGp.settingDebugLevel==2) addDebugMsg(2,"I", "Accelerometer sensor list size="+sensors_list.size()+
            			", type="+sensor.getType()+", vendor="+sensor.getVendor()+
         			", ver="+sensor.getVersion());
         	if (sensor.getType()==Sensor.TYPE_ACCELEROMETER) {
-        		if (DEBUG_ENABLE) addDebugMsg(2, "I", "Accelerometer sensor is available, name="+sensor.getName()+", vendor="+sensor.getVendor()+", version="+sensor.getVersion());
+                if (mGp.settingDebugLevel==2) addDebugMsg(2, "I", "Accelerometer sensor is available, name="+sensor.getName()+", vendor="+sensor.getVendor()+", version="+sensor.getVersion());
         		result=sensor;
             }
         }
@@ -304,11 +287,11 @@ public final class CommonUtilities {
 	    final SensorManager sm = (SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors_list = sm.getSensorList(Sensor.TYPE_LIGHT);
         for(Sensor sensor: sensors_list) {
-           	if (DEBUG_ENABLE) addDebugMsg(2,"I", "Light sensor list size="+sensors_list.size()+
+            if (mGp.settingDebugLevel==2) addDebugMsg(2,"I", "Light sensor list size="+sensors_list.size()+
            			", type="+sensor.getType()+", vendor="+sensor.getVendor()+
         			", ver="+sensor.getVersion());
         	if (sensor.getType()==Sensor.TYPE_LIGHT) {
-        		if (DEBUG_ENABLE) addDebugMsg(2, "I", "Light sensor is available, name="+sensor.getName()+", vendor="+sensor.getVendor()+", version="+sensor.getVersion());
+                if (mGp.settingDebugLevel==2) addDebugMsg(2, "I", "Light sensor is available, name="+sensor.getName()+", vendor="+sensor.getVendor()+", version="+sensor.getVersion());
         		result=sensor;
             }
         }
@@ -320,29 +303,17 @@ public final class CommonUtilities {
 	    final SensorManager sm = (SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensor_list = sm.getSensorList(Sensor.TYPE_MAGNETIC_FIELD);
         for(Sensor sensor: sensor_list) {
-           	if (DEBUG_ENABLE) addDebugMsg(2,"I", "Magnetic-field sensor list size="+sensor_list.size()+
+            if (mGp.settingDebugLevel==2) addDebugMsg(2,"I", "Magnetic-field sensor list size="+sensor_list.size()+
            			", type="+sensor.getType()+", vendor="+sensor.getVendor()+
         			", ver="+sensor.getVersion());
         	if (sensor.getType()==Sensor.TYPE_MAGNETIC_FIELD) {
-        		if (DEBUG_ENABLE) addDebugMsg(2, "I", "Magnetic-field sensor is available, name="+sensor.getName()+", vendor="+sensor.getVendor()+", version="+sensor.getVersion());
+                if (mGp.settingDebugLevel==2) addDebugMsg(2, "I", "Magnetic-field sensor is available, name="+sensor.getName()+", vendor="+sensor.getVendor()+", version="+sensor.getVersion());
         		result=sensor;
             }
         }
         return result;
 	};
 
-	final public boolean screenLockNow() {
-		boolean result=false;
-        DevicePolicyManager dpm = 
-        		(DevicePolicyManager)mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        ComponentName darcn = new ComponentName(mContext, DevAdmReceiver.class);
-        if (dpm.isAdminActive(darcn)) {
-        	dpm.lockNow();
-        	result=true;
-        } else result=false;
-        return result;
-	};
-	
 	@SuppressWarnings("deprecation")
 	final public boolean isTelephonyAvailable() {
 		boolean result=false;
@@ -365,7 +336,7 @@ public final class CommonUtilities {
 	
 	final public boolean isKeyguardEffective() {
     	boolean result=isKeyguardEffective(mContext);
-    	if (DEBUG_ENABLE) addDebugMsg(2, "I", "isKeyguardEffective result="+result);
+        if (mGp.settingDebugLevel==2) addDebugMsg(2, "I", "isKeyguardEffective result="+result);
     	return result;
     };
 
@@ -392,39 +363,6 @@ public final class CommonUtilities {
 	        return pm.isScreenOn();
 	    }
 	}
-
-    final public static ArrayList<TrustDeviceItem> loadTrustedDeviceList(Context c) {
-    	ArrayList<TrustDeviceItem> tl=new ArrayList<TrustDeviceItem>();
-    	SharedPreferences prefs=getPrefMgr(c);
-    	String tl_data=prefs.getString(PREFS_TRUST_LIST_KEY, "");
-    	if (tl_data!=null && !tl_data.equals("")) {
-    		String[] tl_data_array=tl_data.split("\n");
-    		for(int i=0;i<tl_data_array.length;i++) {
-    			String[] tl_item_array=tl_data_array[i].split("\t");
-    			TrustDeviceItem tl_item=new TrustDeviceItem();
-    			if (tl_item_array.length>=3 && tl_item_array[0]!=null && 
-    					(tl_item_array[0].equals("0") || tl_item_array[0].equals("1")) ) {
-        			tl_item.trustedItemType=Integer.parseInt(tl_item_array[0]);
-        			if (tl_item_array[1]!=null) tl_item.trustedItemName=tl_item_array[1];
-        			if (tl_item_array[2]!=null) tl_item.trustedItemAddr=tl_item_array[2];
-        			tl.add(tl_item);
-    			}
-    		}
-    	}
-    	return tl;
-    };
-
-    final public static void saveTrustedDeviceList(Context c, ArrayList<TrustDeviceItem> tl) {
-    	SharedPreferences prefs=getPrefMgr(c);
-    	String tl_data="";
-    	String sep="";
-    	for(int i=0;i<tl.size();i++) {
-    		String tl_item=tl.get(i).trustedItemType+"\t"+tl.get(i).trustedItemName+"\t"+tl.get(i).trustedItemAddr+"\t";
-    		tl_data+=sep+tl_item;
-    		sep="\n";
-    	}
-    	prefs.edit().putString(PREFS_TRUST_LIST_KEY, tl_data).commit();
-    };
 
 	final public String saveProfileToFileByService(ArrayList<ProfileListItem> prof_list) {
 //		AdapterProfileList pfl = new AdapterProfileList(mContext, 
@@ -619,172 +557,72 @@ public final class CommonUtilities {
 		saveSettingsParmsToFileString(pref,group,  pw, "0",  mContext.getString(R.string.settings_main_light_sensor_ignore_time));
 
 		saveSettingsParmsToFileBoolean(pref,group, pw, false,mContext.getString(R.string.settings_main_exit_clean));
-		
-		saveSettingsParmsToFileString(pref,group, pw, "", PREFS_TRUST_LIST_KEY);
 	};
 
     final public void deleteLogFile() {
-		Intent intent = new Intent(BROADCAST_LOG_DELETE);
-		mContext.sendOrderedBroadcast(intent,null);
+        LogUtil.deleteLogFile(mContext, mGp);
 	};
 
 	final public void addLogMsg(String cat, String... msg) {
-		if (envParms.settingDebugLevel>0 || envParms.settingLogOption || cat.equals("E")) {
-			addLogMsg(envParms, mContext, mLogIdent, cat, msg);
-		}
+		if (mGp.settingDebugLevel>0 || mGp.settingLogOption || cat.equals("E")) {
+		    Intent in=new Intent(mContext, LogReceiver.class);
+		    in.setAction(BROADCAST_LOG_SEND);
+		    in.putExtra("TYPE","M");
+		    in.putExtra("ID", mLogId);
+		    in.putExtra("CAT",cat);
+		    String log_msg="";
+            if (msg!=null) {
+                for (String item:msg) {
+                    if (item!=null) log_msg+=item;
+                }
+            }
+//            Log.v("TaskAutomation","length="+msg.length+", "+log_msg);
+            in.putExtra("MSG",log_msg);
+            mContext.sendBroadcast(in);
+ 		}
 	};
 	final public void addDebugMsg(int lvl, String cat, String... msg) {
-		if (envParms.settingDebugLevel>=lvl ) {
-			addDebugMsg(envParms, mContext, mLogIdent, lvl, cat, msg);
-		}
-	};
-
-	final static private void addLogMsg(EnvironmentParms envParms,
-			Context context, String log_id, String cat, String... msg) {
-			StringBuilder log_msg=new StringBuilder(512);
-			for (int i=0;i<msg.length;i++) log_msg.append(msg[i]);
-			if (envParms.settingLogOption) {
-				Intent intent = new Intent(BROADCAST_LOG_SEND);
-				StringBuilder print_msg=new StringBuilder("M ")
-				.append(cat)
-				.append(" ")
-				.append(StringUtil.convDateTimeTo_YearMonthDayHourMinSecMili(System.currentTimeMillis()))
-				.append(" ")
-				.append(log_id)
-				.append(log_msg.toString());
-				intent.putExtra("LOG", print_msg.toString());
-				context.sendOrderedBroadcast(intent,null);
-			}
-			Log.v(APPLICATION_TAG,cat+" "+log_id+log_msg.toString());
-	};
-
-	final static private void addDebugMsg(EnvironmentParms envParms,
-			Context context, String log_id, int lvl, String cat, String... msg) {
-			StringBuilder print_msg=new StringBuilder("D ");
-			print_msg.append(cat);
-			StringBuilder log_msg=new StringBuilder(512);
-			for (int i=0;i<msg.length;i++) log_msg.append(msg[i]);
-			if (envParms.settingLogOption) {
-				Intent intent = new Intent(BROADCAST_LOG_SEND);
-				print_msg.append(" ")
-				.append(StringUtil.convDateTimeTo_YearMonthDayHourMinSecMili(System.currentTimeMillis()))
-				.append(" ")
-				.append(log_id)
-				.append(log_msg.toString());
-				intent.putExtra("LOG", print_msg.toString());
-				context.sendOrderedBroadcast(intent,null);
-			}
-			Log.v(APPLICATION_TAG,cat+" "+log_id+log_msg.toString());
+		if (mGp.settingDebugLevel>=lvl ) {
+            Intent in=new Intent(mContext, LogReceiver.class);
+            in.setAction(BROADCAST_LOG_SEND);
+            in.putExtra("TYPE","D");
+            in.putExtra("ID", mLogId);
+            in.putExtra("CAT",cat);
+            String log_msg="";
+            if (msg!=null) {
+                for (String item:msg) {
+                    if (item!=null) log_msg+=item;
+                }
+            }
+//            Log.v("TaskAutomation","length="+msg.length+", "+log_msg);
+            in.putExtra("MSG",log_msg);
+            mContext.sendBroadcast(in);
+ 		}
 	};
 
 	final public boolean isLogFileExists() {
-		boolean result = false;
-		File lf = new File(getLogFilePath());
-		result=lf.exists();
-		if (envParms.settingDebugLevel>=3) addDebugMsg(3,"I","Log file exists="+result);
+	    boolean result = LogUtil.isLogFileExists(mGp);
+		if (mGp.settingDebugLevel>=3) addDebugMsg(3,"I","Log file exists="+result);
 		return result;
 	};
 
 	final public boolean getSettingsLogOption() {
 		boolean result = false;
 		result=getPrefMgr().getBoolean(mContext.getString(R.string.settings_main_log_option), false);
-		if (envParms.settingDebugLevel>=3) addDebugMsg(3,"I","LogOption="+result);
+		if (mGp.settingDebugLevel>=3) addDebugMsg(3,"I","LogOption="+result);
 		return result;
 	};
 
 	final public boolean setSettingsLogOption(boolean enabled) {
 		boolean result = false;
 		getPrefMgr().edit().putBoolean(mContext.getString(R.string.settings_main_log_option), enabled).commit();
-		if (envParms.settingDebugLevel>=3) addDebugMsg(3,"I","setLLogOption="+result);
+		if (mGp.settingDebugLevel>=3) addDebugMsg(3,"I","setLLogOption="+result);
 		return result;
 	};
 
 	final public String getLogFilePath() {
-		return envParms.settingLogMsgDir+envParms.settingLogMsgFilename;
+	    return LogUtil.getLogFilePath(mGp);
 	};
 	
-	final public void sendLogFileToDeveloper(String log_file_path) {
-		resetLogReceiver();
-		
-		String zip_file_name=envParms.settingLogMsgDir+"log.zip";
-		
-		File lf=new File(zip_file_name);
-		lf.delete();
-		
-//		createZipFile(zip_file_name,log_file_path);
-		String[] lmp=LocalMountPoint.convertFilePathToMountpointFormat(mContext, log_file_path);
-		ZipUtil.createZipFile(mContext, null, null, zip_file_name, lmp[0], log_file_path);
-		
-	    Intent intent=new Intent();
-	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	    intent.setAction(Intent.ACTION_SEND);  
-//	    intent.setType("message/rfc822");  
-//	    intent.setType("text/plain");
-	    intent.setType("application/zip");
-	      
-	    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"gm.developer.fhoshino@gmail.com"});  
-//		    intent.putExtra(Intent.EXTRA_CC, new String[]{"cc@example.com"});  
-//		    intent.putExtra(Intent.EXTRA_BCC, new String[]{"bcc@example.com"});  
-	    intent.putExtra(Intent.EXTRA_SUBJECT, "TaskAutomation log file");  
-	    intent.putExtra(Intent.EXTRA_TEXT, "Any comment");
-	    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(lf)); 
-	    mContext.startActivity(intent);
-	};
-	
-    final static public ArrayList<LogFileManagemntListItem> createLogFileList(EnvironmentParms envParms) {
-    	ArrayList<LogFileManagemntListItem> lfm_fl=new ArrayList<LogFileManagemntListItem>();
-    	
-    	File lf=new File(envParms.settingLogMsgDir);
-    	File[] file_list=lf.listFiles();
-    	if (file_list!=null) {
-    		for (int i=0;i<file_list.length;i++) {
-    			if (file_list[i].getName().startsWith("TaskAutomation_log")) {
-    				if (file_list[i].getName().startsWith("TaskAutomation_log_20")) {
-        		    	LogFileManagemntListItem t=new LogFileManagemntListItem();
-        		    	t.log_file_name=file_list[i].getName();
-        		    	t.log_file_path=file_list[i].getPath();
-        		    	t.log_file_size=MiscUtil.convertFileSize(file_list[i].length());
-        		    	t.log_file_last_modified=file_list[i].lastModified();
-        		    	String lm_date=StringUtil.convDateTimeTo_YearMonthDayHourMinSec(file_list[i].lastModified());
-        		    	if (file_list[i].getPath().equals(envParms.settingLogMsgDir+envParms.settingLogMsgFilename))
-        		    		t.isCurrentLogFile=true;
-        		    	t.log_file_last_modified_date=lm_date.substring(0,10);
-        		    	t.log_file_last_modified_time=lm_date.substring(11);
-        		    	lfm_fl.add(t);
-    				} else if (file_list[i].getName().equals("TaskAutomation_log.txt")){
-        		    	LogFileManagemntListItem t=new LogFileManagemntListItem();
-        		    	t.log_file_name=file_list[i].getName();
-        		    	t.log_file_path=file_list[i].getPath();
-        		    	t.log_file_size=MiscUtil.convertFileSize(file_list[i].length());
-        		    	t.log_file_last_modified=file_list[i].lastModified();
-        		    	if (file_list[i].getPath().equals(envParms.settingLogMsgDir+envParms.settingLogMsgFilename))
-        		    		t.isCurrentLogFile=true;
-        		    	String lm_date=StringUtil.convDateTimeTo_YearMonthDayHourMinSec(file_list[i].lastModified());
-        		    	t.log_file_last_modified_date=lm_date.substring(0,10);
-        		    	t.log_file_last_modified_time=lm_date.substring(11);
-        		    	lfm_fl.add(t);
-    				}
-    			}
-    		}
-    		Collections.sort(lfm_fl,new Comparator<LogFileManagemntListItem>(){
-				@Override
-				public int compare(LogFileManagemntListItem arg0,
-						LogFileManagemntListItem arg1) {
-					int result=0;
-					long comp=arg1.log_file_last_modified-arg0.log_file_last_modified;
-					if (comp==0) result=0;
-					else if(comp<0) result=-1;
-					else if(comp>0) result=1;
-					return result;
-				}
-    			
-    		});
-    	}
-    	if (lfm_fl.size()==0) {
-    		LogFileManagemntListItem t=new LogFileManagemntListItem();
-    		lfm_fl.add(t);
-    	}
-    	return lfm_fl;
-    };
 
 }
