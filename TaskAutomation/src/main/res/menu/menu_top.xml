@@ -23,6 +23,10 @@
           android:title="@string/msgs_menu_toggle_scheduler_enable" 
           appv7:showAsAction="ifRoom|withText"/>
 
+    <item android:id="@+id/menu_top_location_permission"
+        android:title="@string/msgs_main_permission_menu_title"
+        />
+
 <!--
     <item android:id="@+id/menu_top_quick_task"
           android:title="@string/msgs_menu_quick_task" 

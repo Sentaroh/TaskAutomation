@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msgs_main_permission_coarse_location_denied_msg">権限が許可されるまではタスクで位置情報にアクセスしている場合はエラーで終了します。許可を与える場合はメニューから「ロケーション許可」を実行してください。</string>
+    <string name="msgs_main_permission_coarse_location_request_msg">TaskAutomationで位置情報を読み取るために必要な権限です。\n権限が許可されるまではタスクで位置情報にアクセスしている場合はエラーで終了します。\nロケーション許可を要求しますか？</string>
+    <string name="msgs_main_permission_coarse_location_title">ロケーション許可</string>
+    <string name="msgs_main_permission_external_storage_denied_msg">内部ストレージにアクセスする許可が与えられていないためアプリケーションを起動できません。</string>
+    <string name="msgs_main_permission_external_storage_request_msg">内部ストレージに同期するデータや管理用データの読み書きを行うために、内部ストレージにアクセスする許可を与えてください。</string>
+    <string name="msgs_main_permission_external_storage_title">内部ストレージ許可</string>
+
+</resources>

@@ -35,18 +35,19 @@ import java.util.ArrayList;
 
 import com.sentaroh.android.TaskAutomation.Log.LogFileListDialogFragment;
 import com.sentaroh.android.TaskAutomation.Log.LogUtil;
+import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.LocalMountPoint;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.ThemeUtil;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTabContentView;
 import com.sentaroh.android.Utilities.Widget.CustomViewPager;
 import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -75,7 +76,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -213,6 +213,7 @@ public class ActivityMain extends AppCompatActivity {
        		new ArrayList<ProfileListItem>());
         mGp.profileGroupAdapter=new AdapterProfileGroupList(mContext, R.layout.task_profile_group_list_view_item, 
         		new ArrayList<ProfileGroupListItem>(),null);
+        checkRequiredPermissions();
     };
     
 	@Override
@@ -384,6 +385,13 @@ public class ActivityMain extends AppCompatActivity {
 			menu.findItem(R.id.menu_top_toggle_scheduler).setIcon(R.drawable.scheduler_on_32);
 			menu.findItem(R.id.menu_top_toggle_scheduler).setTitle(R.string.msgs_menu_toggle_scheduler_enable);
 		}
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED) {
+            menu.findItem(R.id.menu_top_location_permission).setVisible(true);
+        } else {
+            menu.findItem(R.id.menu_top_location_permission).setVisible(false);
+        }
+
 		super.onPrepareOptionsMenu(menu);
         return true;
 	};
@@ -408,7 +416,10 @@ public class ActivityMain extends AppCompatActivity {
 				return true;			
 			case R.id.menu_top_browse_logfile:
 				invokeLogFileBrowser();
-				return true;			
+				return true;
+            case R.id.menu_top_location_permission:
+                checkLocationPermission(true);
+                return true;
 			case R.id.menu_top_toggle_scheduler:
                 mGp.setSettingEnableScheduler(mContext, !mGp.settingEnableScheduler);
 				try {
@@ -470,7 +481,6 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void processHomeButtonPress() {
-		Log.v("","home");
 		if (mMainTabHost.getCurrentTabTag().equals("Grp")) {
 			mGp.profileGroupAdapter.setShowCheckBox(false);
 			mGp.profileGroupAdapter.setAllItemSelected(false);
@@ -487,7 +497,120 @@ public class ActivityMain extends AppCompatActivity {
 		} 
 	};
 
-	final private void confirmQuickTaskSwitch(final Button btn_quick_task_switch) {
+    private final int REQUEST_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 1;
+    private final int REQUEST_PERMISSIONS_ACCESS_LOCATION = 2;
+
+    private void checkRequiredPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            mGp.util.addDebugMsg(1, "I", "Prermission WriteExternalStorage=" + checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) +
+                    ", WakeLock=" + checkSelfPermission(Manifest.permission.WAKE_LOCK)
+            );
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                NotifyEvent ntfy = new NotifyEvent(mContext);
+                ntfy.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+//                        checkLocationPermission();
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS_WRITE_EXTERNAL_STORAGE);
+                    }
+
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {
+                        NotifyEvent ntfy_term = new NotifyEvent(mContext);
+                        ntfy_term.setListener(new NotifyEventListener() {
+                            @Override
+                            public void positiveResponse(Context c, Object[] o) {
+                                finish();
+                            }
+                            @Override
+                            public void negativeResponse(Context c, Object[] o) {}
+                        });
+                        mGp.commonDlg.showCommonDialog(false, "W",
+                                mContext.getString(R.string.msgs_main_permission_external_storage_title),
+                                mContext.getString(R.string.msgs_main_permission_external_storage_denied_msg), ntfy_term);
+                    }
+                });
+                mGp.commonDlg.showCommonDialog(false, "W",
+                        mContext.getString(R.string.msgs_main_permission_external_storage_title),
+                        mContext.getString(R.string.msgs_main_permission_external_storage_request_msg), ntfy);
+            } else {
+                checkLocationPermission(false);
+            }
+        } else {
+            checkLocationPermission(false);
+        }
+    }
+
+    public void checkLocationPermission(boolean force_permission) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            mGp.util.addDebugMsg(1, "I", "Prermission LocationCoarse=" + checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED && (force_permission)) {
+                NotifyEvent ntfy = new NotifyEvent(mContext);
+                ntfy.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS_ACCESS_LOCATION);
+                    }
+
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {
+                    }
+                });
+                mGp.commonDlg.showCommonDialog(true, "W",
+                        mContext.getString(R.string.msgs_main_permission_coarse_location_title),
+                        mContext.getString(R.string.msgs_main_permission_coarse_location_request_msg), ntfy);
+            } else {
+            }
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Handler hndl=new Handler();
+        if (REQUEST_PERMISSIONS_WRITE_EXTERNAL_STORAGE == requestCode) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                hndl.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkLocationPermission(true);
+                    }
+                }, 500);
+            } else {
+                NotifyEvent ntfy_term = new NotifyEvent(mContext);
+                ntfy_term.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+                        finish();
+                    }
+
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {}
+                });
+                mGp.commonDlg.showCommonDialog(false, "W",
+                        mContext.getString(R.string.msgs_main_permission_external_storage_title),
+                        mContext.getString(R.string.msgs_main_permission_external_storage_denied_msg), ntfy_term);
+            }
+        }
+        if (REQUEST_PERMISSIONS_ACCESS_LOCATION == requestCode) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                NotifyEvent ntfy_deny=new NotifyEvent(mContext);
+                ntfy_deny.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context context, Object[] objects) {
+                    }
+                    @Override
+                    public void negativeResponse(Context context, Object[] objects) {}
+                });
+                mGp.commonDlg.showCommonDialog(false, "W",
+                        mContext.getString(R.string.msgs_main_permission_coarse_location_title),
+                        mContext.getString(R.string.msgs_main_permission_coarse_location_denied_msg), ntfy_deny);
+            }
+        }
+    }
+
+    final private void confirmQuickTaskSwitch(final Button btn_quick_task_switch) {
 		NotifyEvent ntfy=new NotifyEvent(mContext);
 		ntfy.setListener(new NotifyEventListener(){
 			@Override

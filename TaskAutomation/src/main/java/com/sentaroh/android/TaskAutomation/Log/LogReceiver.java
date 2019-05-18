@@ -1,15 +1,12 @@
-package com.sentaroh.android.TaskAutomation;
+package com.sentaroh.android.TaskAutomation.Log;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-import android.os.PowerManager;
 import android.util.Log;
 
-import com.sentaroh.android.TaskAutomation.Log.LogUtil;
-import com.sentaroh.android.Utilities.CommonGlobalParms;
+import com.sentaroh.android.TaskAutomation.GlobalParameters;
+import com.sentaroh.android.TaskAutomation.GlobalWorkArea;
 import com.sentaroh.android.Utilities.LogUtil.CommonLogWriter;
 import com.sentaroh.android.Utilities.StringUtil;
 
@@ -27,7 +24,7 @@ public class LogReceiver extends BroadcastReceiver {
     @Override
     final public void onReceive(Context c, Intent intent) {
         if (mGp==null) {
-            mGp=GlobalWorkArea.getGlobalParameters(c);
+            mGp= GlobalWorkArea.getGlobalParameters(c);
 //            mLogUtil=new LogUtil(c, "LogRcv", mGp);
         }
         String action=intent.getAction();

@@ -49,9 +49,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.PowerManager;
-import android.util.Log;
 import android.widget.ListView;
 
+import com.sentaroh.android.TaskAutomation.Log.LogReceiver;
 import com.sentaroh.android.TaskAutomation.Log.LogUtil;
 
 public final class CommonUtilities {
