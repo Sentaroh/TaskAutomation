@@ -1358,10 +1358,10 @@ public class TaskExecutor implements Runnable {
 		int nwid=wm.getConnectionInfo().getNetworkId();
 		if (ep.isWifiConnected()) {
 			if (!ep.wifiConnectedSsidName.equals(EnvironmentParms.WIFI_DIRECT_SSID)) {
-				wm.disableNetwork(nwid);
+				boolean result=wm.disableNetwork(nwid);
 				ar.action_resp=ActionResponse.ACTION_SUCCESS;
 				ar.resp_msg_text="";
-				return true;
+				return result;
 			} else {
 				ar.action_resp=ActionResponse.ACTION_WARNING;
 				ar.resp_msg_text="Can not disabled, WiFi is connected to WiFi-Direct";
@@ -1582,6 +1582,7 @@ public class TaskExecutor implements Runnable {
     };
 
     final public static String NOTIFICATION_CHANNEL_DEFAULT="Default";
+    final public static String NOTIFICATION_CHANNEL_MESSAGE="Message";
 	final static private void showMessageNotification(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util, TaskResponse tr,
     		String m_text, int led_color, int led_on, int led_off, boolean sound) {
@@ -1606,7 +1607,7 @@ public class TaskExecutor implements Runnable {
 			nb.setContentIntent(pi);
 		}
         if (Build.VERSION.SDK_INT>=26) {
-            nb.setChannelId(NOTIFICATION_CHANNEL_DEFAULT);
+            nb.setChannelId(NOTIFICATION_CHANNEL_MESSAGE);
         }
 
         if (sound) nb.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND);
@@ -1616,15 +1617,15 @@ public class TaskExecutor implements Runnable {
 
         if (Build.VERSION.SDK_INT>=26) {
             NotificationChannel def_ch = new NotificationChannel(
-                    NOTIFICATION_CHANNEL_DEFAULT,
-                    NOTIFICATION_CHANNEL_DEFAULT,
+                    NOTIFICATION_CHANNEL_MESSAGE,
+                    NOTIFICATION_CHANNEL_MESSAGE,
                     NotificationManager.IMPORTANCE_DEFAULT
             );
             def_ch.enableLights(false);
             def_ch.setSound(null,null);
             def_ch.enableVibration(false);
             def_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            nm.deleteNotificationChannel(NOTIFICATION_CHANNEL_DEFAULT);
+            nm.deleteNotificationChannel(NOTIFICATION_CHANNEL_MESSAGE);
             nm.createNotificationChannel(def_ch);
         }
 

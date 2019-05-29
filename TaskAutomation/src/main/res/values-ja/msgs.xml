@@ -56,8 +56,8 @@
 	<string name="msgs_menu_export_profile">プロファイル保存</string>
 	<string name="msgs_menu_import_profile">プロファイル取込</string>
 	<string name="msgs_menu_browse_logfile">ログ表示</string>
-	<string name="msgs_menu_toggle_scheduler_enable">Scheduler有効</string>
-	<string name="msgs_menu_toggle_scheduler_disable">Scheduler無効</string>
+	<string name="msgs_menu_toggle_scheduler_enabled">Scheduler有効</string>
+	<string name="msgs_menu_toggle_scheduler_disabled">Scheduler無効</string>
 	<string name="msgs_menu_about_task_scheduler">TaskAutomationについて</string>
 	<string name="msgs_menu_quick_task">クイックタスク設定</string>
     <string name="msgs_menu_settings">設定</string>

@@ -57,8 +57,8 @@
 	<string name="msgs_menu_export_profile">Export profile</string>
 	<string name="msgs_menu_import_profile">Import profile</string>
 	<string name="msgs_menu_browse_logfile">Browse log</string>
-	<string name="msgs_menu_toggle_scheduler_enable">Enable Scheduler</string>
-	<string name="msgs_menu_toggle_scheduler_disable">Disable Scheduler</string>
+	<string name="msgs_menu_toggle_scheduler_enabled">Enable Scheduler</string>
+	<string name="msgs_menu_toggle_scheduler_disabled">Disable Scheduler</string>
 	<string name="msgs_menu_about_task_scheduler">About TaskAutomation</string>
 	<string name="msgs_menu_quick_task">QuickTask settings</string>
     <string name="msgs_menu_settings">Settings</string>

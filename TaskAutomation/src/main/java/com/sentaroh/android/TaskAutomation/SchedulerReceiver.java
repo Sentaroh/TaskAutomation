@@ -56,13 +56,14 @@ public class SchedulerReceiver extends BroadcastReceiver{
             if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
                 CommonUtilities.clearSavedBluetoothConnectedDeviceList(context);
                 in.setAction(action);
-                if (Build.VERSION.SDK_INT>=26) {
-                    context.startForegroundService(in);
-                } else {
-                    context.startService(in);
-                }
+            } else if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+                in.setAction(action);
             } else {
                 in.setAction(action);
+            }
+            if (Build.VERSION.SDK_INT>=26) {
+                context.startForegroundService(in);
+            } else {
                 context.startService(in);
             }
 		}

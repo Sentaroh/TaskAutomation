@@ -24,7 +24,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
-import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -450,14 +449,11 @@ public class ProfileMaintenance {
 		btnOK.setOnClickListener(new View.OnClickListener() {
 			final public void onClick(View v) {
 				dialog.dismiss();
-				boolean quick_task=false, settings=false;
-				for (int i=0;i<epl.size();i++) 
-					if (epl.get(i).isChecked && 
-							epl.get(i).item_name.equals(QUICK_TASK_GROUP_NAME)) quick_task=true;
-				for (int i=0;i<epl.size();i++) 
+				boolean settings=false;
+				for (int i=0;i<epl.size();i++)
 					if (epl.get(i).isChecked && 
 							epl.get(i).item_name.equals(EXPORT_IMPORT_SETTING_NAME)) settings=true;
-				importProfileConfirm(mGlblParms,pfla,tfl,settings,quick_task,epl,fp, p_ntfy);
+				importProfileConfirm(mGlblParms,pfla,tfl,settings,epl,fp, p_ntfy);
 			}
 		});
 		// Cancelリスナーの指定
@@ -472,7 +468,7 @@ public class ProfileMaintenance {
 	};
 	
 	final static private void importProfileConfirm(final GlobalParameters mGlblParms,final AdapterProfileList pfla, 
-			final AdapterProfileList tfl, final boolean settings, final boolean quick_task,
+			final AdapterProfileList tfl, final boolean settings,
 			final ArrayList<ExportImportProfileListItem> epl, final String fpath,
 			final NotifyEvent p_ntfy) {
 		String conf_name="";
@@ -496,7 +492,7 @@ public class ProfileMaintenance {
 							ProfileUtilities.deleteProfileGroup(mGlblParms.util,pfla,epl.get(i).item_name);
 						}
 					}
-					importProfileFromFile(mGlblParms,pfla,tfl,settings,quick_task,epl,fpath);
+					importProfileFromFile(mGlblParms,pfla,tfl,settings,epl,fpath);
 					p_ntfy.notifyToListener(true, null);
 				}
 				@Override
@@ -512,13 +508,13 @@ public class ProfileMaintenance {
 					mGlblParms.context.getString(R.string.msgs_import_profile_confirm2_msg)+
 					"\n"+conf_name,ntfy);
 		} else {
-			importProfileFromFile(mGlblParms,pfla,tfl,settings,quick_task,epl,fpath);
+			importProfileFromFile(mGlblParms,pfla,tfl,settings,epl,fpath);
 			p_ntfy.notifyToListener(true, null);
 		}
 	};
 	
 	final static private void importProfileFromFile(GlobalParameters mGlblParms, final AdapterProfileList pfla, 
-			final AdapterProfileList tfl, boolean settings, boolean quick_task,
+			final AdapterProfileList tfl, boolean settings,
 			final ArrayList<ExportImportProfileListItem> epl, String fpath) {
 		for (int i=0;i<tfl.getDataListCount();i++) {
 			boolean found=false;
@@ -533,13 +529,6 @@ public class ProfileMaintenance {
 			}
 		}
 		if (settings) restoreSettingParms(mGlblParms);
-		if (quick_task) {
-			restoreQuickTaskParm(mGlblParms);
-			ProfileUtilities.deleteProfileGroup(mGlblParms.util,pfla, QUICK_TASK_GROUP_NAME);
-			QuickTaskMaintenance.buildQuickTaskProfile(mGlblParms.context, pfla, 
-					mGlblParms.util, QUICK_TASK_GROUP_NAME);
-
-		}
 		pfla.sort();
 		pfla.notifyDataSetChanged();
 		putProfileListToService(mGlblParms,pfla,true);
@@ -710,10 +699,6 @@ public class ProfileMaintenance {
 				dialog.dismiss();
 				AdapterProfileList pfl = new AdapterProfileList(mGlblParms.context, 
 						R.layout.task_profile_list_view_item, new ArrayList<ProfileListItem>() );
-				boolean quick_task=false;
-				for (int i=0;i<epl.size();i++) 
-					if (epl.get(i).isChecked && 
-							epl.get(i).item_name.equals(QUICK_TASK_GROUP_NAME)) quick_task=true;
 				for (int i=0;i<pfla.getDataListCount();i++) {
 					boolean found=false;
 					for (int j=0;j<epl.size();j++) 
@@ -731,7 +716,7 @@ public class ProfileMaintenance {
 				String fpath=dlg_filename.getText().toString();
     			String fd=fpath.substring(0,fpath.lastIndexOf("/"));
     			String fn=fpath.replace(fd+"/","");
-    			exportProfileToFile(mGlblParms,pfl,pflv,fd,fn,settings,quick_task);
+    			exportProfileToFile(mGlblParms,pfl,pflv,fd,fn,settings);
 			}
 		});
 		// Cancelリスナーの指定
@@ -747,7 +732,7 @@ public class ProfileMaintenance {
 
 	final static private void exportProfileToFile(final GlobalParameters mGlblParms,final AdapterProfileList pfla, final ListView pflv,
 			final String profile_dir, final String profile_filename, 
-			final boolean settings, final boolean quick_task) {
+			final boolean settings) {
 		
 		File lf = new File(profile_dir+"/"+profile_filename);
 		NotifyEvent ntfy=new NotifyEvent(mGlblParms.context);
@@ -759,7 +744,7 @@ public class ProfileMaintenance {
     			String fd =profile_dir;
     			String result=null;
     			result=mGlblParms.util.saveProfileToFile(true,settings,
-    					quick_task, pfla.getDataList(),
+    					pfla.getDataList(),
     					pflv,fd,profile_filename);
 				if (result==null) {
 					mGlblParms.commonDlg.showCommonDialog(false,
@@ -2553,10 +2538,6 @@ public class ProfileMaintenance {
         adapter.clear();
         ArrayList<String> gl=ProfileUtilities.createProfileGroupList(mGlblParms.util,pfla);
         for (int i=0;i<gl.size();i++) adapter.add(gl.get(i));
-        for (int i=adapter.getCount()-1;i>=0;i--) {
-        	if (adapter.getItem(i).equals(QUICK_TASK_GROUP_NAME)) 
-        		adapter.remove(adapter.getItem(i));
-        }
         int sel=0;
         for (int i=adapter.getCount()-1;i>=0;i--) {
         	if (adapter.getItem(i).equals(c_grp)) {

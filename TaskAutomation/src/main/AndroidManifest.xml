@@ -40,6 +40,7 @@
 				<action android:name="android.intent.action.ACTION_SHUTDOWN" />
 				<action android:name="android.intent.action.LOCALE_CHANGED" />
 				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
 				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_START_ACTIVITY_TASK_STATUS"/>
 				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_TIMER_EXPIRED" />
 				<action android:name="com.sentaroh.android.TaskAutomation.ACTION_START_SCHEDULER" />
@@ -51,21 +52,6 @@
 			</intent-filter>
 		</receiver>
 
-        <receiver
-            android:name=".Log.LogReceiver"
-            android:icon="@drawable/main_icon"
-            android:label="LogReceiver"
-            android:process=":Log"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_SEND" />
-                <action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_RESET" />
-                <action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_ROTATE" />
-                <action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_DELETE" />
-                <action android:name="com.sentaroh.android.TaskAutomation.ACTION_LOG_FLUSH" />
-            </intent-filter>
-        </receiver>
-
         <service
 		    android:name=".SchedulerService"
             android:process=":Svc"
@@ -75,6 +61,12 @@
 			</intent-filter>
 						
 		</service>
+
+        <service
+            android:name=".Log.LogService"
+            android:process=":Log"
+            android:exported="false">
+        </service>
 
         <service
             android:name=".SchedulerMonitor"

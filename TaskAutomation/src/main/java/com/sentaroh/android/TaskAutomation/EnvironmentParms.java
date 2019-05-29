@@ -127,26 +127,6 @@ public class EnvironmentParms implements Serializable {
 	public final int BATTERY_CHARGE_STATUS_INT_FULL=3;
 	public final int BATTERY_CHARGE_STATUS_INT_CHARGING=1;
 	public final int BATTERY_CHARGE_STATUS_INT_DISCHARGING=2;
-	public long battery_comsumption_data_begin_time=0;
-	public int battery_comsumption_data_begin_level=0;
-	public long battery_comsumption_data_end_time=0;
-	public int battery_comsumption_data_end_level=0;
-	public void loadBatteryComsumptionData(Context c){
-		battery_comsumption_data_begin_time=
-				CommonUtilities.getPrefMgr(c).getLong(BATTERY_CONSUMPTION_DATA_KEY_1,0L);
-		battery_comsumption_data_begin_level=
-				CommonUtilities.getPrefMgr(c).getInt(BATTERY_CONSUMPTION_DATA_KEY_2,0);
-		battery_comsumption_data_end_time=
-				CommonUtilities.getPrefMgr(c).getLong(BATTERY_CONSUMPTION_DATA_KEY_3,0L);
-		battery_comsumption_data_end_level=
-				CommonUtilities.getPrefMgr(c).getInt(BATTERY_CONSUMPTION_DATA_KEY_4,0);
-	}
-	public void saveBatteryComsumptionData(Context c){
-		CommonUtilities.getPrefMgr(c).edit().putLong(BATTERY_CONSUMPTION_DATA_KEY_1,battery_comsumption_data_begin_time).commit();
-		CommonUtilities.getPrefMgr(c).edit().putInt(BATTERY_CONSUMPTION_DATA_KEY_2,battery_comsumption_data_begin_level).commit();
-		CommonUtilities.getPrefMgr(c).edit().putLong(BATTERY_CONSUMPTION_DATA_KEY_3,battery_comsumption_data_end_time).commit();
-		CommonUtilities.getPrefMgr(c).edit().putInt(BATTERY_CONSUMPTION_DATA_KEY_4,battery_comsumption_data_end_level).commit();
-	}
 	public boolean isBatteryCharging() {
 		return batteryPowerSource.equals(CURRENT_POWER_SOURCE_AC)?true:false;
 	}
@@ -297,7 +277,6 @@ public class EnvironmentParms implements Serializable {
 		deviceManufacturer=Build.MANUFACTURER;
 		deviceModel=Build.MODEL;
 		
-		loadBatteryComsumptionData(c);
 		localRootDir=LocalMountPoint.getExternalStorageDir();
 
 	}

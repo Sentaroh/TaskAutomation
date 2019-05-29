@@ -23,7 +23,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
-import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -380,10 +379,10 @@ public class ActivityMain extends AppCompatActivity {
 		}
 		if (mGp.settingEnableScheduler) {
 			menu.findItem(R.id.menu_top_toggle_scheduler).setIcon(R.drawable.scheduler_off_32);
-			menu.findItem(R.id.menu_top_toggle_scheduler).setTitle(R.string.msgs_menu_toggle_scheduler_disable);
+			menu.findItem(R.id.menu_top_toggle_scheduler).setTitle(R.string.msgs_menu_toggle_scheduler_disabled);
 		} else {
 			menu.findItem(R.id.menu_top_toggle_scheduler).setIcon(R.drawable.scheduler_on_32);
-			menu.findItem(R.id.menu_top_toggle_scheduler).setTitle(R.string.msgs_menu_toggle_scheduler_enable);
+			menu.findItem(R.id.menu_top_toggle_scheduler).setTitle(R.string.msgs_menu_toggle_scheduler_enabled);
 		}
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED) {
@@ -610,34 +609,6 @@ public class ActivityMain extends AppCompatActivity {
         }
     }
 
-    final private void confirmQuickTaskSwitch(final Button btn_quick_task_switch) {
-		NotifyEvent ntfy=new NotifyEvent(mContext);
-		ntfy.setListener(new NotifyEventListener(){
-			@Override
-			public void positiveResponse(Context c, Object[] o) {
-				boolean qt=ProfileUtilities.isProfileGroupActive(mGp.util, mGp.profileAdapter, QUICK_TASK_GROUP_NAME);
-				ProfileUtilities.setProfileGroupActive(mGp.util, mGp.profileAdapter, QUICK_TASK_GROUP_NAME, !qt);
-				ProfileMaintenance.putProfileListToService(mGp,mGp.profileAdapter,true);
-	  			createProfileGroupList();
-	  			setSchedulerStatus();
-	  			if (qt) btn_quick_task_switch.setText(c.getString(R.string.msgs_control_tab_quick_task_switch_disabled));
-	  			else btn_quick_task_switch.setText(c.getString(R.string.msgs_control_tab_quick_task_switch_enabled));
-			}
-			@Override
-			public void negativeResponse(Context c, Object[] o) {
-			}
-			
-		});
-		boolean qt=ProfileUtilities.isProfileGroupActive(mGp.util, mGp.profileAdapter, QUICK_TASK_GROUP_NAME);
-		String msg="";
-		if (qt) {
-			msg=getString(R.string.msgs_control_tab_confirm_quick_task_switch_disable);
-		} else {
-			msg=getString(R.string.msgs_control_tab_confirm_quick_task_switch_enaable);
-		}
-		mGp.commonDlg.showCommonDialog(true, "W", msg,"", ntfy);
-	};
-	
 	final private void uninstallApplication() {
 		NotifyEvent ntfy=new NotifyEvent(mContext);
 		ntfy.setListener(new NotifyEventListener(){
@@ -2257,54 +2228,40 @@ public class ActivityMain extends AppCompatActivity {
 			if (!mGp.profileAdapter.isShowCheckBox()) {
 				mGp.profileListView.setEnabled(false);
 				String curr_grp=item.getProfileGroup();
-				if (item.getProfileGroup().equals(QUICK_TASK_GROUP_NAME)) {
-					if (item.getProfileType().equals(PROFILE_TYPE_TASK)) {
-						  ProfileMaintenanceTaskProfile pmtp=ProfileMaintenanceTaskProfile.newInstance();
-						  pmtp.showDialog(getSupportFragmentManager(), pmtp, "BROWSE",curr_grp,item, null);
-					}
-					else if (item.getProfileType().equals(PROFILE_TYPE_TIME)) {
-						ProfileMaintenanceTimeProfile pmip=ProfileMaintenanceTimeProfile.newInstance();
-						pmip.showDialog(getSupportFragmentManager(), pmip, "BROWSE",curr_grp,item, null);
-					}
-					else if (item.getProfileType().equals(PROFILE_TYPE_ACTION)) {
-						ProfileMaintenanceActionProfile pmap=ProfileMaintenanceActionProfile.newInstance();
-						pmap.showDialog(getSupportFragmentManager(), pmap, "BROWSE",curr_grp,item, null);
-					}
-				} else {
-					boolean selected=false;
-					for (int i=0;i<mGp.profileAdapter.getProfItemCount();i++) {
-						if (mGp.profileAdapter.getProfItem(i).isProfileItemSelected()) {
-							selected=true;
-							break;
-						}
-					}
-					if (!selected) {
-						if (item.getProfileType().equals(PROFILE_TYPE_TASK)) {
-							ProfileMaintenanceTaskProfile pmtp=ProfileMaintenanceTaskProfile.newInstance();
-							pmtp.showDialog(getSupportFragmentManager(), pmtp, "EDIT",curr_grp,item, null);
-						} else if (item.getProfileType().equals(PROFILE_TYPE_TIME)){
-							ProfileMaintenanceTimeProfile pmip=ProfileMaintenanceTimeProfile.newInstance();
-							pmip.showDialog(getSupportFragmentManager(), pmip, "EDIT",curr_grp,item, null);
-						} else if (item.getProfileType().equals(PROFILE_TYPE_ACTION)){
-							ProfileMaintenanceActionProfile pmap=ProfileMaintenanceActionProfile.newInstance();
-							pmap.showDialog(getSupportFragmentManager(), pmap, "EDIT",curr_grp,item, null);
-						}
-					} else {
-						item = mGp.profileAdapter.getProfItem(position);
-						if (item.isProfileItemSelected()) {
-							item.setProfileItemSelected(false);
-							mGp.profileAdapter.notifyDataSetChanged();
-						} else {
-							item.setProfileItemSelected(true);
-							mGp.profileAdapter.notifyDataSetChanged();
-						}
-					}
-				}
-				Handler hndl=new Handler();
+                boolean selected=false;
+                for (int i=0;i<mGp.profileAdapter.getProfItemCount();i++) {
+                    if (mGp.profileAdapter.getProfItem(i).isProfileItemSelected()) {
+                        selected=true;
+                        break;
+                    }
+                }
+                if (!selected) {
+                    if (item.getProfileType().equals(PROFILE_TYPE_TASK)) {
+                        ProfileMaintenanceTaskProfile pmtp=ProfileMaintenanceTaskProfile.newInstance();
+                        pmtp.showDialog(getSupportFragmentManager(), pmtp, "EDIT",curr_grp,item, null);
+                    } else if (item.getProfileType().equals(PROFILE_TYPE_TIME)){
+                        ProfileMaintenanceTimeProfile pmip=ProfileMaintenanceTimeProfile.newInstance();
+                        pmip.showDialog(getSupportFragmentManager(), pmip, "EDIT",curr_grp,item, null);
+                    } else if (item.getProfileType().equals(PROFILE_TYPE_ACTION)){
+                        ProfileMaintenanceActionProfile pmap=ProfileMaintenanceActionProfile.newInstance();
+                        pmap.showDialog(getSupportFragmentManager(), pmap, "EDIT",curr_grp,item, null);
+                    }
+                } else {
+                    item = mGp.profileAdapter.getProfItem(position);
+                    if (item.isProfileItemSelected()) {
+                        item.setProfileItemSelected(false);
+                        mGp.profileAdapter.notifyDataSetChanged();
+                    } else {
+                        item.setProfileItemSelected(true);
+                        mGp.profileAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                Handler hndl=new Handler();
 				hndl.postDelayed(new Runnable(){
 					@Override
 					public void run() {
-						mGp.profileListView.setEnabled(true);					
+						mGp.profileListView.setEnabled(true);
 					}
 				}, 100);
 			} else {

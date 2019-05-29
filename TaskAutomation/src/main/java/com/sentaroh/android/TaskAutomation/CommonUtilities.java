@@ -28,7 +28,6 @@ import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG
 import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_RESET;
 import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_ROTATE;
 import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_SEND;
-import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,7 +50,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.widget.ListView;
 
-import com.sentaroh.android.TaskAutomation.Log.LogReceiver;
+import com.sentaroh.android.TaskAutomation.Log.LogService;
 import com.sentaroh.android.TaskAutomation.Log.LogUtil;
 
 public final class CommonUtilities {
@@ -87,22 +86,31 @@ public final class CommonUtilities {
     }
 
 	static final public void resetLogReceiver(Context c) {
-        Intent in=new Intent(c, LogReceiver.class);
+//        Intent in=new Intent(c, LogReceiver.class);
+//        in.setAction(BROADCAST_LOG_RESET);
+//        c.sendBroadcast(in);
+        Intent in=new Intent(c, LogService.class);
         in.setAction(BROADCAST_LOG_RESET);
-        c.sendBroadcast(in);
+        c.startService(in);
     };
 
 	static final public void flushLog(Context c, GlobalParameters mGp) {
-        Intent in=new Intent(c, LogReceiver.class);
+//        Intent in=new Intent(c, LogReceiver.class);
+//        in.setAction(BROADCAST_LOG_FLUSH);
+//        c.sendBroadcast(in);
+        Intent in=new Intent(c, LogService.class);
         in.setAction(BROADCAST_LOG_FLUSH);
-        c.sendBroadcast(in);
-        LogUtil.flushLog(c, mGp);
-	};
+        c.startService(in);
+
+    };
 
 	static final public void rotateLogFile(Context c) {
-        Intent in=new Intent(c, LogReceiver.class);
+//        Intent in=new Intent(c, LogReceiver.class);
+//        in.setAction(BROADCAST_LOG_ROTATE);
+//        c.sendBroadcast(in);
+        Intent in=new Intent(c, LogService.class);
         in.setAction(BROADCAST_LOG_ROTATE);
-        c.sendBroadcast(in);
+        c.startService(in);
 
     };
 
@@ -367,16 +375,15 @@ public final class CommonUtilities {
 	final public String saveProfileToFileByService(ArrayList<ProfileListItem> prof_list) {
 //		AdapterProfileList pfl = new AdapterProfileList(mContext, 
 //				R.layout.task_profile_list_view_item, prof_list);
-		return saveProfileToFile(false, false,false,prof_list, null, "", "");
+		return saveProfileToFile(false, false, prof_list, null, "", "");
 	};
 	
 	final public String saveProfileToFileProfileOnly(boolean sdcard,  
 			ArrayList<ProfileListItem> prof_list, ListView pflv, String fd, String fn) {
-		return saveProfileToFile(sdcard, false,false, prof_list, pflv, fd, fn); 
+		return saveProfileToFile(sdcard, false, prof_list, pflv, fd, fn);
 	};
 	final public String saveProfileToFile(boolean sdcard, 
-			boolean settings,boolean quick_task, 
-			ArrayList<ProfileListItem> prof_list, 
+			boolean settings, ArrayList<ProfileListItem> prof_list,
 			ListView pflv, String fd, String fn) {
 		String result=null;
 		String ofp="";
@@ -412,7 +419,6 @@ public final class CommonUtilities {
 				}
 			}
 			if (settings) saveSettingsParmsToFile(pw);
-			if (quick_task) saveQuickTaskSettingToFile(pw);
 			pw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -456,79 +462,6 @@ public final class CommonUtilities {
 		
 	};
 	
-	final private void saveQuickTaskSettingToFile(PrintWriter pw) {
-		addDebugMsg(2, "I", "saveQuickTaskSettingToFile entered");
-		String group="Default";// 12Bytes
-		SharedPreferences pref=getPrefMgr();
-		saveSettingsParmsToFileString(pref,group, pw, QUICK_TASK_CURRENT_VERSION, QUICK_TASK_VERSION_KEY);
-		
-		saveSettingsParmsToFileBoolean(pref,group, pw, false, QUICK_TASK_PROFILE_USE_BEAN_SHELL);
-		
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_WIFI_SCREEN_LOCKED);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_WIFI_SCREEN_LOCKED_AC);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_WIFI_WIFI_ON);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_WIFI_WIFI_ON_AC);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_WIFI_SCREEN_UNLOCKED);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_WIFI_SCREEN_UNLOCKED_AC);
-
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_BT_SCREEN_LOCKED);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_BT_SCREEN_LOCKED_AC);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_BT_BT_ON);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_BT_BT_ON_AC);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_BT_SCREEN_UNLOCKED);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_BT_SCREEN_UNLOCKED_AC);
-		
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_SCREEN_PROXIMITY_UNDETECTED);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_SCREEN_PROXIMITY_DETECTED);
-		saveSettingsParmsToFileBoolean(pref,group, pw, false,QUICK_TASK_SCREEN_PROXIMITY_DETECTED_IGNORE_LANDSCAPE);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_SCREEN_LIGHT_DETECTED);
-		saveSettingsParmsToFileBoolean(pref,group, pw, true, QUICK_TASK_SCREEN_LIGHT_UNDETECTED);
-
-		saveSettingsParmsToFileBoolean(pref,group, pw, false,QUICK_TASK_ALARM_CLOCK01_ENABLED);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK01_DATE_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK01_DAY_OF_WEEK);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK01_DATE_DAY);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK01_DATE_TIME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK01_SOUND_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK01_SOUND_NAME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK01_RINGTONE_PATH);
-		saveSettingsParmsToFileBoolean(pref,group, pw, false,QUICK_TASK_ALARM_CLOCK02_ENABLED);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK02_DATE_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK02_DAY_OF_WEEK);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK02_DATE_DAY);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK02_DATE_TIME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK02_SOUND_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK02_SOUND_NAME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK02_RINGTONE_PATH);
-		saveSettingsParmsToFileBoolean(pref,group, pw, false,QUICK_TASK_ALARM_CLOCK03_ENABLED);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK03_DATE_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK03_DAY_OF_WEEK);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK03_DATE_DAY);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK03_DATE_TIME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK03_SOUND_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK03_SOUND_NAME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_ALARM_CLOCK03_RINGTONE_PATH);
-		
-		saveSettingsParmsToFileBoolean(pref,group, pw, false,QUICK_TASK_TIME_ACTIVITY01_ENABLED);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY01_DATE_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY01_DAY_OF_WEEK);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY01_DATE_DAY);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY01_DATE_TIME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY01_ACTIVITY);
-		saveSettingsParmsToFileBoolean(pref,group, pw, false,QUICK_TASK_TIME_ACTIVITY02_ENABLED);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY02_DATE_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY02_DAY_OF_WEEK);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY02_DATE_DAY);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY02_DATE_TIME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY02_ACTIVITY);
-		saveSettingsParmsToFileBoolean(pref,group, pw, false,QUICK_TASK_TIME_ACTIVITY03_ENABLED);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY03_DATE_TYPE);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY03_DAY_OF_WEEK);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY03_DATE_DAY);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY03_DATE_TIME);
-		saveSettingsParmsToFileString(pref,group,  pw, "",   QUICK_TASK_TIME_ACTIVITY03_ACTIVITY);
-	};
-	
 	final private void saveSettingsParmsToFile(PrintWriter pw) {
 		addDebugMsg(2, "I", "saveSettingsParmsToFile entered");
 		String group="Default";// 12Bytes
@@ -565,38 +498,26 @@ public final class CommonUtilities {
 
 	final public void addLogMsg(String cat, String... msg) {
 		if (mGp.settingDebugLevel>0 || mGp.settingLogOption || cat.equals("E")) {
-		    Intent in=new Intent(mContext, LogReceiver.class);
+		    Intent in=new Intent(mContext, LogService.class);
 		    in.setAction(BROADCAST_LOG_SEND);
 		    in.putExtra("TYPE","M");
 		    in.putExtra("ID", mLogId);
 		    in.putExtra("CAT",cat);
-		    String log_msg="";
-            if (msg!=null) {
-                for (String item:msg) {
-                    if (item!=null) log_msg+=item;
-                }
-            }
 //            Log.v("TaskAutomation","length="+msg.length+", "+log_msg);
-            in.putExtra("MSG",log_msg);
-            mContext.sendBroadcast(in);
+            in.putExtra("MSG",msg);
+            mContext.startService(in);
  		}
 	};
 	final public void addDebugMsg(int lvl, String cat, String... msg) {
 		if (mGp.settingDebugLevel>=lvl ) {
-            Intent in=new Intent(mContext, LogReceiver.class);
+            Intent in=new Intent(mContext, LogService.class);
             in.setAction(BROADCAST_LOG_SEND);
             in.putExtra("TYPE","D");
             in.putExtra("ID", mLogId);
             in.putExtra("CAT",cat);
-            String log_msg="";
-            if (msg!=null) {
-                for (String item:msg) {
-                    if (item!=null) log_msg+=item;
-                }
-            }
 //            Log.v("TaskAutomation","length="+msg.length+", "+log_msg);
-            in.putExtra("MSG",log_msg);
-            mContext.sendBroadcast(in);
+            in.putExtra("MSG",msg);
+            mContext.startService(in);
  		}
 	};
 

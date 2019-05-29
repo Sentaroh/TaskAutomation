@@ -20,7 +20,7 @@
           />
 
     <item android:id="@+id/menu_top_toggle_scheduler"
-          android:title="@string/msgs_menu_toggle_scheduler_enable" 
+          android:title="@string/msgs_menu_toggle_scheduler_enabled"
           appv7:showAsAction="ifRoom|withText"/>
 
     <item android:id="@+id/menu_top_location_permission"

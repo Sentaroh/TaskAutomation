@@ -24,7 +24,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
-import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.QUICK_TASK_GROUP_NAME;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -359,50 +358,7 @@ public class ProfileUtilities {
 		}
 		return ic_found;
 	};
-	
-	final static public boolean isQuickTaskProfileExisted(
-			CommonUtilities util, AdapterProfileList pfa) {
-		boolean result=false;
-		for (int i=0;i<pfa.getDataListCount();i++) 
-			if (pfa.getDataListItem(i).getProfileGroup().equals(QUICK_TASK_GROUP_NAME)) {
-				result=true;
-				break;
-			}
-		return result;
-	};
 
-	final static public boolean isQuickTaskProfileActivated(
-			CommonUtilities util,
-			AdapterProfileList pfa) {
-		return isQuickTaskProfileActivated(util,pfa.getDataList());
-	};
-    final static public boolean isQuickTaskProfileActivated(
-    		CommonUtilities util,
-    		ArrayList<ProfileListItem> prof_list) {
-		boolean result=false;
-		for (int i=0;i<prof_list.size();i++) 
-			if (prof_list.get(i).getProfileGroup().equals(QUICK_TASK_GROUP_NAME)) {
-				result=prof_list.get(i).isProfileGroupActivated();
-				break;
-			}
-		return result;
-	};
-	
-	final static public void setQuickTaskProfileActivated(
-			CommonUtilities util,
-			AdapterProfileList pfa, boolean qa) {
-		setQuickTaskProfileActivated(util,pfa.getDataList(), qa);
-	};
-	final static public void setQuickTaskProfileActivated(
-			CommonUtilities util,
-			ArrayList<ProfileListItem> prof_list, boolean qa) {
-		if (isQuickTaskProfileActivated(util,prof_list)) return;
-		for (int i=0;i<prof_list.size();i++) 
-			if (prof_list.get(i).getProfileGroup().equals(QUICK_TASK_GROUP_NAME)) {
-				prof_list.get(i).setProfileGroupActivated(qa);
-			}
-	};
-	
     final static public void sortProfileArrayList(CommonUtilities util,
     		ArrayList<ProfileListItem> array_list) {
 		Collections.sort(array_list, new Comparator<ProfileListItem>(){

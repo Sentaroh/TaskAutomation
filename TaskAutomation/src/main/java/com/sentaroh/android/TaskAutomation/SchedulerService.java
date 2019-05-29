@@ -24,9 +24,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import static com.sentaroh.android.TaskAutomation.CommonConstants.*;
-import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.QUICK_TASK_CURRENT_VERSION;
-import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.QUICK_TASK_GROUP_NAME;
-import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.QUICK_TASK_VERSION_KEY;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -415,8 +412,7 @@ public final class SchedulerService extends Service {
 		mEnvParms.telephonyStatus=tm.getCallState();
  		
  		mEnvParms.airplane_mode_on=getAirplaneModeOn();
-    	mEnvParms.quickTaskVersion=mUtil.getPrefMgr().getString(QUICK_TASK_VERSION_KEY, "unknown");
-    	
+
       	ConnectivityManager cm = (ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo[] ni_array=cm.getAllNetworkInfo();
         if( ni_array != null ){
@@ -607,22 +603,6 @@ public final class SchedulerService extends Service {
 		TaskManager.acqLock(TaskManager.LOCK_ID_PROFILE_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
 		TaskManager.acqLock(TaskManager.LOCK_ID_EVENT_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
 		TaskManager.acqLock(TaskManager.LOCK_ID_TIMER_TASK_LIST, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms,mUtil, mGp);
-
-		if (!mUtil.getPrefMgr().getString(QUICK_TASK_VERSION_KEY, QUICK_TASK_CURRENT_VERSION).equals(QUICK_TASK_CURRENT_VERSION)) {
-			boolean qta=ProfileUtilities.isQuickTaskProfileActivated(mUtil,mProfileArrayList);
-			ProfileUtilities.deleteProfileGroup(mUtil,mProfileArrayList,QUICK_TASK_GROUP_NAME);
-			QuickTaskMaintenance.buildQuickTaskProfile(mContext,mProfileArrayList,mUtil,QUICK_TASK_GROUP_NAME);
-			ProfileUtilities.sortProfileArrayList(mUtil, mProfileArrayList);
-			ProfileUtilities.setQuickTaskProfileActivated(mUtil,mProfileArrayList,qta);
-			mEnvParms.quickTaskVersion=QUICK_TASK_CURRENT_VERSION;
-			Runnable r=new Runnable(){
-				@Override
-				public void run() {
-					mUtil.saveProfileToFileByService(mProfileArrayList);
-				}
-			};
-			mTaskMgrParms.normalTaskControlThreadPool.execute(r);
-		}
 
 		TaskManager.acqLock(TaskManager.LOCK_ID_TASK_CONTROL, TaskManager.LOCK_MODE_WRITE,mEnvParms,mTaskMgrParms, mUtil, mGp);
 		mRequiredBatteryLevelExecution=false;
@@ -858,54 +838,43 @@ public final class SchedulerService extends Service {
     };
     
     final static private void restoreTaskList() {
-		if (mEnvParms.quickTaskVersion.equals(QUICK_TASK_CURRENT_VERSION)) {
-			try {
-			    FileInputStream fis=mContext.openFileInput(SERVICE_TASK_LIST_FILE_NAME);
-			    BufferedInputStream bis=new BufferedInputStream(fis,
-			    		GENERAL_FILE_BUFFER_SIZE);
-			    ObjectInputStream ois = new ObjectInputStream(bis);
-			    TaskListHolder tlh= new TaskListHolder();
-			    tlh.readExternal(ois);
-			    mProfileArrayList=tlh.profile_array_list;
-			    mBuiltinEventTaskList=tlh.builtin_task_list;
-			    mTimerEventTaskList=tlh.timer_task_list;
-			    mTaskEventTaskList=tlh.task_task_list;
-			    mBuiltinEventTaskLookupTable=tlh.lookup_list;
-				mRequiredBatteryLevelExecution=tlh.req_bl;
-				mRequiredSensorLight=tlh.req_light;
-				mRequiredSensorProximity=tlh.req_prx;
-				mRequiredSensorAccelerometer=tlh.req_acc;
-				mRequiredSensorMagneticField=tlh.req_mag;
-				mEnvParms.taskListBuildTime=tlh.build_time;
-				mEnvParms.taskListBuildTimeString=StringUtil.convDateTimeTo_MonthDayHourMin(mEnvParms.taskListBuildTime);
-				for (int i=0;i<mTimerEventTaskList.size();i++) {
-					mTimerEventTaskList.get(i).timer_update_required=true;
-				}
+        try {
+            FileInputStream fis=mContext.openFileInput(SERVICE_TASK_LIST_FILE_NAME);
+            BufferedInputStream bis=new BufferedInputStream(fis,
+                    GENERAL_FILE_BUFFER_SIZE);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            TaskListHolder tlh= new TaskListHolder();
+            tlh.readExternal(ois);
+            mProfileArrayList=tlh.profile_array_list;
+            mBuiltinEventTaskList=tlh.builtin_task_list;
+            mTimerEventTaskList=tlh.timer_task_list;
+            mTaskEventTaskList=tlh.task_task_list;
+            mBuiltinEventTaskLookupTable=tlh.lookup_list;
+            mRequiredBatteryLevelExecution=tlh.req_bl;
+            mRequiredSensorLight=tlh.req_light;
+            mRequiredSensorProximity=tlh.req_prx;
+            mRequiredSensorAccelerometer=tlh.req_acc;
+            mRequiredSensorMagneticField=tlh.req_mag;
+            mEnvParms.taskListBuildTime=tlh.build_time;
+            mEnvParms.taskListBuildTimeString=StringUtil.convDateTimeTo_MonthDayHourMin(mEnvParms.taskListBuildTime);
+            for (int i=0;i<mTimerEventTaskList.size();i++) {
+                mTimerEventTaskList.get(i).timer_update_required=true;
+            }
 //			 		buildTaskListLookupTable();
-			    mUtil.addDebugMsg(1,"I", "Saved task list was restored, build time=",
-			    		StringUtil.convDateTimeTo_YearMonthDayHourMin(mEnvParms.taskListBuildTime));
-			    ois.close();
-			} catch (Exception e) {
+            mUtil.addDebugMsg(1,"I", "Saved task list was restored, build time=",
+                    StringUtil.convDateTimeTo_YearMonthDayHourMin(mEnvParms.taskListBuildTime));
+            ois.close();
+        } catch (Exception e) {
 //				e.printStackTrace();
-				mUtil.addDebugMsg(1,"E", "restoreTaskList error, ",e.getMessage());
-				mUtil.addDebugMsg(1,"E", "Rebuild task list has been started");
-				mProfileArrayList=new ArrayList<ProfileListItem>();
-				mBuiltinEventTaskList=new ArrayList<TaskListItem>();
-				mTimerEventTaskList=new ArrayList<TaskListItem>();
-				mTaskEventTaskList=new ArrayList<TaskListItem>();
-	    		mProfileArrayList=buildProfileList();
-				buildTaskList();
-			}
-		} else {
-			mUtil.addDebugMsg(1,"E", "Rebuild task list has been started(QuickTask version different)");
-			mProfileArrayList=new ArrayList<ProfileListItem>();
-			mBuiltinEventTaskList=new ArrayList<TaskListItem>();
-			mTimerEventTaskList=new ArrayList<TaskListItem>();
-			mTaskEventTaskList=new ArrayList<TaskListItem>();
-    		mProfileArrayList=buildProfileList();
-			buildTaskList();
-			
-		}
+            mUtil.addDebugMsg(1,"E", "restoreTaskList error, ",e.getMessage());
+            mUtil.addDebugMsg(1,"E", "Rebuild task list has been started");
+            mProfileArrayList=new ArrayList<ProfileListItem>();
+            mBuiltinEventTaskList=new ArrayList<TaskListItem>();
+            mTimerEventTaskList=new ArrayList<TaskListItem>();
+            mTaskEventTaskList=new ArrayList<TaskListItem>();
+            mProfileArrayList=buildProfileList();
+            buildTaskList();
+        }
     };
      
 	@Override
@@ -964,8 +933,7 @@ public final class SchedulerService extends Service {
         }
     };
     
-    final static private ISchedulerClient.Stub mSvcSchedulerClient = 
-			new ISchedulerClient.Stub() {
+    final static private ISchedulerClient.Stub mSvcSchedulerClient = new ISchedulerClient.Stub() {
 		final public void setCallBack(final ISchedulerCallback callback)
 				throws RemoteException {
 			mUtil.addDebugMsg(2,"I","setCallBack entered");
@@ -1428,7 +1396,7 @@ public final class SchedulerService extends Service {
     static private int mLastBatteryStatusSt,mLastBatteryStatusBl,mLastBatteryStatusBs;
     static final private String parseBatteryChargeStatus(int st) {
 		String n_bcs=mTaskMgrParms.svcMsgs.msgs_widget_battery_status_charge_discharging;
-		if (st==BatteryManager.BATTERY_PLUGGED_AC||st==BatteryManager.BATTERY_STATUS_CHARGING){
+		if (st==BatteryManager.BATTERY_PLUGGED_AC||st==BatteryManager.BATTERY_STATUS_CHARGING||st==11){
 			n_bcs=mTaskMgrParms.svcMsgs.msgs_widget_battery_status_charge_charging;
 			mEnvParms.batteryChargeStatusInt=mEnvParms.BATTERY_CHARGE_STATUS_INT_CHARGING;
 		} else if (st==BatteryManager.BATTERY_STATUS_DISCHARGING||st==BatteryManager.BATTERY_STATUS_NOT_CHARGING){
@@ -1446,11 +1414,13 @@ public final class SchedulerService extends Service {
 		int n_bl=0;
 		if (bs==0) n_bl=bl;
 		else n_bl=(bl*100)/bs;
-		if (st==BatteryManager.BATTERY_PLUGGED_AC||
-				st==BatteryManager.BATTERY_PLUGGED_USB ||
-				st==BatteryManager.BATTERY_STATUS_FULL )
-				n_ps=CURRENT_POWER_SOURCE_AC;
-			else n_ps=CURRENT_POWER_SOURCE_BATTERY;
+		if (st==BatteryManager.BATTERY_STATUS_FULL ||
+                st==11 ||
+                st==BatteryManager.BATTERY_STATUS_CHARGING) {
+		    n_ps=CURRENT_POWER_SOURCE_AC;
+        } else {
+		    n_ps=CURRENT_POWER_SOURCE_BATTERY;
+        }
 		if (n_ps==CURRENT_POWER_SOURCE_AC) {
 			if (mEnvParms.batteryPowerSource.equals(n_ps)) {
 				//充電中が継続なのでなにもしない
@@ -1463,38 +1433,14 @@ public final class SchedulerService extends Service {
 				if (mEnvParms.batteryLevel==-1) {
 					//起動直後ため何もしない
 				} else {
-					if (mEnvParms.battery_comsumption_data_begin_level==0) {
-						//reset
-						mEnvParms.battery_comsumption_data_begin_time=sctm;
-						mEnvParms.battery_comsumption_data_begin_level=bl;
-						mUtil.addDebugMsg(1,"I","Battery comsumption ratio was reset(Begin value was invalid)");
-					}
-					if (mEnvParms.battery_comsumption_data_end_level!=bl) {
-						mEnvParms.battery_comsumption_data_end_time=sctm;
-						mEnvParms.battery_comsumption_data_end_level=bl;
-						mEnvParms.saveBatteryComsumptionData(mContext);
-						if (mGp.settingDebugLevel>=1) {
-							long rate=-1;
-							long diff_time=(mEnvParms.battery_comsumption_data_end_time-mEnvParms.battery_comsumption_data_begin_time);
-							long diff_level=(mEnvParms.battery_comsumption_data_begin_level-mEnvParms.battery_comsumption_data_end_level);
-							if (diff_level>0) rate=diff_time/diff_level;
-							
-							mUtil.addDebugMsg(1,"I","Battery consumption rate="+rate+", time="+diff_time+", level="+diff_level);
-						}
-					}
 				}
 			} else {
 				//放電に切りかわった
-				mEnvParms.battery_comsumption_data_begin_time=sctm;
-				mEnvParms.battery_comsumption_data_begin_level=bl;
-				mEnvParms.battery_comsumption_data_end_time=sctm;
-				mEnvParms.battery_comsumption_data_end_level=bl;
-				mEnvParms.saveBatteryComsumptionData(mContext);
-				mUtil.addDebugMsg(1,"I","Battery comsumption ratio was reset");
 			}
 		}
 		String n_bcs=parseBatteryChargeStatus(st);
-		if (mEnvParms.batteryLevel==-1) {
+//        mUtil.addDebugMsg(1,"I","status="+st+", desc="+n_bcs);
+        if (mEnvParms.batteryLevel==-1) {
 			if (mGp.settingDebugLevel>=1)
 				mUtil.addDebugMsg(1,"I","Initial battery status, level=",String.valueOf(n_bl),
 					", source=",n_ps,", charge=",n_bcs,
@@ -1591,20 +1537,27 @@ public final class SchedulerService extends Service {
 			if (wssid.equals("0x")) wssid="<unknown ssid>";
 			
 			boolean new_wifi_enabled=mWifiMgr.isWifiEnabled();
+			if (!new_wifi_enabled) {
+			    tssid="";
+			    tmac="";
+            }
 			mUtil.addDebugMsg(2,"I","WIFI receiver " +"Action="+in.getAction()+
 					", SupplicantState="+ss+
 					", mEnvParms.wifiIsActive="+mEnvParms.wifiIsActive+
 					", new_wifi_enabled="+new_wifi_enabled+
 					", mEnvParms.wifiSsid="+mEnvParms.wifiConnectedSsidName+
 					", tssid="+tssid+", wssid="+wssid+", mac addr="+tmac);
-			if (!new_wifi_enabled && mEnvParms.wifiIsActive ) {
-				mUtil.addDebugMsg(1,"I","WIFI receiver, WIFI Off");
-				mEnvParms.wifiConnectedSsidName="";
-				mEnvParms.wifiConnectedSsidAddr="";
-				mEnvParms.wifiIsActive=false;
-				TaskManager.notifyToEventList(mTaskMgrParms,
-						mTaskMgrParms.wifiNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_OFF, mGp);
-				scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_OFF);
+			if (ss.equals("COMPLETED") && tssid.equals("")) return;
+			if (!new_wifi_enabled) {// && mEnvParms.wifiIsActive ) {
+			    if (mEnvParms.wifiIsActive) {
+                    mUtil.addDebugMsg(1,"I","WIFI receiver, WIFI Off");
+                    mEnvParms.wifiConnectedSsidName="";
+                    mEnvParms.wifiConnectedSsidAddr="";
+                    mEnvParms.wifiIsActive=false;
+                    TaskManager.notifyToEventList(mTaskMgrParms,
+                            mTaskMgrParms.wifiNotifyEventList,EXTRA_DEVICE_EVENT_DEVICE_OFF, mGp);
+                    scheduleBuiltinEventTask(mBuiltinEventTaskList,BUILTIN_EVENT_WIFI_OFF);
+                }
 			} else {
 				if (ss.equals("COMPLETED")  ) {
 					if (mEnvParms.wifiConnectedSsidName.equals("") && !wssid.equals("")) {

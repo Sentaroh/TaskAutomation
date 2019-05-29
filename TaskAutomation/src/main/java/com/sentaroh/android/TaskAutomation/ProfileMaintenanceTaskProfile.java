@@ -44,7 +44,6 @@ import static com.sentaroh.android.TaskAutomation.CommonConstants.TRIGGER_EVENT_
 import static com.sentaroh.android.TaskAutomation.CommonConstants.TRIGGER_EVENT_CATEGORY_TASK;
 import static com.sentaroh.android.TaskAutomation.CommonConstants.TRIGGER_EVENT_CATEGORY_TIME;
 import static com.sentaroh.android.TaskAutomation.CommonConstants.TRIGGER_EVENT_TASK;
-import static com.sentaroh.android.TaskAutomation.QuickTaskConstants.QUICK_TASK_GROUP_NAME;
 
 import java.util.ArrayList;
 
@@ -859,8 +858,7 @@ public class ProfileMaintenanceTaskProfile extends DialogFragment{
 			@Override
 			final public void onItemClick(AdapterView<?> parent, View view,
 					final int position, long id) {
-				if (!mGlblParms.taskActionListAdapter.getItem(position).action.startsWith(BUILTIN_PREFIX) &&
-						!curr_grp.equals(QUICK_TASK_GROUP_NAME)) {
+				if (!mGlblParms.taskActionListAdapter.getItem(position).action.startsWith(BUILTIN_PREFIX) ) {
 					for (int i=0;i<pfla.getDataListCount();i++) {
 						if (pfla.getDataListItem(i).getProfileType().equals(PROFILE_TYPE_ACTION)&&
 							pfla.getDataListItem(i).getProfileGroup().equals(curr_grp) &&

@@ -5,7 +5,7 @@ android {
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.sentaroh.android.TaskAutomation"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 26
 
         versionCode 147
@@ -55,6 +55,7 @@ android {
 //                        def newName = "${mod_name}_${versionName}_${versionNumber}_${date}.${fileExtension}"
                         def newName = "${mod_name}_${versionName}_${versionNumber}_release.${fileExtension}"
                         outputFileName = newName
+
                     }
                 }
             }
