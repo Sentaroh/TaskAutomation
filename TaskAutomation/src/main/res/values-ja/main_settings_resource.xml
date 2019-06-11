@@ -66,10 +66,6 @@
     <string name="settings_main_exit_clean_title">終了時の処理</string>
     <string name="settings_main_exit_clean_summary_ena">アプリケーション終了時にプロセスをキルする</string>
 
-	<string name="settings_main_sample_title">サンプルプロファイル</string>
-	<string name="settings_main_sample_recreate_title">サンプルプロファイルの再作成</string>
-    <string name="settings_main_sample_recreate_summary_ena">設定終了時に再作成する</string>
-	
 	<string name="settings_main_light_sensor_title">照明センサー</string>
 	
     <string name="settings_main_light_sensor_use_thread_title">照明センサー スレッド</string>

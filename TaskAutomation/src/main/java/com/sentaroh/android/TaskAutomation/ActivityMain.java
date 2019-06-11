@@ -450,12 +450,32 @@ public class ActivityMain extends AppCompatActivity {
 			case R.id.menu_top_uninstall:
 				uninstallApplication();
 				return true;			
-//			case R.id.menu_top_quit:
-//				finish();
-//				return true;			
+			case R.id.menu_top_create_sample:
+			    createSampleProfile();
+				return true;
 		}
 		return false;
 	};
+
+	private void createSampleProfile() {
+        boolean sample=ProfileUtilities.isProfileGroupActive(mGp.util, mGp.profileAdapter, "*Sample for Task");
+        boolean bsh=ProfileUtilities.isProfileGroupActive(mGp.util, mGp.profileAdapter, "*Sample for BeanShell API");
+        ProfileUtilities.deleteProfileGroup(mGp.util, mGp.profileAdapter, "*Sample for Task");
+        ProfileUtilities.deleteProfileGroup(mGp.util, mGp.profileAdapter, "*Sample for BeanShell API");
+        SampleProfile.addSampleProfile(mGp.profileAdapter, true, true);
+
+        mGp.profileAdapter.sort();
+        mGp.profileAdapter.updateShowList();
+        mGp.profileAdapter.notifyDataSetChanged();
+        if (sample || bsh) ProfileMaintenance.putProfileListToService(mGp,mGp.profileAdapter,true);
+        else ProfileMaintenance.putProfileListToService(mGp,mGp.profileAdapter,false);
+
+        createProfileGroupList();
+        setProfileGroupSelectorListener();
+        setProfileGroupTabListClickListener();
+        setProfileGroupTabListLongClickListener();
+        setProfileFilterSelectorListener();
+    }
 
     private void invokeLogManagement() {
         NotifyEvent ntfy = new NotifyEvent(mContext);
@@ -475,7 +495,7 @@ public class ActivityMain extends AppCompatActivity {
                 LogFileListDialogFragment.newInstance(false, getString(R.string.msgs_log_management_title),
                         getString(R.string.msgs_log_management_send_log_file_warning),
                         getString(R.string.msgs_log_management_enable_log_file_warning),
-                        "SMBSync2 log file");
+                        "TaskAutomation log file");
         lfm.showDialog(getSupportFragmentManager(), lfm, mGp, ntfy);
     }
 
@@ -644,8 +664,8 @@ public class ActivityMain extends AppCompatActivity {
 
 		final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.about_dialog_title_view);
 		final TextView title = (TextView) dialog.findViewById(R.id.about_dialog_title);
-		title_view.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
-		title.setTextColor(mGp.themeColorList.text_color_dialog_title);
+		title_view.setBackgroundColor(mGp.themeColorList.title_background_color);
+		title.setTextColor(mGp.themeColorList.title_text_color);
 		title.setText(getString(R.string.msgs_about_dlg_title)+" Ver "+getApplVersionName());
 		
         // get our tabHost from the xml
@@ -777,7 +797,7 @@ public class ActivityMain extends AppCompatActivity {
 		mMainTabHost.addTab(tabSpec);
 		
 		LinearLayout ll_main=(LinearLayout)findViewById(R.id.main_view);
-		ll_main.setBackgroundColor(mGp.themeColorList.window_background_color_content);
+//		ll_main.setBackgroundColor(mGp.themeColorList.window_background_color_content);
 		
         LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mGroupView=(LinearLayout)vi.inflate(R.layout.activity_main_group,null);
@@ -903,7 +923,6 @@ public class ActivityMain extends AppCompatActivity {
 			getPrefsMgr().edit().putString(getString(R.string.settings_main_scheduler_thread_pool_count),"5").commit();
 			getPrefsMgr().edit().putBoolean(getString(R.string.settings_main_enable_scheduler),true).commit();
 			getPrefsMgr().edit().putBoolean(getString(R.string.settings_main_device_admin),true).commit();
-			getPrefsMgr().edit().putBoolean(getString(R.string.settings_main_sample_recreate),false).commit();
 			getPrefsMgr().edit().putBoolean(getString(R.string.settings_main_scheduler_monitor),false).commit();
 			
 			getPrefsMgr().edit().putString(mContext.getString(R.string.settings_main_log_dir),
@@ -969,29 +988,7 @@ public class ActivityMain extends AppCompatActivity {
 			
 			mGp.util.resetLogReceiver(mContext);
 
-			if (getPrefsMgr().getBoolean(getString(R.string.settings_main_sample_recreate),false)) {
-				getPrefsMgr().edit().putBoolean(getString(R.string.settings_main_sample_recreate),false).commit();
-				boolean sample=ProfileUtilities.isProfileGroupActive(mGp.util, mGp.profileAdapter, "Sample");
-				boolean bsh=ProfileUtilities.isProfileGroupActive(mGp.util, mGp.profileAdapter, "BeanShell API Sample");
-				ProfileUtilities.deleteProfileGroup(mGp.util, mGp.profileAdapter, "Sample");
-				ProfileUtilities.deleteProfileGroup(mGp.util, mGp.profileAdapter, "BeanShell API Sample");
-				SampleProfile.addSampleProfile(mGp.profileAdapter, true, true);
-
-				mGp.profileAdapter.sort();
-				mGp.profileAdapter.updateShowList();
-				mGp.profileAdapter.notifyDataSetChanged();
-				if (sample || bsh) ProfileMaintenance.putProfileListToService(mGp,mGp.profileAdapter,true);
-				else ProfileMaintenance.putProfileListToService(mGp,mGp.profileAdapter,false);
-
-				createProfileGroupList();
-				setProfileGroupSelectorListener();
-				setProfileGroupTabListClickListener();
-				setProfileGroupTabListLongClickListener();
-				setProfileFilterSelectorListener();
-
-			}
-
-			if (p_tpc!=n_tpc || 
+			if (p_tpc!=n_tpc ||
 					isBooleanDifferent(p_light_sensor_thread,mGp.settingLightSensorUseThread)) {
 				if (!pms && mGp.settingEnableScheduler) mGp.util.startScheduler();
 //				mGlblParms.util.restartScheduler();

@@ -1591,12 +1591,12 @@ public class ProfileMaintenanceActionProfile extends DialogFragment{
     				@Override
     				final public void positiveResponse(Context c, Object[] o) {
     					uri_data.selectAll();
-    					uri_data.setText(Uri.parse((String)o[0]).toString());
+    					uri_data.setText(Uri.parse((String)o[0]+"/"+(String)o[1]).toString());
     				}
     				@Override
     				final public void negativeResponse(Context c, Object[] o) {}
     			});
-    			mGlblParms.commonDlg.fileOnlySelectWithoutCreate(
+    			mGlblParms.commonDlg.fileSelectorFileOnlyWithCreate(true,
     					LocalMountPoint.getExternalStorageDir(),"", 
     					"", "Select file", ntfy);
 			}

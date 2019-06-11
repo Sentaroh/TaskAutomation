@@ -283,7 +283,7 @@ public final class SchedulerService extends Service {
     	if (in!=null && in.getAction()!=null) t_act=in.getAction();
     	else t_act="";
     	final String action=t_act;
-		if (mGp.settingDebugLevel>=2 && !action.equals(BROADCAST_SERVICE_HEARTBEAT))
+//		if (mGp.settingDebugLevel>=2 && !action.equals(BROADCAST_SERVICE_HEARTBEAT))
 			mUtil.addDebugMsg(2,"I","onStartCommand entered, action=",action,", flag=",String.valueOf(flags));
 		if (action.startsWith(CANCEL_ALL_SOUND_PLAYBACK_STOP_REQUEST)) {
 			cancelSoundPlayBackTask();

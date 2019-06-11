@@ -66,6 +66,8 @@
     <string name="msgs_menu_uninstall_subtitle">アンインストールの確認</string>
     <string name="msgs_menu_uninstall_message">スクリーンロックを無効にし、アンインストールを続行しますか？次に表示される画面でアプリケーションのアンインストールを中止した場合はアプリケーション設定でスクリーンロックを有効にしてください。</string>
     <string name="msgs_menu_restart_scheduler">スケジューラーの再起動</string>
+
+    <string name="msgs_menu_create_sample">サンプルの作成</string>
     
     <string name="msgs_confirm_activate_group">以下のグループを有効にしますか？</string>
     <string name="msgs_confirm_inactivate_group">以下のグループを無効にしますか？</string>

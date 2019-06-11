@@ -68,6 +68,8 @@
     
     <string name="msgs_menu_uninstall_subtitle">Confirm uninstall</string>
     <string name="msgs_menu_uninstall_message">Do you want to continue with the uninstallation after disabling the lock screen? If you cancel the uninstallation of the application in the next screen, please enable the screen lock in the application settings.</string>
+
+    <string name="msgs_menu_create_sample">Create sample profile</string>
     
     <string name="msgs_confirm_activate_group">以下のグループを有効にしますか？</string>
     <string name="msgs_confirm_inactivate_group">以下のグループを無効にしますか？</string>

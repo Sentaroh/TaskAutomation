@@ -118,8 +118,7 @@ public class ActivitySettings extends PreferenceActivity{
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_log_file_max_count));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_log_level));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_exit_clean));
-		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_sample_recreate));
-    	
+
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_light_sensor_use_thread));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_light_sensor_monitor_interval_time));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_light_sensor_monitor_active_time));
@@ -317,8 +316,6 @@ public class ActivitySettings extends PreferenceActivity{
 			SharedPreferences shared_pref, String key_string, Context c) {
 		boolean isChecked = false;
     	if (key_string.equals(c.getString(R.string.settings_main_exit_clean))) {
-    		isChecked=true;
-    	} else if (key_string.equals(c.getString(R.string.settings_main_sample_recreate))) {
     		isChecked=true;
     	}
     	return isChecked;
@@ -519,7 +516,6 @@ public class ActivitySettings extends PreferenceActivity{
         	}
     		
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_exit_clean));
-    		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_sample_recreate));
         };
         
         @Override

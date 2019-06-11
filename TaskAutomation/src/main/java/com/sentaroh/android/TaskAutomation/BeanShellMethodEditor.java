@@ -307,7 +307,7 @@ public class BeanShellMethodEditor {
 		ntfy.setListener(new NotifyEventListener(){
 			@Override
 			public void positiveResponse(Context c, Object[] o) {
-				String fp=(String)o[0];
+				String fp=(String)o[0]+"/"+(String)o[1];
 				String n_method=method.replace(a_parm[pos], "\""+fp+"\"");
 //				Log.v("","file_path="+fp);
 //				Log.v("","n_method="+n_method);
@@ -320,7 +320,7 @@ public class BeanShellMethodEditor {
 		});
 		String mn=method.substring(0,method.indexOf("("));
 		String title=String.format(context.getString(R.string.msgs_bsh_method_editor_dlg_select_file),mn,a_parm[pos]);
-		commonDlg.fileOnlySelectWithoutCreate(LocalMountPoint.getExternalStorageDir(), "", "", 
+		commonDlg.fileSelectorFileOnlyWithCreate(true, LocalMountPoint.getExternalStorageDir(), "", "",
 				title, ntfy);
 	}
 	final private void parseParameterNonArrayValueListSelector(final String method,
@@ -894,15 +894,17 @@ public class BeanShellMethodEditor {
 			{"Message",				"",		"showMessageDialog(String meesage_text, boolean use_vibrator)"},
 			{"Message",				"",		"showMessageNotification(String message_text, boolean use_vibrator, boolean use_led, String led_color)"}, 
 			{"Activity",			"",		"startActivity(intent)"},
-			{"Activity",			"",		"startActivity(String actv_package_name)"},
+            {"Activity",			"",		"createIntent()"},
+			{"Activity",			"",		"createIntentWithPackageName(String actv_package_name)"},
+            {"Activity",			"",		"intentSetAction(Intent in, String action)"},
 			{"Activity",			"",		"startActivity(String actv_package_name, String actv_data)"},
-			{"Activity",			"",		"startActivityAddExtra(intent, String actv_extra_key, boolean actv_boolean)"}, 
-			{"Activity",			"",		"startActivityAddExtra(intent, \"hoge key\", new boolean[]{true,false})"},
-			{"Activity",			"",		"startActivityAddExtra(intent, String actv_extra_key, int actv_int)"},
-			{"Activity",			"",		"startActivityAddExtra(intent, \"hoge key\", new int[]{value,value})"},
-			{"Activity",			"",		"startActivityAddExtra(intent, String actv_extra_key, String actv_string)"},
-			{"Activity",			"",		"startActivityAddExtra(intent, \"hoge key\", new String[] {\"hoge\",\"hoge\"})"},
-			{"Activity",			"intent=",	"startActivityBuildIntent(String actv_package_name)"},
+			{"Activity",			"",		"intentAddExtra(intent, String actv_extra_key, boolean actv_boolean)"},
+			{"Activity",			"",		"intentAddExtra(intent, \"hoge key\", new boolean[]{true,false})"},
+			{"Activity",			"",		"intentAddExtra(intent, String actv_extra_key, int actv_int)"},
+			{"Activity",			"",		"intentAddExtra(intent, \"hoge key\", new int[]{value,value})"},
+			{"Activity",			"",		"intentAddExtra(intent, String actv_extra_key, String actv_string)"},
+			{"Activity",			"",		"intentAddExtra(intent, \"hoge key\", new String[] {\"hoge\",\"hoge\"})"},
+//			{"Activity",			"intent=",	"startActivityBuildIntent(String actv_package_name)"},
 
 			{"Intent",			"",		"sendBroadcastIntent(Intent intent)"},
 			{"Intent",			"",		"setIntentAction(intent, String action)"},

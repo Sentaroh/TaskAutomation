@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -11,6 +12,15 @@ import com.sentaroh.android.TaskAutomation.GlobalParameters;
 import com.sentaroh.android.TaskAutomation.GlobalWorkArea;
 import com.sentaroh.android.Utilities.LogUtil.CommonLogWriter;
 import com.sentaroh.android.Utilities.StringUtil;
+import com.sentaroh.android.Utilities.ThreadCtrl;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static com.sentaroh.android.TaskAutomation.CommonConstants.APPLICATION_TAG;
 import static com.sentaroh.android.TaskAutomation.Log.LogConstants.BROADCAST_LOG_DELETE;
@@ -25,12 +35,95 @@ public class LogService extends Service {
 
     private Context mContext=null;
 
+    private ThreadCtrl mLogCatCtl=new ThreadCtrl();
+
     @Override
     public void onCreate() {
         if (mGp==null) {
             mContext=this;
             mGp= GlobalWorkArea.getGlobalParameters(this);
         }
+
+//        mLogCatCtl.setDisabled();
+//        Thread th=new Thread() {
+//            @Override
+//            public void run() {
+//                Log.v(APPLICATION_TAG, "LogCat monitor started");
+//                startLogcat();
+//                boolean for_ever=true;
+//                while(for_ever) {
+//                    SystemClock.sleep(1000*60*60);
+//                    mLogCatCtl.setDisabled();
+//                    synchronized(mLogCatCtl) {
+//                        try {
+//                            mLogCatCtl.wait();
+//                            startLogcat();
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//                Log.v(APPLICATION_TAG, "LogCat monitor ended");
+//            }
+//        };
+//        th.setName("LogCatMonitor");
+//        th.start();
+
+    }
+
+    private boolean mLogcatActive=false;
+    private String mLogcatDir="/storage/emulated/0/TaskAutomation", mLogcatFilename="logcat.txt";
+    private void startLogcat() {
+        Thread th=new Thread() {
+            @Override
+            public void run() {
+                if (mLogCatCtl.isEnabled()) return;
+                mLogCatCtl.setEnabled();
+                Log.v(APPLICATION_TAG, "LogCat writer started");
+                mLogcatActive=true;
+                Process process = null;
+                BufferedReader reader = null;
+                BufferedOutputStream bos=null;
+                try {
+                    File log_dir=new File(mLogcatDir);
+                    if (!log_dir.exists()) log_dir.mkdirs();
+                    File log_out=new File(mLogcatDir+"/"+System.currentTimeMillis()+".txt");//mLogcatFilename);
+                    bos=new BufferedOutputStream(new FileOutputStream(log_out), 1024*1024*2);
+
+                    process = Runtime.getRuntime().exec("su");
+                    DataOutputStream cmd_in=new DataOutputStream(process.getOutputStream());
+                    String logcat_cmd = "logcat -v time";
+                    cmd_in.writeBytes(logcat_cmd+"\n");
+                    cmd_in.flush();
+                    reader = new BufferedReader(new InputStreamReader(process.getInputStream()), 1024*64);
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        bos.write((line+"\n").getBytes());
+//                        bos.flush();
+                        if (!mLogCatCtl.isEnabled()) break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    synchronized(mLogCatCtl) {
+                        mLogCatCtl.notify();
+                    }
+                    Log.v(APPLICATION_TAG, "LogCat writer ended");
+                    mLogCatCtl.setDisabled();
+                    if (reader != null) {
+                        try {
+                            bos.flush();
+                            bos.close();
+                            reader.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        };
+        th.setName("LogCatWriter");
+        th.start();
     }
 
     private StringBuilder log_msg=new StringBuilder(1024);

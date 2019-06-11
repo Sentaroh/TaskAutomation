@@ -670,14 +670,14 @@ public class ProfileMaintenance {
 				ntfy_listing.setListener(new NotifyEventListener() {
 					@Override
 					final public void positiveResponse(Context c, Object[] o) {
-		    			dlg_filename.setText((String)o[0]);
+		    			dlg_filename.setText((String)o[0]+"/"+(String)o[1]);
 					}
 					@Override
 					final public void negativeResponse(Context c, Object[] o) {}
 				});
-				mGlblParms.commonDlg.fileOnlySelectWithCreate(
+				mGlblParms.commonDlg.fileSelectorFileOnlyWithCreate(true,
 						mGlblParms.localRootDir,"/"+APPLICATION_TAG,"profile.txt",
-						mGlblParms.context.getString(R.string.msgs_export_profile_select_file),ntfy_listing);
+						mGlblParms.context.getString(R.string.msgs_export_profile_select_file), ntfy_listing);
 			}
 		});
 		
@@ -2016,13 +2016,13 @@ public class ProfileMaintenance {
     			ntfy.setListener(new NotifyEventListener() {
     				@Override
     				final public void positiveResponse(Context c, Object[] o) {
-    					sound_file_name.setText((String)o[0]);
+    					sound_file_name.setText((String)o[0]+"/"+(String)o[1]);
     					playBtn.setEnabled(true);
     				}
     				@Override
     				final public void negativeResponse(Context c, Object[] o) {}
     			});
-    			mGlblParms.commonDlg.fileOnlySelectWithoutCreate(
+    			mGlblParms.commonDlg.fileSelectorFileOnlyWithCreate(true,
     					mpdf[0], mpdf[1], mpdf[2], "Select file", ntfy);
     		}
     	});

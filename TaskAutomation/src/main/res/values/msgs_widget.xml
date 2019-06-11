@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="msgs_widget_appname">DeviceMonitor</string>    
-    <string name="msgs_widget_battery">TA Battery</string>
-    <string name="msgs_widget_bluetooth">TA Bluetooth</string>
-    <string name="msgs_widget_wifi">TA Wireless LAN</string>
-    <string name="msgs_widget_silent">TA Silent</string>
-    <string name="msgs_widget_camera">TA Camera</string>
-    <string name="msgs_widget_locked_screen_simple">TA button</string>
-    <string name="msgs_widget_locked_screen_with_info">TA button with TA info</string>
-    
    	<string name="msgs_widget_battery_status_charge_charging">Charging</string>
    	<string name="msgs_widget_battery_status_charge_discharging">Discharging</string>
    	<string name="msgs_widget_battery_status_charge_full">Full</string>
@@ -20,7 +11,4 @@
    	<string name="msgs_widget_battery_status_health_failure">Failure</string>
    	<string name="msgs_widget_battery_status_health_unknown">Unknown</string>
    	<string name="msgs_widget_battery_status_tempture">°C</string>
-   	
-   	<string name="msgs_widget_battery_button_not_functional">To lock the screen failed. make sure  "screen lock" is enabled.</string>
-    
 </resources>

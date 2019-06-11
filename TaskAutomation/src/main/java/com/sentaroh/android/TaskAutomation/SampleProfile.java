@@ -33,20 +33,18 @@ public class SampleProfile {
 
 	public static void addSampleProfile(AdapterProfileList pla, boolean sample, boolean bhs) {
 		if (sample) {
-			addSampleProfilePhone(false,"Sample",pla.getDataList());
+			addSampleProfilePhone(false,"*Sample for Task",pla.getDataList());
 //			addSampleProfileSmbsyncTaFunc(false,"SMBSync_TAFUNC",pla.getDataList());
-			addSampleProfileSmbsyncBsh(false,"SMBSync_BSH",pla.getDataList());
 		}
-		if (bhs) addBhsProfile(false,"BeanShell API Sample",pla.getDataList());
+		if (bhs) addBhsProfile(false,"*Sample for BeanShell API",pla.getDataList());
 	};
 
 	public static void addSampleProfile(ArrayList<ProfileListItem> pfl, boolean sample, boolean bhs) {
 		if (sample) {
-			addSampleProfilePhone(false,"Sample",pfl);
+			addSampleProfilePhone(false,"Sample for Task",pfl);
 //			addSampleProfileSmbsyncTaFunc(false,"SMBSync_TAFUNC",pfl);
-			addSampleProfileSmbsyncBsh(false,"SMBSync_BSH",pfl);
 		}
-		if (bhs) addBhsProfile(false,"BeanShell API Sample",pfl);
+		if (bhs) addBhsProfile(false,"Sample for BeanShell API",pfl);
 	};
 	public static void addBhsProfile(boolean active, 
 			String grp, ArrayList<ProfileListItem> pfl) {
@@ -55,15 +53,14 @@ public class SampleProfile {
 		tpli= new ProfileListItem();
 		tpli.setActionBeanShellScriptEntry(PROFILE_VERSION_CURRENT,grp,false,System.currentTimeMillis(),
 				PROFILE_TYPE_ACTION,"a.Activity-NoParm", 
-				PROFILE_ENABLED,"TaCmd.startActivity(\"com.sentaroh.android.SMBSync\");");
+				PROFILE_ENABLED,"TaCmd.startActivity(\"com.sentaroh.android.SMBSync2\");");
 		pfl.add(tpli);
 
 		tpli= new ProfileListItem();
-		String script="in=TaCmd.startActivityBuildIntent(\"com.sentaroh.android.SMBSync\");"+"\n"+
-				"TaCmd.startActivityAddExtra(in,\"AutoStart\",true);"+"\n"+
-				"TaCmd.startActivityAddExtra(in,\"AutoTerm\",true);"+"\n"+
-				"String[] p2=new String[]{\"HOGE1\",\"HOGE2\"};"+"\n"+
-				"TaCmd.startActivityAddExtra(in,\"SyncProfile\",p2);"+"\n"+
+		String script="in=TaCmd.intentCreate();"+"\n"+
+                "TaCmd.intentSetAction(in, \"com.sentaroh.android.SMBSync2.ACTION_START_SYNC\");"+"\n"+
+				"String p2=\"HOGE1,HOGE2\";"+"\n"+
+				"TaCmd.intentAddExtraData(in,\"SyncProfile\",p2);"+"\n"+
 				"TaCmd.startActivity(in);";
 		tpli.setActionBeanShellScriptEntry(PROFILE_VERSION_CURRENT,grp,false,System.currentTimeMillis(),
 				PROFILE_TYPE_ACTION,"a.Activity-ExtraData", 
@@ -80,7 +77,7 @@ public class SampleProfile {
 		tpli= new ProfileListItem();
 		script=
 				"if (TaCmd.isWifiConnected()){\n" +
-				"  ssid=TaCmd.getWifiSsidName();\n" +
+				"  ssid=TaCmd.getWifiSsidName().toLowerCase();\n" +
 				"  if (!ssid.equals(\"my-wlan\") && !ssid.equals(\"docomo\") ) {\n" +
 				"    if (TaCmd.setWifiSsidDisabled())\n" +
 				"      TaCmd.showMessageNotification(ssid+\"は無効なAPのため削除しました。\", true, true,\"BLUE\");" +
@@ -355,7 +352,7 @@ public class SampleProfile {
 		act.add(BUILTIN_ACTION_WIFI_ON);
 		act.add(BUILTIN_ACTION_WAIT_1_MIN);
 		act.add("SSID Check");
-		act.add("SMBSync");
+		act.add("SMBSync2");
 		trig.add("DailyTimer");
 		tpli= new ProfileListItem();
 		tpli.setTaskEntry(PROFILE_VERSION_CURRENT,grp,false,System.currentTimeMillis(),
@@ -629,8 +626,8 @@ public class SampleProfile {
 		aed_list.add(aedi);
 		
 		tpli.setActionAndroidEntry(PROFILE_VERSION_CURRENT,grp,false, System.currentTimeMillis(),
-				PROFILE_TYPE_ACTION,"SMBSync", 
-				PROFILE_ENABLED,"SMBSync","com.sentaroh.android.SMBSync",
+				PROFILE_TYPE_ACTION,"SMBSync2",
+				PROFILE_ENABLED,"SMBSync2","com.sentaroh.android.SMBSync2",
 				PROFILE_ACTION_TYPE_ACTIVITY_DATA_TYPE_EXTRA,"",aed_list);
 		tpli.setProfileGroupShowed(active);
 		pfl.add(tpli);
@@ -678,154 +675,4 @@ public class SampleProfile {
 		ProfileUtilities.sortProfileArrayList(null, pfl);
 	};
 	
-	@SuppressWarnings("unused")
-	private static void addSampleProfileSmbsyncTaFunc(boolean active, 
-			String grp, ArrayList<ProfileListItem> pfl) {
-		ProfileListItem tpli;
-		ArrayList<String> act;
-		ArrayList<String> trig;
-
-		act=new ArrayList<String>();
-		trig=new ArrayList<String>();
-		act.add("SSID Check");
-		act.add("SMBSync");
-		trig.add("DailyTimer");
-		tpli= new ProfileListItem();
-		tpli.setTaskEntry(PROFILE_VERSION_CURRENT,grp,false,System.currentTimeMillis(),
-				PROFILE_TYPE_TASK,"SMBSync-Activity", 
-				PROFILE_ENABLED,PROFILE_RETROSPECIVE_DISABLED,"0",
-				PROFILE_ERROR_NOTIFICATION_DISABLED,act,trig);
-		tpli.setProfileGroupShowed(active);
-		pfl.add(tpli);
-
-		tpli= new ProfileListItem();
-		ActivityExtraDataItem aedi=new ActivityExtraDataItem();
-		ArrayList<ActivityExtraDataItem> aed_list=new ArrayList<ActivityExtraDataItem>();
-		aedi.key_value="AutoStart";
-		aedi.data_type=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_BOOLEAN;
-		aedi.data_value="true";
-		aedi.data_value_array=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_ARRAY_NO;
-		aed_list.add(aedi);
-
-		aedi=new ActivityExtraDataItem();
-		aedi.key_value="AutoTerm";
-		aedi.data_type=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_BOOLEAN;
-		aedi.data_value="true";
-		aedi.data_value_array=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_ARRAY_NO;
-		aed_list.add(aedi);
-		
-		aedi=new ActivityExtraDataItem();
-		aedi.key_value="SyncProfile";
-		aedi.data_type=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_STRING;
-		aedi.data_value="S-TEST\u0003S-SAMPLE\u0003";
-		aedi.data_value_array=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_ARRAY_YES;
-		aed_list.add(aedi);
-		
-		tpli.setActionAndroidEntry(PROFILE_VERSION_CURRENT,grp,false, System.currentTimeMillis(),
-				PROFILE_TYPE_ACTION,"SMBSync", 
-				PROFILE_ENABLED,"SMBSync","com.sentaroh.android.SMBSync",
-				PROFILE_ACTION_TYPE_ACTIVITY_DATA_TYPE_EXTRA,"",aed_list);
-		tpli.setProfileGroupShowed(active);
-		pfl.add(tpli);
-		
-		tpli= new ProfileListItem();
-//		setActionWifiEntry(String pt, String pn, String pe,  
-//				String comp_type, String ssid, String ra)
-		String[] c_val=new String[1];
-		c_val[0]="MY-WLAN";
-		tpli.setActionCompareEntry(PROFILE_VERSION_CURRENT,grp,false, System.currentTimeMillis(),
-				PROFILE_TYPE_ACTION,"SSID Check", 
-				PROFILE_ENABLED,
-				PROFILE_ACTION_TYPE_COMPARE_TARGET_WIFI,
-				PROFILE_ACTION_TYPE_COMPARE_CPMPARE_NE,c_val,
-				PROFILE_ACTION_TYPE_COMPARE_RESULT_ABORT);
-		tpli.setProfileGroupShowed(active);
-		pfl.add(tpli);
-		
-		tpli= new ProfileListItem();
-		tpli.setTimeEventEntry(PROFILE_VERSION_CURRENT,grp,false, System.currentTimeMillis(),
-				PROFILE_TYPE_TIME,"DailyTimer", 
-				PROFILE_ENABLED,PROFILE_DATE_TIME_TYPE_EVERY_DAY,"0000000","****/**/**","00:00");
-		tpli.setProfileGroupShowed(active);
-		pfl.add(tpli);
-		
-		ProfileUtilities.sortProfileArrayList(null, pfl);
-	};
-
-	private static void addSampleProfileSmbsyncBsh(boolean active, 
-			String grp, ArrayList<ProfileListItem> pfl) {
-		ProfileListItem tpli;
-		ArrayList<String> act;
-		ArrayList<String> trig;
-
-		act=new ArrayList<String>();
-		trig=new ArrayList<String>();
-		act.add("SSID Check");
-		act.add("SMBSync");
-		trig.add("DailyTimer");
-		tpli= new ProfileListItem();
-		tpli.setTaskEntry(PROFILE_VERSION_CURRENT,grp,false,System.currentTimeMillis(),
-				PROFILE_TYPE_TASK,"SMBSync-Activity", 
-				PROFILE_ENABLED,PROFILE_RETROSPECIVE_DISABLED,"0",
-				PROFILE_ERROR_NOTIFICATION_DISABLED,act,trig);
-		tpli.setProfileGroupShowed(active);
-		pfl.add(tpli);
-
-		tpli= new ProfileListItem();
-		ActivityExtraDataItem aedi=new ActivityExtraDataItem();
-		ArrayList<ActivityExtraDataItem> aed_list=new ArrayList<ActivityExtraDataItem>();
-		aedi.key_value="AutoStart";
-		aedi.data_type=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_BOOLEAN;
-		aedi.data_value="true";
-		aedi.data_value_array=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_ARRAY_NO;
-		aed_list.add(aedi);
-
-		aedi=new ActivityExtraDataItem();
-		aedi.key_value="AutoTerm";
-		aedi.data_type=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_BOOLEAN;
-		aedi.data_value="true";
-		aedi.data_value_array=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_ARRAY_NO;
-		aed_list.add(aedi);
-		
-		aedi=new ActivityExtraDataItem();
-		aedi.key_value="SyncProfile";
-		aedi.data_type=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_STRING;
-		aedi.data_value="S-TEST\u0003S-SAMPLE\u0003";
-		aedi.data_value_array=PROFILE_ACTION_TYPE_ACTIVITY_EXTRA_DATA_VALUE_ARRAY_YES;
-		aed_list.add(aedi);
-		
-		tpli.setActionAndroidEntry(PROFILE_VERSION_CURRENT,grp,false, System.currentTimeMillis(),
-				PROFILE_TYPE_ACTION,"SMBSync", 
-				PROFILE_ENABLED,"SMBSync","com.sentaroh.android.SMBSync",
-				PROFILE_ACTION_TYPE_ACTIVITY_DATA_TYPE_EXTRA,"",aed_list);
-		tpli.setProfileGroupShowed(active);
-		pfl.add(tpli);
-		
-		tpli= new ProfileListItem();
-//		setActionWifiEntry(String pt, String pn, String pe,  
-//				String comp_type, String ssid, String ra)
-		String script=
-				"if (TaCmd.isWifiConnected()){\n" +
-				"  ssid=TaCmd.getWifiSsidName();\n" +
-				"  if (!ssid.equals(\"my-wlan\") && !ssid.equals(\"docomo\") ) {\n" +
-				"      TaCmd.showMessageNotification(ssid+\" is invalid SSID, application not started\", true, true,\"BLUE\");" +
-				"      TaCmd.abort();\n"+
-				"  }\n"+
-				"}";
-		tpli.setActionBeanShellScriptEntry(PROFILE_VERSION_CURRENT,grp,false,System.currentTimeMillis(),
-				PROFILE_TYPE_ACTION,"SSID Check", 
-				PROFILE_ENABLED,script);
-		tpli.setProfileGroupShowed(active);
-		pfl.add(tpli);
-		
-		tpli= new ProfileListItem();
-		tpli.setTimeEventEntry(PROFILE_VERSION_CURRENT,grp,false, System.currentTimeMillis(),
-				PROFILE_TYPE_TIME,"DailyTimer", 
-				PROFILE_ENABLED,PROFILE_DATE_TIME_TYPE_EVERY_DAY,"0000000","****/**/**","00:00");
-		tpli.setProfileGroupShowed(active);
-		pfl.add(tpli);
-		
-		ProfileUtilities.sortProfileArrayList(null, pfl);
-	};
-
 }

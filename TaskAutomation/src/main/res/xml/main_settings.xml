@@ -90,10 +90,6 @@
 			android:key="settings_main_exit_clean"
 			android:title="@string/settings_main_exit_clean_title"
 			android:summary="@string/settings_main_exit_clean_summary_ena" />
-   	    <CheckBoxPreference
-			android:key="settings_main_sample_recreate"
-			android:title="@string/settings_main_sample_recreate_title"
-			android:summary="@string/settings_main_sample_recreate_summary_ena" />
 	</PreferenceCategory>
 		
 	<PreferenceCategory android:title="@string/settings_main_light_sensor_title">

@@ -117,11 +117,6 @@
     <string name="settings_main_exit_clean_summary_ena">Kill application process after application cleanup.</string>
 	<string name="settings_main_exit_clean">settings_main_exit_clean</string>
 
-	<string name="settings_main_sample_title">Sample profile</string>
-	<string name="settings_main_sample_recreate_title">Re-create sample profile</string>
-    <string name="settings_main_sample_recreate_summary_ena">Re-create sample profiles　after settings close.</string>
-	<string name="settings_main_sample_recreate">settings_main_sample_recreate</string>
-
 	<string name="settings_main_light_sensor_title">Light sensor</string>
 
     <string name="settings_main_light_sensor_use_thread_title">Light sensor receiver</string>

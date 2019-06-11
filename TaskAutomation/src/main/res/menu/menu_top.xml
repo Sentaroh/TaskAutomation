@@ -60,5 +60,9 @@
           android:title="@string/msgs_menu_about_task_scheduler" 
           android:icon="@android:drawable/ic_menu_info_details"
           />
-    
+
+    <item android:id="@+id/menu_top_create_sample"
+        android:title="@string/msgs_menu_create_sample"
+        />
+
 </menu>

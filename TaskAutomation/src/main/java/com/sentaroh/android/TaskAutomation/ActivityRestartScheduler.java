@@ -102,7 +102,7 @@ public class ActivityRestartScheduler extends Activity {
         util.addDebugMsg(1,"I","onCreate entered");
         
 		FrameLayout fl_main=(FrameLayout)findViewById(R.id.activity_message_fl_main);
-		fl_main.setBackgroundColor(mThemeColorList.window_background_color_content);
+//		fl_main.setBackgroundColor(mThemeColorList.window_background_color_content);
 
 //		if (util.isKeyguardEffective()) {
 //		}

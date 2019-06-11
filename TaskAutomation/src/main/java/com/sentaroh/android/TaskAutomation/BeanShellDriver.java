@@ -704,79 +704,79 @@ public class BeanShellDriver {
 		throw new Exception("TaskAutomationAbortException");
 	}
 	 
-	final public void startActivityAddExtra(Intent in, String key, String value) throws Exception {
-		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
-		checkCancel(taskResponse,actionResponse);
-		in.putExtra(key,value);
-		if (mGp.settingDebugLevel>=1)
-			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
-		if (taskResponse.task_action_notification) {
-			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
-			actionResponse.resp_msg_text="";
-			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
-		}
-	}
-	final public void startActivityAddExtra(Intent in, String key, String[] value) throws Exception {
-		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
-		checkCancel(taskResponse,actionResponse);
-		in.putExtra(key,value);
-		if (mGp.settingDebugLevel>=1)
-			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
-		if (taskResponse.task_action_notification) {
-			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
-			actionResponse.resp_msg_text="";
-			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
-		}
-	}
-	final public void startActivityAddExtra(Intent in, String key, int value) throws Exception {
-		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
-		checkCancel(taskResponse,actionResponse);
-		in.putExtra(key,value);
-		if (mGp.settingDebugLevel>=1)
-			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
-		if (taskResponse.task_action_notification) {
-			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
-			actionResponse.resp_msg_text="";
-			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
-		}
-	}
-	final public void startActivityAddExtra(Intent in, String key, int[] value) throws Exception {
-		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
-		checkCancel(taskResponse,actionResponse);
-		in.putExtra(key,value);
-		if (mGp.settingDebugLevel>=1)
-			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
-		if (taskResponse.task_action_notification) {
-			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
-			actionResponse.resp_msg_text="";
-			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
-		}
-	}
-	final public void startActivityAddExtra(Intent in, String key, boolean value) throws Exception {
-		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
-		checkCancel(taskResponse,actionResponse);
-		in.putExtra(key,value);
-		if (mGp.settingDebugLevel>=1)
-			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
-		if (taskResponse.task_action_notification) {
-			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
-			actionResponse.resp_msg_text="";
-			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
-		}
-	}
-	final public void startActivityAddExtra(Intent in, String key, boolean[] value) throws Exception {
-		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
-		checkCancel(taskResponse,actionResponse);
-		in.putExtra(key,value);
-		if (mGp.settingDebugLevel>=1)
-			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
-		if (taskResponse.task_action_notification) {
-			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
-			actionResponse.resp_msg_text="";
-			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
-		}
-	}
-	final public Intent startActivityBuildIntent(String pkgname) throws Exception {
+//	final public void startActivityAddExtra(Intent in, String key, String value) throws Exception {
+//		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		checkCancel(taskResponse,actionResponse);
+//		in.putExtra(key,value);
+//		if (mGp.settingDebugLevel>=1)
+//			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
+//		if (taskResponse.task_action_notification) {
+//			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
+//			actionResponse.resp_msg_text="";
+//			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		}
+//	}
+//	final public void startActivityAddExtra(Intent in, String key, String[] value) throws Exception {
+//		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		checkCancel(taskResponse,actionResponse);
+//		in.putExtra(key,value);
+//		if (mGp.settingDebugLevel>=1)
+//			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
+//		if (taskResponse.task_action_notification) {
+//			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
+//			actionResponse.resp_msg_text="";
+//			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		}
+//	}
+//	final public void startActivityAddExtra(Intent in, String key, int value) throws Exception {
+//		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		checkCancel(taskResponse,actionResponse);
+//		in.putExtra(key,value);
+//		if (mGp.settingDebugLevel>=1)
+//			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
+//		if (taskResponse.task_action_notification) {
+//			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
+//			actionResponse.resp_msg_text="";
+//			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		}
+//	}
+//	final public void startActivityAddExtra(Intent in, String key, int[] value) throws Exception {
+//		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		checkCancel(taskResponse,actionResponse);
+//		in.putExtra(key,value);
+//		if (mGp.settingDebugLevel>=1)
+//			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
+//		if (taskResponse.task_action_notification) {
+//			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
+//			actionResponse.resp_msg_text="";
+//			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		}
+//	}
+//	final public void startActivityAddExtra(Intent in, String key, boolean value) throws Exception {
+//		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		checkCancel(taskResponse,actionResponse);
+//		in.putExtra(key,value);
+//		if (mGp.settingDebugLevel>=1)
+//			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
+//		if (taskResponse.task_action_notification) {
+//			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
+//			actionResponse.resp_msg_text="";
+//			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		}
+//	}
+//	final public void startActivityAddExtra(Intent in, String key, boolean[] value) throws Exception {
+//		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		checkCancel(taskResponse,actionResponse);
+//		in.putExtra(key,value);
+//		if (mGp.settingDebugLevel>=1)
+//			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed.");
+//		if (taskResponse.task_action_notification) {
+//			actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
+//			actionResponse.resp_msg_text="";
+//			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+//		}
+//	}
+	final public Intent intentCreateWithPackageName(String pkgname) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(pkgname), mGp);
 		Intent result=null;
 		checkCancel(taskResponse,actionResponse);
@@ -797,6 +797,21 @@ public class BeanShellDriver {
 		}
 		return result;
 	}
+//    final public Intent createIntentWithAction(String action) throws Exception {
+//        if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(action), mGp);
+//        Intent result=null;
+//        checkCancel(taskResponse,actionResponse);
+//        Intent in=new Intent(action);
+//        actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
+////        in.setAction(Intent.ACTION_VIEW);
+//        result=in;
+//        if (mGp.settingDebugLevel>=1)
+//            util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed. result=",actionResponse.resp_msg_text);
+//        if (taskResponse.task_action_notification) {
+//            notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(action), mGp);
+//        }
+//        return result;
+//    }
 	final public boolean startActivity(Intent in) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName("Your specified intent"), mGp);
 		checkCancel(taskResponse,actionResponse);
@@ -845,7 +860,7 @@ public class BeanShellDriver {
 		return result;
 	}
 	
-	final public void addIntentExtraData(Intent in, String key, String value) throws Exception {
+	final public void intentAddExtraData(Intent in, String key, String value) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
 		checkCancel(taskResponse,actionResponse);
 		in.putExtra(key,value);
@@ -857,7 +872,7 @@ public class BeanShellDriver {
 			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
 		}
 	}
-	final public void addIntentExtraData(Intent in, String key, String[] value) throws Exception {
+	final public void intentAddExtraData(Intent in, String key, String[] value) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
 		checkCancel(taskResponse,actionResponse);
 		in.putExtra(key,value);
@@ -869,7 +884,7 @@ public class BeanShellDriver {
 			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
 		}
 	}
-	final public void addIntentExtraData(Intent in, String key, int value) throws Exception {
+	final public void intentAddExtraData(Intent in, String key, int value) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
 		checkCancel(taskResponse,actionResponse);
 		in.putExtra(key,value);
@@ -881,7 +896,7 @@ public class BeanShellDriver {
 			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
 		}
 	}
-	final public void addIntentExtraData(Intent in, String key, int[] value) throws Exception {
+	final public void intentAddExtraData(Intent in, String key, int[] value) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
 		checkCancel(taskResponse,actionResponse);
 		in.putExtra(key,value);
@@ -893,7 +908,7 @@ public class BeanShellDriver {
 			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
 		}
 	}
-	final public void addIntentExtraData(Intent in, String key, boolean value) throws Exception {
+	final public void intentAddExtraData(Intent in, String key, boolean value) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
 		checkCancel(taskResponse,actionResponse);
 		in.putExtra(key,value);
@@ -905,7 +920,7 @@ public class BeanShellDriver {
 			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
 		}
 	}
-	final public void addIntentExtraData(Intent in, String key, boolean[] value) throws Exception {
+	final public void intentAddExtraData(Intent in, String key, boolean[] value) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
 		checkCancel(taskResponse,actionResponse);
 		in.putExtra(key,value);
@@ -917,7 +932,7 @@ public class BeanShellDriver {
 			notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
 		}
 	}
-	final public Intent buildIntent() throws Exception {
+	final public Intent intentCreate() throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
 		checkCancel(taskResponse,actionResponse);
 		Intent result=new Intent();
@@ -929,7 +944,7 @@ public class BeanShellDriver {
 		}
 		return result;
 	}
-	final public void setIntentAction(Intent in, String action) throws Exception {
+	final public void intentSetAction(Intent in, String action) throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(action), mGp);
 		checkCancel(taskResponse,actionResponse);
 		actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
