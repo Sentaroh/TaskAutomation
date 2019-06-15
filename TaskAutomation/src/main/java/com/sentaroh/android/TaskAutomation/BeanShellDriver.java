@@ -121,10 +121,10 @@ public class BeanShellDriver {
 		return result;
 	}
 	
-	final public boolean isLocationProviderAvailable()throws Exception {
-		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
+	final public boolean isLocationServiceEnabled() throws Exception {
+		if (taskResponse.task_action_notification) notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
 		checkCancel(taskResponse,actionResponse);
-		boolean result=TaskExecutor.isLocationProviderAvailable(taskMgrParms, envParms, util);
+		boolean result=TaskExecutor.isLocationServiceEnabled(taskMgrParms, envParms, util);
 		if (mGp.settingDebugLevel>=1)
 			util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed, result="+result);
 		if (taskResponse.task_action_notification) {
@@ -135,7 +135,21 @@ public class BeanShellDriver {
 		return result;
 	}
 
-	final public boolean isGpsLocationProviderAvailable()throws Exception {
+    final public boolean isLocationProviderAvailable()throws Exception {
+        if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+        checkCancel(taskResponse,actionResponse);
+        boolean result=TaskExecutor.isLocationProviderAvailable(taskMgrParms, envParms, util);
+        if (mGp.settingDebugLevel>=1)
+            util.addDebugMsg(1, "I", "Bsh ",getExecutedMethodName()," executed, result="+result);
+        if (taskResponse.task_action_notification) {
+            actionResponse.action_resp=ActionResponse.ACTION_SUCCESS;
+            actionResponse.resp_msg_text="result="+result;
+            notifyToActivityEnded(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp);
+        }
+        return result;
+    }
+
+    final public boolean isGpsLocationProviderAvailable()throws Exception {
 		if (taskResponse.task_action_notification)notifyToActivityStarted(taskMgrParms,envParms,util,taskResponse,actionResponse,getExecutedMethodName(), mGp); 
 		checkCancel(taskResponse,actionResponse);
 		boolean result=TaskExecutor.isGpsLocationProviderAvailable(taskMgrParms, envParms, util);

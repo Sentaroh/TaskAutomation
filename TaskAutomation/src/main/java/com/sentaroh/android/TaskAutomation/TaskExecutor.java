@@ -1296,12 +1296,17 @@ public class TaskExecutor implements Runnable {
 		}
 	};
 	
-	final static public boolean isLocationProviderAvailable(TaskManagerParms tmp,
+	final static public boolean isLocationServiceEnabled(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util) {
-		return tmp.locationUtil.isLocationProviderAvailable();
+		return tmp.locationUtil.isLocationServiceEnabled();
 	};
 
-	final static public boolean isGpsLocationProviderAvailable(TaskManagerParms tmp,
+    final static public boolean isLocationProviderAvailable(TaskManagerParms tmp,
+                                                            EnvironmentParms ep, CommonUtilities util) {
+        return tmp.locationUtil.isLocationProviderAvailable();
+    };
+
+    final static public boolean isGpsLocationProviderAvailable(TaskManagerParms tmp,
     		EnvironmentParms ep, CommonUtilities util) {
 		return tmp.locationUtil.isGpsLocationProviderAvailable();
 	};

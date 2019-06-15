@@ -5,6 +5,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 
@@ -25,18 +26,28 @@ public class LocationUtilities implements LocationListener{
 		mLooper=Looper.getMainLooper();
 	};
 
-	final public boolean isLocationProviderAvailable() {
-		LocationManager locMgr=(LocationManager)mTaskMgrParms.context.getSystemService(Context.LOCATION_SERVICE);
-		boolean result=false;
-		if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			result=true;
-		} else if (locMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-			result=true;
-		}
-		return result;
+	final public boolean isLocationServiceEnabled() {
+	    if (Build.VERSION.SDK_INT>=28) {
+            LocationManager locMgr=(LocationManager)mTaskMgrParms.context.getSystemService(Context.LOCATION_SERVICE);
+            boolean result=locMgr.isLocationEnabled();
+            return result;
+        } else {
+            return false;
+        }
 	};
-	
-	final public boolean isGpsLocationProviderAvailable() {
+
+    final public boolean isLocationProviderAvailable() {
+        LocationManager locMgr=(LocationManager)mTaskMgrParms.context.getSystemService(Context.LOCATION_SERVICE);
+        boolean result=false;
+        if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            result=true;
+        } else if (locMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            result=true;
+        }
+        return result;
+    };
+
+    final public boolean isGpsLocationProviderAvailable() {
 		LocationManager locMgr=(LocationManager)mTaskMgrParms.context.getSystemService(Context.LOCATION_SERVICE);
 		boolean result=false;
 		if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {

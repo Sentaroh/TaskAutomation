@@ -670,7 +670,7 @@ public class ProfileMaintenance {
 				ntfy_listing.setListener(new NotifyEventListener() {
 					@Override
 					final public void positiveResponse(Context c, Object[] o) {
-		    			dlg_filename.setText((String)o[0]+"/"+(String)o[1]);
+		    			dlg_filename.setText((String)o[0]+(String)o[1]+"/"+(String)o[2]);
 					}
 					@Override
 					final public void negativeResponse(Context c, Object[] o) {}
