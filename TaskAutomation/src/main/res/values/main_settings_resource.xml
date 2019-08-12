@@ -105,9 +105,9 @@
         <item>50</item>
     </string-array>
     
-    <string name="settings_main_log_dir">settings_main_log_dir</string>
-	<string name="settings_main_log_dir_title">Log file directory</string>        
-    <string name="settings_main_log_dir_summary">Current=</string>        
+    <!--<string name="settings_main_log_dir">settings_main_log_dir</string>-->
+	<!--<string name="settings_main_log_dir_title">Log file directory</string>        -->
+    <!--<string name="settings_main_log_dir_summary">Current=</string>        -->
 
     <string name="settings_main_default_current_setting">Current=</string>
     

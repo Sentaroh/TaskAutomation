@@ -33,9 +33,7 @@ import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.util.SparseArray;
 import android.widget.ListView;
@@ -56,7 +54,7 @@ public class GlobalParameters extends CommonGlobalParms {
     public int     settingDebugLevel;
     public boolean settingEnableScheduler,settingEnableMonitor;
     public int     settingLogMaxFileCount=10;
-    public String  settingLogMsgDir="", settingLogMsgFilename=LOG_FILE_NAME;
+    public String settingLogMsgDir ="", settingLogMsgFilename=LOG_FILE_NAME;
     public boolean settingLogOption=false;
     public long    settingHeartBeatIntervalTime=600*1000;
 
@@ -126,6 +124,7 @@ public class GlobalParameters extends CommonGlobalParms {
 
     public void initGlobalParamter(Context c) {
         if (initialyzeRequired) {
+            settingLogMsgDir =c.getExternalFilesDirs(null)[0].getPath()+"/log";
             initialyzeRequired=false;
             loadSettingParms(c);
         }
@@ -168,8 +167,6 @@ public class GlobalParameters extends CommonGlobalParms {
         settingUseRootPrivilege=
                 CommonUtilities.getPrefMgr(c).getBoolean(c.getString(R.string.settings_main_use_root_privilege),false);
 
-        settingLogMsgDir=
-                CommonUtilities.getPrefMgr(c).getString(c.getString(R.string.settings_main_log_dir),"");
         settingLogOption=
                 CommonUtilities.getPrefMgr(c).getBoolean(c.getString(R.string.settings_main_log_option),false);
         settingLogMaxFileCount=Integer.valueOf(

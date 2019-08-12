@@ -77,12 +77,6 @@
 			android:entries="@array/settings_main_log_file_max_count_list_entries"
 			android:entryValues="@array/settings_main_log_file_max_count_list_values"/>
    	    	    	    
-   	    <com.sentaroh.android.Utilities.Preference.DirectorySelectPreference
-			android:key="@string/settings_main_log_dir"
-			android:title="@string/settings_main_log_dir_title"
-			android:summary="@string/settings_main_log_dir_summary"
-			android:inputType="text"/>
-   	    	    
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/settings_main_misc_title">

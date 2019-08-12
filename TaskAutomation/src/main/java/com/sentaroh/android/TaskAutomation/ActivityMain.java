@@ -201,7 +201,7 @@ public class ActivityMain extends AppCompatActivity {
 				"applicationRunFirstTime="+mApplicationRunFirstTime+
 				", localRootDir="+mEnvParms.localRootDir+
 				", settingDebugLevel="+mGp.settingDebugLevel+
-				", settingLogMsgDir="+mGp.settingLogMsgDir+
+//				", settingLogMsgDir="+mGp.settingLogMsgDir+
 				", settingLogOption="+mGp.settingLogOption+
 				", settingEnableScheduler="+mGp.settingEnableScheduler+
 				", settingExitClean="+mGp.settingExitClean);
@@ -925,10 +925,6 @@ public class ActivityMain extends AppCompatActivity {
 			getPrefsMgr().edit().putBoolean(getString(R.string.settings_main_device_admin),true).commit();
 			getPrefsMgr().edit().putBoolean(getString(R.string.settings_main_scheduler_monitor),false).commit();
 			
-			getPrefsMgr().edit().putString(mContext.getString(R.string.settings_main_log_dir),
-					Environment.getExternalStorageDirectory().toString()+
-					"/"+APPLICATION_TAG+"/").commit();
-			
 			getPrefsMgr().edit().putString(
 					getString(R.string.settings_main_light_sensor_monitor_interval_time),"1000").commit();
 			getPrefsMgr().edit().putString(
@@ -952,18 +948,18 @@ public class ActivityMain extends AppCompatActivity {
 			boolean p_light_sensor_thread=mGp.settingLightSensorUseThread;
 			
 			mGp.loadSettingParms(mContext);
-    		if (mGp.settingLogMsgDir.equals("")) {
-                mGp.settingLogMsgDir=Environment.getExternalStorageDirectory().toString()+
-    					"/"+APPLICATION_TAG+"/";
-    			getPrefsMgr().edit().putString(mContext.getString(R.string.settings_main_log_dir),
-                        mGp.settingLogMsgDir).commit();
-    		} else {
-        		if (!mGp.settingLogMsgDir.endsWith("/")) {
-                    mGp.settingLogMsgDir+="/";
-        			getPrefsMgr().edit().putString(mContext.getString(R.string.settings_main_log_dir),
-                            mGp.settingLogMsgDir).commit();
-        		}	
-    		}
+//    		if (mGp.settingLogMsgDir.equals("")) {
+//                mGp.settingLogMsgDir=Environment.getExternalStorageDirectory().toString()+
+//    					"/"+APPLICATION_TAG+"/";
+//    			getPrefsMgr().edit().putString(mContext.getString(R.string.settings_main_log_dir),
+//                        mGp.settingLogMsgDir).commit();
+//    		} else {
+//        		if (!mGp.settingLogMsgDir.endsWith("/")) {
+//                    mGp.settingLogMsgDir+="/";
+//        			getPrefsMgr().edit().putString(mContext.getString(R.string.settings_main_log_dir),
+//                            mGp.settingLogMsgDir).commit();
+//        		}
+//    		}
 			
 			int n_tpc=mGp.settingTaskExecThreadPoolCount;
 			
@@ -975,7 +971,7 @@ public class ActivityMain extends AppCompatActivity {
 			mGp.util.addDebugMsg(1,"I","initSettingParms ");
 			mGp.util.addDebugMsg(1,"I","  localRootDir="+mEnvParms.localRootDir);
 			mGp.util.addDebugMsg(1,"I","  settingDebugLevel="+mGp.settingDebugLevel);
-			mGp.util.addDebugMsg(1,"I","  settingLogMsgDir="+mGp.settingLogMsgDir);
+//			mGp.util.addDebugMsg(1,"I","  settingLogMsgDir="+mGp.settingLogMsgDir);
 			mGp.util.addDebugMsg(1,"I","  settingLogOption="+mGp.settingLogOption);
 			mGp.util.addDebugMsg(1,"I","  settingEnableScheduler="+mGp.settingEnableScheduler);
 			mGp.util.addDebugMsg(1,"I","  settingMaxTaskCount="+mGp.settingMaxTaskCount);
@@ -1060,7 +1056,7 @@ public class ActivityMain extends AppCompatActivity {
 //				Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		intent.setDataAndType(Uri.parse("file://"+
-                        mGp.settingLogMsgDir+mGp.settingLogMsgFilename+".txt"),
+                        mGp.settingLogMsgDir +mGp.settingLogMsgFilename+".txt"),
 				"text/plain");
 		startActivity(intent);
 	};

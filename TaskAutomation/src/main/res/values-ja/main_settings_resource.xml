@@ -55,9 +55,9 @@
 	<string name="settings_main_log_file_max_count_summary">保持するログファイルの最大数=</string>
 	<string name="settings_main_log_file_max_count_dialog_title">ログファイルの最大数</string>
 		
-    <string name="settings_main_log_dir">settings_main_log_dir</string>
-	<string name="settings_main_log_dir_title">ログファイルのディレクトリ</string>        
-    <string name="settings_main_log_dir_summary">現在</string>        
+    <!--<string name="settings_main_log_dir">settings_main_log_dir</string>-->
+	<!--<string name="settings_main_log_dir_title">ログファイルのディレクトリ</string>        -->
+    <!--<string name="settings_main_log_dir_summary">現在</string>        -->
         
     <string name="settings_main_default_current_setting">現設定=</string>
     

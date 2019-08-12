@@ -98,11 +98,6 @@ public class ActivitySettings extends PreferenceActivity{
 		pref_light=mPrefAct.findPreference(mContext.getString(R.string.settings_main_scheduler_sleep_wake_lock_light_sensor));
 		pref_proximity=mPrefAct.findPreference(mContext.getString(R.string.settings_main_scheduler_sleep_wake_lock_proximity_sensor));
 
-    	if (!LocalMountPoint.isExternalStorageAvailable()) {
-    		mPrefAct.findPreference(getString(R.string.settings_main_log_dir).toString())
-    			.setEnabled(false);
-    	}
-		
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_scheduler_monitor));
 		
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_enable_scheduler));
@@ -113,7 +108,6 @@ public class ActivitySettings extends PreferenceActivity{
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_scheduler_sleep_wake_lock_light_sensor));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_scheduler_sleep_wake_lock_proximity_sensor));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_use_root_privilege));
-		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_log_dir));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_log_option));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_log_file_max_count));
 		initSettingValueBeforeHc(shared_pref,getString(R.string.settings_main_log_level));
@@ -324,12 +318,7 @@ public class ActivitySettings extends PreferenceActivity{
 	private static boolean checkLogSettings(Preference pref_key, 
 			SharedPreferences shared_pref, String key_string, Context c) {
 		boolean isChecked = false;
-    	if (key_string.equals(c.getString(R.string.settings_main_log_dir))) {
-    		isChecked=true;
-    		pref_key.setSummary(shared_pref.getString(key_string,""));
-//						Environment.getExternalStorageDirectory().toString()+
-//						"/"+APPLICATION_TAG+"/"));
-    	} else if (key_string.equals(c.getString(R.string.settings_main_log_option))) {
+    	if (key_string.equals(c.getString(R.string.settings_main_log_option))) {
     		isChecked=true;
     	} else if (key_string.equals(c.getString(R.string.settings_main_log_file_max_count))) {
     		isChecked=true;
@@ -403,11 +392,6 @@ public class ActivitySettings extends PreferenceActivity{
 			pref_light=mPrefFrag.findPreference(mContext.getString(R.string.settings_main_scheduler_sleep_wake_lock_light_sensor));
 			pref_proximity=mPrefFrag.findPreference(mContext.getString(R.string.settings_main_scheduler_sleep_wake_lock_proximity_sensor));
 
-        	if (!LocalMountPoint.isExternalStorageAvailable()) {
-        		findPreference(getString(R.string.settings_main_log_dir).toString())
-        			.setEnabled(false);
-        	}
-    		
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_scheduler_monitor));
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_enable_scheduler));
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_scheduler_max_task_count));
@@ -458,12 +442,6 @@ public class ActivitySettings extends PreferenceActivity{
 
     		SharedPreferences shared_pref=pm.getSharedPreferences();
 
-        	if (!LocalMountPoint.isExternalStorageAvailable()) {
-        		findPreference(getString(R.string.settings_main_log_dir).toString())
-        			.setEnabled(false);
-        	}
-    		
-    		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_log_dir));
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_log_option));
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_log_file_max_count));
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_log_level));
@@ -510,11 +488,6 @@ public class ActivitySettings extends PreferenceActivity{
 
     		SharedPreferences shared_pref=pm.getSharedPreferences();
 
-        	if (!LocalMountPoint.isExternalStorageAvailable()) {
-        		findPreference(getString(R.string.settings_main_log_dir).toString())
-        			.setEnabled(false);
-        	}
-    		
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_exit_clean));
         };
         
@@ -554,11 +527,6 @@ public class ActivitySettings extends PreferenceActivity{
 
     		SharedPreferences shared_pref=pm.getSharedPreferences();
 
-        	if (!LocalMountPoint.isExternalStorageAvailable()) {
-        		findPreference(getString(R.string.settings_main_log_dir).toString())
-        			.setEnabled(false);
-        	}
-    		
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_light_sensor_use_thread));
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_light_sensor_monitor_interval_time));
     		initSettingValueAfterHc(shared_pref,getString(R.string.settings_main_light_sensor_monitor_active_time));

@@ -2960,7 +2960,7 @@ public final class SchedulerService extends Service {
     	mUtil.addDebugMsg(1,"I","General parameters");
   		mUtil.addDebugMsg(1,"I","   localRootDir=",mEnvParms.localRootDir);
   		mUtil.addDebugMsg(1,"I","   settingDebugLevel=",String.valueOf(mGp.settingDebugLevel));
-  		mUtil.addDebugMsg(1,"I","   settingLogMsgDir=",mGp.settingLogMsgDir);
+//  		mUtil.addDebugMsg(1,"I","   settingLogMsgDir=",mGp.settingLogMsgDir);
   		mUtil.addDebugMsg(1,"I","   settingLogOption=",String.valueOf(mGp.settingLogOption));
   		mUtil.addDebugMsg(1,"I","   settingEnableScheduler=",String.valueOf(mGp.settingEnableScheduler));
   		mUtil.addDebugMsg(1,"I","   settingMaxTaskCount=",String.valueOf(mGp.settingMaxTaskCount));

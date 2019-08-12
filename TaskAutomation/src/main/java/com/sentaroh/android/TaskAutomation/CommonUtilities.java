@@ -480,7 +480,6 @@ public final class CommonUtilities {
 		
 		saveSettingsParmsToFileBoolean(pref,group, pw, false,mContext.getString(R.string.settings_main_log_option));
 		saveSettingsParmsToFileString(pref,group,  pw, "0",  mContext.getString(R.string.settings_main_log_level));
-		saveSettingsParmsToFileString(pref,group,  pw, "/",  mContext.getString(R.string.settings_main_log_dir));
 		saveSettingsParmsToFileString(pref,group,  pw, "10", mContext.getString(R.string.settings_main_log_file_max_count));
 		
 		saveSettingsParmsToFileBoolean(pref,group, pw, false,mContext.getString(R.string.settings_main_light_sensor_use_thread));
